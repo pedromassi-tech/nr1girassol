@@ -10,11 +10,11 @@ export interface QuizQuestion {
 
 export const quizQuestions: QuizQuestion[] = [
   {
-    question: "Hoje, como você descreveria o nível de entendimento da sua empresa sobre as exigências da NR-1 ligadas a riscos psicossociais?",
+    question: "Hoje, como a nova NR-1 (inclusão dos riscos psicossociais) está sendo tratada na sua empresa na prática?",
     options: [
-      { text: "Sinceramente, quase ninguém sabe explicar.", points: 0 },
-      { text: "Temos alguma ideia, mas nada muito estruturado.", points: 5 },
-      { text: "Existe clareza, materiais e comunicação sobre isso internamente.", points: 10 },
+      { text: "Ainda estamos tentando entender o que precisa ser feito.", points: 0 },
+      { text: "Temos iniciativas, mas sem estrutura clara.", points: 5 },
+      { text: "Já temos uma abordagem estruturada.", points: 10 },
     ],
   },
   {
