@@ -305,7 +305,7 @@ const Index = () => {
             </p>
             <Button
               onClick={() => scrollTo("quiz")}
-              className="gold-gradient border-0 text-primary px-10 py-6 text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
+              className="gold-gradient border-0 text-primary px-8 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
             >
               Fazer o diagnóstico agora
               <ArrowDown className="h-4 w-4" />
