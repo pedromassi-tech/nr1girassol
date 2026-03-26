@@ -61,8 +61,8 @@ const Quiz = () => {
         <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-5 sm:p-8 text-center`}>
           <div className="flex justify-center mb-3">{getResultIcon()}</div>
           <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Sua nota</p>
-          <div className="text-5xl sm:text-6xl font-extrabold text-primary">
-            {totalScore}<span className="text-2xl font-semibold text-muted-foreground">/100</span>
+          <div className="text-4xl sm:text-6xl font-extrabold text-primary">
+            {totalScore}<span className="text-xl sm:text-2xl font-semibold text-muted-foreground">/100</span>
           </div>
           <p className="mt-2 text-secondary font-bold text-lg">{result.level}</p>
         </div>
