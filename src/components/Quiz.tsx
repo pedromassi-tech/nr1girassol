@@ -25,6 +25,9 @@ const Quiz = () => {
     if (currentQuestion + 1 < totalQuestions) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      const total = newAnswers.reduce((a, b) => a + b, 0);
+      const res = getScoreResult(total);
+      addQuizCompletion(total, res.level);
       setShowResult(true);
     }
   };
