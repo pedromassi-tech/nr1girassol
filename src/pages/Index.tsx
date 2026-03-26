@@ -129,7 +129,7 @@ const Index = () => {
               </motion.h1>
               <motion.p
                 variants={fadeUp}
-                className="mt-5 md:mt-7 text-primary-foreground/65 text-base md:text-lg leading-relaxed max-w-lg"
+                className="mt-4 md:mt-7 text-primary-foreground/65 text-sm md:text-lg leading-relaxed max-w-lg"
               >
                 Responda 10 perguntas simples e descubra, em poucos minutos, se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
               </motion.p>
