@@ -115,7 +115,7 @@ const Quiz = () => {
               <button
                 key={idx}
                 onClick={() => setSelectedOption(idx)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 text-sm leading-relaxed ${
+                className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 text-xs sm:text-sm leading-relaxed ${
                   selectedOption === idx
                     ? "border-secondary bg-secondary/10 shadow-sm"
                     : "border-border hover:border-secondary/40 bg-background"
