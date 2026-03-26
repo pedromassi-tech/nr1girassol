@@ -235,11 +235,32 @@ const Index = () => {
                 <div className="text-foreground/70 text-sm md:text-[0.95rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
                   <p>
                     A NR-1 mudou o jogo da responsabilidade empresarial.
-                    Não é só atualizar o PGR e guardar numa pasta.
-                    É integrar os riscos psicossociais à forma como o trabalho é organizado, liderado e monitorado no dia a dia.
                   </p>
                   <p>
-                    Esse teste foi criado para ajudar você a enxergar, de forma rápida, se a sua empresa está realmente cuidando desse tema ou se ainda está correndo risco com desorganização, afastamentos, passivos trabalhistas e perda de produtividade invisível.
+                    Não se trata mais apenas de atualizar o PGR e arquivar documentos. Trata-se de integrar os riscos psicossociais à forma como o trabalho é organizado, liderado e acompanhado no dia a dia.
+                  </p>
+                  <p className="font-medium text-foreground/85">
+                    E isso impacta diretamente o negócio:
+                  </p>
+                  <ul className="space-y-2 pl-1">
+                    <li className="flex gap-2 items-start">
+                      <span className="text-secondary mt-0.5">•</span>
+                      <span><strong className="text-foreground/85">Custos invisíveis</strong> como retrabalho, presenteísmo, rotatividade e perda de produtividade</span>
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="text-secondary mt-0.5">•</span>
+                      <span><strong className="text-foreground/85">Impacto financeiro</strong> que muitas vezes não aparece no curto prazo — e não é só sobre multa</span>
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="text-secondary mt-0.5">•</span>
+                      <span><strong className="text-foreground/85">Responsabilidade compartilhada</strong> entre empresa, liderança, equipe e toda a operação</span>
+                    </li>
+                  </ul>
+                  <p>
+                    Ao mesmo tempo, empresas que estruturam isso de forma consistente começam a acessar algo que poucos estão percebendo: <strong className="text-secondary">vantagem competitiva real</strong> — e cuidando da reputação.
+                  </p>
+                  <p>
+                    Esse diagnóstico foi criado para te ajudar a enxergar, de forma rápida e prática, em qual nível a sua empresa está hoje e o que pode estar passando despercebido.
                   </p>
                 </div>
               </div>
