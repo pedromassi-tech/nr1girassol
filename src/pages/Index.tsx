@@ -297,7 +297,7 @@ const Index = () => {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
+            <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-3 md:mb-4">
               Pronto para descobrir onde sua empresa está?
             </h3>
             <p className="text-primary-foreground/60 text-sm md:text-base mb-6 max-w-lg mx-auto">
