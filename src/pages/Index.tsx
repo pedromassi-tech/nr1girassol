@@ -267,7 +267,7 @@ const Index = () => {
       </section>
 
       {/* ─── PARA QUEM É ─── */}
-      <section id="para-quem" className="py-16 md:py-24 px-5 sm:px-8 bg-card">
+      <section id="para-quem" className="py-12 md:py-24 px-4 sm:px-8 bg-card">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
