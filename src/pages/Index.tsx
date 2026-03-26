@@ -4,8 +4,8 @@ import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Ti
 import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
 import ContactForm from "@/components/ContactForm";
-import logoLight from "@/assets/logo-girassol-light.jpeg";
-import logoDark from "@/assets/logo-girassol-dark.jpeg";
+import logoLight from "@/assets/logo-girassol-light.png";
+import logoDark from "@/assets/logo-girassol-dark.png";
 import mariaResende from "@/assets/maria-resende.png";
 
 const fadeUp = {
