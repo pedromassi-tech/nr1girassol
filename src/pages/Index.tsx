@@ -356,7 +356,7 @@ const Index = () => {
                   <img
                     src={mariaResende}
                     alt="Maria Resende – fundadora do Instituto Girassol"
-                    className="relative w-64 sm:w-72 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl"
+                    className="relative w-48 sm:w-64 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl"
                   />
                 </div>
               </div>
