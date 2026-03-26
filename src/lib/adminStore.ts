@@ -104,14 +104,29 @@ export function getLeads(): Lead[] {
   return getItem<Lead[]>(LEADS_KEY, []);
 }
 
-export function addLead(lead: Omit<Lead, "id" | "createdAt">) {
+export function addLead(lead: Omit<Lead, "id" | "createdAt" | "status" | "notas">) {
   const leads = getLeads();
   leads.unshift({
     ...lead,
     id: crypto.randomUUID(),
+    status: "novo",
+    notas: "",
     createdAt: new Date().toISOString(),
   });
   setItem(LEADS_KEY, leads);
+}
+
+export function updateLead(id: string, updates: Partial<Lead>) {
+  const leads = getLeads();
+  const idx = leads.findIndex((l) => l.id === id);
+  if (idx >= 0) {
+    leads[idx] = { ...leads[idx], ...updates };
+    setItem(LEADS_KEY, leads);
+  }
+}
+
+export function deleteLead(id: string) {
+  setItem(LEADS_KEY, getLeads().filter((l) => l.id !== id));
 }
 
 // ─── QUIZ ───
