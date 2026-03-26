@@ -393,7 +393,7 @@ const Index = () => {
                 Preencha o formulário e a equipe do Instituto Girassol entrará em contato para entender sua realidade.
               </p>
             </motion.div>
-            <motion.div variants={fadeUp} className="bg-background rounded-3xl border border-border/60 p-6 sm:p-8 md:p-10 shadow-sm">
+            <motion.div variants={fadeUp} className="bg-background rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-sm">
               <ContactForm />
             </motion.div>
           </motion.div>
