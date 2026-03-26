@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { quizQuestions, getScoreResult } from "@/data/quizQuestions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, RotateCcw, AlertTriangle, ShieldCheck, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowRight, RotateCcw, AlertTriangle, ShieldCheck, CheckCircle, User, Mail } from "lucide-react";
 import { addQuizCompletion } from "@/lib/adminStore";
 
 const Quiz = () => {
@@ -11,6 +13,8 @@ const Quiz = () => {
   const [answers, setAnswers] = useState<number[]>([]);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [showCapture, setShowCapture] = useState(false);
+  const [captureForm, setCaptureForm] = useState({ nome: "", email: "" });
 
   const totalQuestions = quizQuestions.length;
   const progress = ((currentQuestion) / totalQuestions) * 100;
@@ -25,11 +29,18 @@ const Quiz = () => {
     if (currentQuestion + 1 < totalQuestions) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      const total = newAnswers.reduce((a, b) => a + b, 0);
-      const res = getScoreResult(total);
-      addQuizCompletion(total, res.level);
-      setShowResult(true);
+      // Show capture form instead of results
+      setShowCapture(true);
     }
+  };
+
+  const handleCaptureSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const total = answers.reduce((a, b) => a + b, 0);
+    const res = getScoreResult(total);
+    addQuizCompletion(total, res.level, captureForm.nome, captureForm.email);
+    setShowCapture(false);
+    setShowResult(true);
   };
 
   const totalScore = answers.reduce((a, b) => a + b, 0);
@@ -40,6 +51,8 @@ const Quiz = () => {
     setAnswers([]);
     setSelectedOption(null);
     setShowResult(false);
+    setShowCapture(false);
+    setCaptureForm({ nome: "", email: "" });
   };
 
   const getResultIcon = () => {
@@ -53,6 +66,69 @@ const Quiz = () => {
     if (totalScore <= 60) return "from-secondary/10 to-secondary/5 border-secondary/20";
     return "from-secondary/15 to-secondary/5 border-secondary/30";
   };
+
+  // Data capture step
+  if (showCapture) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="text-center mb-6">
+          <div className="h-14 w-14 rounded-2xl gold-gradient flex items-center justify-center mx-auto mb-4 shadow-md">
+            <CheckCircle className="h-7 w-7 text-primary" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold text-primary mb-2">
+            Quiz concluído!
+          </h3>
+          <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
+            Preencha seus dados abaixo para ver o resultado do seu diagnóstico NR-1.
+          </p>
+        </div>
+
+        <form onSubmit={handleCaptureSubmit} className="space-y-4 max-w-sm mx-auto">
+          <div>
+            <Label htmlFor="quiz-nome" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">
+              Nome
+            </Label>
+            <div className="relative mt-1.5">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="quiz-nome"
+                required
+                value={captureForm.nome}
+                onChange={e => setCaptureForm({ ...captureForm, nome: e.target.value })}
+                className="pl-10 bg-background"
+                placeholder="Seu nome completo"
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="quiz-email" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">
+              E-mail
+            </Label>
+            <div className="relative mt-1.5">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="quiz-email"
+                type="email"
+                required
+                value={captureForm.email}
+                onChange={e => setCaptureForm({ ...captureForm, email: e.target.value })}
+                className="pl-10 bg-background"
+                placeholder="seu@email.com"
+              />
+            </div>
+          </div>
+          <Button type="submit" className="w-full hero-gradient border-0 text-primary-foreground py-5 text-sm font-semibold shadow-md gap-2">
+            Ver meu resultado
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </form>
+      </motion.div>
+    );
+  }
 
   if (showResult) {
     return (

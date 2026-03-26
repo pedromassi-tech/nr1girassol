@@ -24,6 +24,8 @@ export interface AdminUser {
 
 export interface QuizCompletion {
   id: string;
+  nome: string;
+  email: string;
   score: number;
   level: string;
   createdAt: string;
@@ -184,21 +186,37 @@ export function getQuizCompletions(): QuizCompletion[] {
     .filter((item): item is Partial<QuizCompletion> => typeof item?.id === "string")
     .map((item) => ({
       id: item.id!,
+      nome: typeof item.nome === "string" ? item.nome : "",
+      email: typeof item.email === "string" ? item.email : "",
       score: typeof item.score === "number" ? item.score : 0,
       level: typeof item.level === "string" ? item.level : "",
       createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
     }));
 }
 
-export function addQuizCompletion(score: number, level: string) {
+export function addQuizCompletion(score: number, level: string, nome: string = "", email: string = "") {
   const completions = getQuizCompletions();
   completions.unshift({
     id: crypto.randomUUID(),
+    nome,
+    email,
     score,
     level,
     createdAt: new Date().toISOString(),
   });
   setItem(QUIZ_KEY, completions);
+
+  // Also add as a lead for CRM
+  if (nome && email) {
+    addLead({
+      nome,
+      email,
+      whatsapp: "",
+      empresa: "",
+      cargo: "",
+      desafio: `Quiz NR-1 — Score: ${score}/100 — ${level}`,
+    });
+  }
 }
 
 // ─── PAGE VIEWS ───
