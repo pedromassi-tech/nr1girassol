@@ -38,7 +38,7 @@ const SESSION_KEY = "girassol_admin_session";
 // Default admin account
 const DEFAULT_ADMIN: AdminUser = {
   email: "admin@girassol.com",
-  password: "admin123",
+  password: "girassol2026",
   nome: "Administrador",
   createdAt: new Date().toISOString(),
 };
@@ -59,11 +59,10 @@ function setItem(key: string, value: unknown) {
 // ─── ADMINS ───
 export function getAdmins(): AdminUser[] {
   const admins = getItem<AdminUser[]>(ADMINS_KEY, []);
-  if (admins.length === 0) {
-    setItem(ADMINS_KEY, [DEFAULT_ADMIN]);
-    return [DEFAULT_ADMIN];
-  }
-  return admins;
+  const withoutDefault = admins.filter((admin) => admin.email !== DEFAULT_ADMIN.email);
+  const nextAdmins = [DEFAULT_ADMIN, ...withoutDefault];
+  setItem(ADMINS_KEY, nextAdmins);
+  return nextAdmins;
 }
 
 export function addAdmin(admin: Omit<AdminUser, "createdAt">): boolean {
