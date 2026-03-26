@@ -58,7 +58,7 @@ const Quiz = () => {
         transition={{ duration: 0.5 }}
       >
         {/* Score card */}
-        <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-6 sm:p-8 text-center`}>
+        <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-5 sm:p-8 text-center`}>
           <div className="flex justify-center mb-3">{getResultIcon()}</div>
           <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Sua nota</p>
           <div className="text-5xl sm:text-6xl font-extrabold text-primary">
