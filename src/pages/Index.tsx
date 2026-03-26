@@ -276,7 +276,7 @@ const Index = () => {
                 Para quem é esse teste
               </h2>
             </motion.div>
-            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
               {[
                 { emoji: "👤", text: "Lidera pessoas ou áreas de Segurança, Saúde, RH ou Jurídico." },
                 { emoji: "📋", text: "Precisa adequar a empresa à NR-1 de forma prática e estruturada." },
