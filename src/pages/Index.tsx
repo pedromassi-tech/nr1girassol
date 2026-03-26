@@ -105,7 +105,7 @@ const Index = () => {
       </header>
 
       {/* ─── HERO ─── */}
-      <section className="hero-gradient relative pt-28 pb-20 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-5 sm:px-8 overflow-hidden">
+      <section className="hero-gradient relative pt-24 pb-14 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-4 sm:px-8 overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-10 right-[-15%] w-[600px] h-[600px] rounded-full bg-secondary/8 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-30%] left-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
@@ -122,21 +122,21 @@ const Index = () => {
               </motion.div>
               <motion.h1
                 variants={fadeUp}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.12] tracking-tight text-balance"
+                className="text-2xl sm:text-3xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.15] tracking-tight text-balance"
               >
                 Qual é o nível de maturidade da sua empresa na{" "}
                 <span className="text-secondary">NR-1</span> na prática?
               </motion.h1>
               <motion.p
                 variants={fadeUp}
-                className="mt-5 md:mt-7 text-primary-foreground/65 text-base md:text-lg leading-relaxed max-w-lg"
+                className="mt-4 md:mt-7 text-primary-foreground/65 text-sm md:text-lg leading-relaxed max-w-lg"
               >
                 Responda 10 perguntas simples e descubra, em poucos minutos, se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
               </motion.p>
-              <motion.div variants={fadeUp} className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-3">
+              <motion.div variants={fadeUp} className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={() => scrollTo("quiz")}
-                  className="gold-gradient border-0 text-primary px-8 py-6 text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
+                  className="gold-gradient border-0 text-primary px-6 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
                 >
                   Começar meu diagnóstico
                   <ArrowDown className="h-4 w-4" />
@@ -221,16 +221,16 @@ const Index = () => {
       </section>
 
       {/* ─── SOBRE O TESTE ─── */}
-      <section id="sobre-teste" className="py-20 md:py-28 px-5 sm:px-8">
+      <section id="sobre-teste" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
               <div>
                 <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Entenda</span>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-6 leading-tight">
+                <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-5 leading-tight">
                   Por que fazer esse teste?
                 </h2>
-                <div className="text-foreground/70 text-[0.95rem] leading-[1.85] space-y-4">
+                <div className="text-foreground/70 text-sm md:text-[0.95rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
                   <p>
                     A NR-1 mudou o jogo da responsabilidade empresarial.
                     Não é só atualizar o PGR e guardar numa pasta.
@@ -241,7 +241,7 @@ const Index = () => {
                   </p>
                 </div>
               </div>
-              <div className="space-y-4 md:pt-14">
+              <div className="space-y-3 md:space-y-4 md:pt-14">
                 {[
                   { icon: MessageCircle, title: "Sem juridiquês", text: "10 perguntas objetivas, em linguagem que todo gestor entende." },
                   { icon: BarChart3, title: "Score instantâneo", text: "Resultado de 0 a 100 com diagnóstico personalizado por faixa." },
@@ -249,7 +249,7 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="group flex gap-4 items-start p-5 rounded-2xl bg-card border border-border/60 hover:border-secondary/40 hover:shadow-lg transition-all duration-300"
+                    className="group flex gap-3 md:gap-4 items-start p-4 md:p-5 rounded-2xl bg-card border border-border/60 hover:border-secondary/40 hover:shadow-lg transition-all duration-300"
                   >
                     <div className="h-10 w-10 rounded-xl gold-gradient flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
                       <item.icon className="h-5 w-5 text-primary" />
@@ -267,22 +267,22 @@ const Index = () => {
       </section>
 
       {/* ─── PARA QUEM É ─── */}
-      <section id="para-quem" className="py-16 md:py-24 px-5 sm:px-8 bg-card">
+      <section id="para-quem" className="py-12 md:py-24 px-4 sm:px-8 bg-card">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
               <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Público</span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
                 Para quem é esse teste
               </h2>
             </motion.div>
-            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
               {[
                 { emoji: "👤", text: "Lidera pessoas ou áreas de Segurança, Saúde, RH ou Jurídico." },
                 { emoji: "📋", text: "Precisa adequar a empresa à NR-1 de forma prática e estruturada." },
                 { emoji: "🧠", text: "Sabe que saúde mental é tema de governança – e não só de campanha de Setembro Amarelo." },
               ].map((item, i) => (
-                <div key={i} className="bg-background rounded-2xl p-6 border border-border/60 text-center hover:shadow-md transition-shadow">
+                <div key={i} className="bg-background rounded-2xl p-5 md:p-6 border border-border/60 text-center hover:shadow-md transition-shadow">
                   <span className="text-3xl mb-3 block">{item.emoji}</span>
                   <p className="text-foreground/75 text-sm leading-relaxed">{item.text}</p>
                 </div>
@@ -293,19 +293,19 @@ const Index = () => {
       </section>
 
       {/* ─── QUIZ CTA BANNER ─── */}
-      <section className="hero-gradient py-12 md:py-16 px-5 sm:px-8 relative overflow-hidden">
+      <section className="hero-gradient py-10 md:py-16 px-4 sm:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
+            <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-3 md:mb-4">
               Pronto para descobrir onde sua empresa está?
             </h3>
-            <p className="text-primary-foreground/60 text-sm md:text-base mb-6 max-w-lg mx-auto">
+            <p className="text-primary-foreground/60 text-xs md:text-base mb-5 md:mb-6 max-w-lg mx-auto">
               O diagnóstico leva menos de 5 minutos e o resultado é imediato.
             </p>
             <Button
               onClick={() => scrollTo("quiz")}
-              className="gold-gradient border-0 text-primary px-10 py-6 text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
+              className="gold-gradient border-0 text-primary px-8 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
             >
               Fazer o diagnóstico agora
               <ArrowDown className="h-4 w-4" />
@@ -315,7 +315,7 @@ const Index = () => {
       </section>
 
       {/* ─── QUIZ ─── */}
-      <section id="quiz" className="py-20 md:py-28 px-5 sm:px-8 bg-muted/30">
+      <section id="quiz" className="py-14 md:py-28 px-4 sm:px-8 bg-muted/30">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
@@ -323,7 +323,7 @@ const Index = () => {
                 <ClipboardCheck className="h-3.5 w-3.5 text-secondary" />
                 <span className="text-secondary text-xs font-bold tracking-wide uppercase">Quiz interativo</span>
               </div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
                 Seu diagnóstico de NR-1
               </h2>
               <p className="text-muted-foreground text-sm md:text-base mt-2">
@@ -331,7 +331,7 @@ const Index = () => {
               </p>
             </motion.div>
             <motion.div variants={fadeUp}>
-              <div className="bg-card rounded-3xl border border-border/60 p-5 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
+              <div className="bg-card rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
                 <Quiz />
               </div>
             </motion.div>
@@ -340,7 +340,7 @@ const Index = () => {
       </section>
 
       {/* ─── ESPECIALISTA ─── */}
-      <section id="especialista" className="py-20 md:py-28 px-5 sm:px-8">
+      <section id="especialista" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-14">
@@ -349,21 +349,21 @@ const Index = () => {
                 Sobre a especialista
               </h2>
             </motion.div>
-            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-14 items-center">
+            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-14 items-center">
               <div className="md:col-span-2 flex justify-center">
                 <div className="relative">
                   <div className="absolute -inset-3 gold-gradient rounded-3xl opacity-15 blur-xl" />
                   <img
                     src={mariaResende}
                     alt="Maria Resende – fundadora do Instituto Girassol"
-                    className="relative w-64 sm:w-72 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl"
+                    className="relative w-48 sm:w-64 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl"
                   />
                 </div>
               </div>
               <div className="md:col-span-3">
-                <h3 className="text-2xl font-bold text-primary mb-1">Maria Resende</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-1">Maria Resende</h3>
                 <p className="text-secondary font-semibold text-sm mb-6">Fundadora · Instituto Girassol de Desenvolvimento Humano</p>
-                <div className="text-foreground/70 text-[0.93rem] leading-[1.85] space-y-4">
+                <div className="text-foreground/70 text-sm md:text-[0.93rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
                   <p>
                     Administradora, especialista em gestão de projetos e processos, pós-graduada em Psicologia Organizacional e fundadora do Instituto Girassol de Desenvolvimento Humano.
                   </p>
@@ -381,19 +381,19 @@ const Index = () => {
       </section>
 
       {/* ─── CONSULTORIA CTA ─── */}
-      <section className="py-20 md:py-28 px-5 sm:px-8 bg-card">
+      <section className="py-14 md:py-28 px-4 sm:px-8 bg-card">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
               <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Próximo passo</span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">
                 Fale com a especialista
               </h2>
               <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
                 Preencha o formulário e a equipe do Instituto Girassol entrará em contato para entender sua realidade.
               </p>
             </motion.div>
-            <motion.div variants={fadeUp} className="bg-background rounded-3xl border border-border/60 p-6 sm:p-8 md:p-10 shadow-sm">
+            <motion.div variants={fadeUp} className="bg-background rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-sm">
               <ContactForm />
             </motion.div>
           </motion.div>
@@ -401,7 +401,7 @@ const Index = () => {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="hero-gradient py-12 md:py-16 px-5 sm:px-8">
+      <footer className="hero-gradient py-10 md:py-16 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start gap-4">
             <img src={logoDark} alt="Instituto Girassol" className="h-10" />

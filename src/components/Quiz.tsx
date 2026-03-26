@@ -58,16 +58,16 @@ const Quiz = () => {
         transition={{ duration: 0.5 }}
       >
         {/* Score card */}
-        <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-6 sm:p-8 text-center`}>
+        <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-5 sm:p-8 text-center`}>
           <div className="flex justify-center mb-3">{getResultIcon()}</div>
           <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Sua nota</p>
-          <div className="text-5xl sm:text-6xl font-extrabold text-primary">
-            {totalScore}<span className="text-2xl font-semibold text-muted-foreground">/100</span>
+          <div className="text-4xl sm:text-6xl font-extrabold text-primary">
+            {totalScore}<span className="text-xl sm:text-2xl font-semibold text-muted-foreground">/100</span>
           </div>
           <p className="mt-2 text-secondary font-bold text-lg">{result.level}</p>
         </div>
 
-        <div className="mt-6 text-foreground/75 text-[0.92rem] leading-[1.8] whitespace-pre-line">
+        <div className="mt-5 sm:mt-6 text-foreground/75 text-xs sm:text-[0.92rem] leading-[1.7] sm:leading-[1.8] whitespace-pre-line">
           {result.text}
         </div>
 
@@ -106,16 +106,16 @@ const Quiz = () => {
           exit={{ opacity: 0, x: -30 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <h3 className="text-base sm:text-lg font-semibold text-primary mb-6 leading-relaxed">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-primary mb-4 sm:mb-6 leading-relaxed">
             {question.question}
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {question.options.map((option, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedOption(idx)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 text-sm leading-relaxed ${
+                className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 text-xs sm:text-sm leading-relaxed ${
                   selectedOption === idx
                     ? "border-secondary bg-secondary/10 shadow-sm"
                     : "border-border hover:border-secondary/40 bg-background"
