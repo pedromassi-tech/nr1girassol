@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { trackPageView } from "@/lib/adminStore";
 import { motion } from "framer-motion";
 import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
