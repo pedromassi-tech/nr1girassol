@@ -1,12 +1,17 @@
 // Simple localStorage-based store for admin panel
 
+export type LeadStatus = "novo" | "em_contato" | "negociando" | "fechado" | "perdido";
+
 export interface Lead {
   id: string;
   nome: string;
   email: string;
+  whatsapp: string;
   empresa: string;
   cargo: string;
   desafio: string;
+  status: LeadStatus;
+  notas: string;
   createdAt: string;
 }
 
