@@ -282,7 +282,7 @@ const Index = () => {
                 { emoji: "📋", text: "Precisa adequar a empresa à NR-1 de forma prática e estruturada." },
                 { emoji: "🧠", text: "Sabe que saúde mental é tema de governança – e não só de campanha de Setembro Amarelo." },
               ].map((item, i) => (
-                <div key={i} className="bg-background rounded-2xl p-6 border border-border/60 text-center hover:shadow-md transition-shadow">
+                <div key={i} className="bg-background rounded-2xl p-5 md:p-6 border border-border/60 text-center hover:shadow-md transition-shadow">
                   <span className="text-3xl mb-3 block">{item.emoji}</span>
                   <p className="text-foreground/75 text-sm leading-relaxed">{item.text}</p>
                 </div>
