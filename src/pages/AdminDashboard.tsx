@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   getSession, logout, getLeads, getPageViews, getQuizCompletions,
-  getAdmins, addAdmin, removeAdmin, updateLead, deleteLead,
+  getAdmins, addAdmin, removeAdmin, updateLead, deleteLead, loginAdmin,
   type Lead, type AdminUser, type QuizCompletion, type LeadStatus,
 } from "@/lib/adminStore";
 import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote,
+  BarChart3, StickyNote, Lock,
 } from "lucide-react";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
