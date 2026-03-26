@@ -4,6 +4,7 @@ import { quizQuestions, getScoreResult } from "@/data/quizQuestions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, RotateCcw, AlertTriangle, ShieldCheck, CheckCircle } from "lucide-react";
+import { addQuizCompletion } from "@/lib/adminStore";
 
 const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -24,6 +25,9 @@ const Quiz = () => {
     if (currentQuestion + 1 < totalQuestions) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      const total = newAnswers.reduce((a, b) => a + b, 0);
+      const res = getScoreResult(total);
+      addQuizCompletion(total, res.level);
       setShowResult(true);
     }
   };

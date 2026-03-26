@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { trackPageView } from "@/lib/adminStore";
 import { motion } from "framer-motion";
 import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const Index = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    trackPageView();
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);

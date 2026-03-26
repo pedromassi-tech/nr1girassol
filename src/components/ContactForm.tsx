@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CheckCircle } from "lucide-react";
+import { addLead } from "@/lib/adminStore";
 
 const ContactForm = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -18,6 +19,7 @@ const ContactForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    addLead(form);
     setSubmitted(true);
   };
 
