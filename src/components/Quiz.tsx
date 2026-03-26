@@ -3,14 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { quizQuestions, getScoreResult } from "@/data/quizQuestions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { CheckCircle, AlertTriangle, ShieldCheck, ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw, AlertTriangle, ShieldCheck, CheckCircle } from "lucide-react";
 
 const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
   const totalQuestions = quizQuestions.length;
@@ -18,7 +16,7 @@ const Quiz = () => {
 
   const handleNext = () => {
     if (selectedOption === null) return;
-    const points = quizQuestions[currentQuestion].options[parseInt(selectedOption)].points;
+    const points = quizQuestions[currentQuestion].options[selectedOption].points;
     const newAnswers = [...answers, points];
     setAnswers(newAnswers);
     setSelectedOption(null);
@@ -41,67 +39,47 @@ const Quiz = () => {
   };
 
   const getResultIcon = () => {
-    if (totalScore <= 30) return <AlertTriangle className="h-12 w-12 text-destructive" />;
-    if (totalScore <= 60) return <ShieldCheck className="h-12 w-12 text-secondary" />;
-    return <CheckCircle className="h-12 w-12 text-secondary" />;
+    if (totalScore <= 30) return <AlertTriangle className="h-10 w-10 text-destructive" />;
+    if (totalScore <= 60) return <ShieldCheck className="h-10 w-10 text-secondary" />;
+    return <CheckCircle className="h-10 w-10 text-secondary" />;
   };
 
-  const getResultBorderColor = () => {
-    if (totalScore <= 30) return "border-destructive/30 bg-destructive/5";
-    if (totalScore <= 60) return "border-secondary/30 bg-secondary/5";
-    return "border-secondary/40 bg-secondary/10";
-  };
-
-  const getScoreColor = () => {
-    if (totalScore <= 30) return "text-destructive";
-    if (totalScore <= 60) return "text-secondary";
-    return "text-secondary";
+  const getScoreBg = () => {
+    if (totalScore <= 30) return "from-destructive/10 to-destructive/5 border-destructive/20";
+    if (totalScore <= 60) return "from-secondary/10 to-secondary/5 border-secondary/20";
+    return "from-secondary/15 to-secondary/5 border-secondary/30";
   };
 
   if (showResult) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-2xl mx-auto"
+        transition={{ duration: 0.5 }}
       >
-        <div className={`rounded-2xl border-2 p-8 md:p-12 ${getResultBorderColor()}`}>
-          <div className="flex flex-col items-center text-center mb-8">
-            {getResultIcon()}
-            <h3 className="text-2xl md:text-3xl font-bold text-primary mt-4">
-              {result.level}
-            </h3>
-            <div className={`text-5xl md:text-6xl font-extrabold mt-4 ${getScoreColor()}`}>
-              {totalScore}<span className="text-2xl md:text-3xl font-semibold text-muted-foreground">/100</span>
-            </div>
+        {/* Score card */}
+        <div className={`rounded-2xl border bg-gradient-to-b ${getScoreBg()} p-6 sm:p-8 text-center`}>
+          <div className="flex justify-center mb-3">{getResultIcon()}</div>
+          <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Sua nota</p>
+          <div className="text-5xl sm:text-6xl font-extrabold text-primary">
+            {totalScore}<span className="text-2xl font-semibold text-muted-foreground">/100</span>
           </div>
-          <div className="text-foreground/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
-            {result.text}
-          </div>
-          <div className="mt-8 flex justify-center">
-            <Button variant="outline" onClick={handleRestart} className="gap-2">
-              <RotateCcw className="h-4 w-4" /> Refazer o teste
-            </Button>
-          </div>
+          <p className="mt-2 text-secondary font-bold text-lg">{result.level}</p>
         </div>
 
-        {/* CTA Section */}
-        <div className="mt-12 space-y-8">
-          {/* Grupo NR1 na Prática */}
-          <div className="rounded-2xl bg-card border p-8 text-center">
-            <h4 className="text-xl font-bold text-primary mb-3">
-              Quer continuar essa conversa com quem vive NR-1 no dia a dia?
-            </h4>
-            <p className="text-muted-foreground mb-6">
-              Entre para o grupo oficial "NR1 na Prática" e acompanhe conteúdos, casos reais e orientações sobre como tirar a norma do papel.
-            </p>
-            <a href="https://seulinkdogrupo.com" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 text-base px-8 py-6 font-semibold">
-                Entrar no grupo NR1 na Prática
-              </Button>
-            </a>
-          </div>
+        <div className="mt-6 text-foreground/75 text-[0.92rem] leading-[1.8] whitespace-pre-line">
+          {result.text}
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+          <a href="https://seulinkdogrupo.com" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+            <Button className="w-full gold-gradient border-0 text-primary font-semibold px-6 py-5 shadow-md">
+              Entrar no grupo NR1 na Prática
+            </Button>
+          </a>
+          <Button variant="outline" onClick={handleRestart} className="w-full sm:w-auto gap-2 py-5">
+            <RotateCcw className="h-4 w-4" /> Refazer
+          </Button>
         </div>
       </motion.div>
     );
@@ -110,56 +88,60 @@ const Quiz = () => {
   const question = quizQuestions[currentQuestion];
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div>
       {/* Progress */}
-      <div className="mb-8">
-        <div className="flex justify-between text-sm text-muted-foreground mb-2">
+      <div className="mb-7">
+        <div className="flex justify-between text-xs font-medium text-muted-foreground mb-2">
           <span>Pergunta {currentQuestion + 1} de {totalQuestions}</span>
-          <span>{Math.round(showResult ? 100 : progress)}%</span>
+          <span>{Math.round(progress)}%</span>
         </div>
-        <Progress value={progress} className="h-2" />
+        <Progress value={progress} className="h-1.5" />
       </div>
 
       <AnimatePresence mode="wait">
         <motion.div
           key={currentQuestion}
-          initial={{ opacity: 0, x: 40 }}
+          initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.35 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <h3 className="text-lg md:text-xl font-semibold text-primary mb-6 leading-relaxed">
+          <h3 className="text-base sm:text-lg font-semibold text-primary mb-6 leading-relaxed">
             {question.question}
           </h3>
 
-          <RadioGroup
-            value={selectedOption ?? ""}
-            onValueChange={setSelectedOption}
-            className="space-y-3"
-          >
+          <div className="space-y-3">
             {question.options.map((option, idx) => (
-              <Label
+              <button
                 key={idx}
-                htmlFor={`option-${idx}`}
-                className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                  selectedOption === String(idx)
-                    ? "border-secondary bg-secondary/10"
-                    : "border-border hover:border-secondary/50"
+                onClick={() => setSelectedOption(idx)}
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 text-sm leading-relaxed ${
+                  selectedOption === idx
+                    ? "border-secondary bg-secondary/10 shadow-sm"
+                    : "border-border hover:border-secondary/40 bg-background"
                 }`}
               >
-                <RadioGroupItem value={String(idx)} id={`option-${idx}`} className="mt-0.5" />
-                <span className="text-sm md:text-base leading-relaxed">{option.text}</span>
-              </Label>
+                <div className="flex gap-3 items-start">
+                  <div
+                    className={`mt-0.5 h-4 w-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                      selectedOption === idx ? "border-secondary bg-secondary" : "border-muted-foreground/30"
+                    }`}
+                  >
+                    {selectedOption === idx && <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
+                  </div>
+                  <span className="text-foreground/80">{option.text}</span>
+                </div>
+              </button>
             ))}
-          </RadioGroup>
+          </div>
 
-          <div className="mt-8 flex justify-end">
+          <div className="mt-7 flex justify-end">
             <Button
               onClick={handleNext}
               disabled={selectedOption === null}
-              className="bg-primary text-primary-foreground px-8 py-6 text-base font-semibold gap-2"
+              className="hero-gradient border-0 text-primary-foreground px-7 py-5 text-sm font-semibold gap-2 shadow-md disabled:opacity-40"
             >
-              {currentQuestion + 1 === totalQuestions ? "Ver meu resultado" : "Próxima"}
+              {currentQuestion + 1 === totalQuestions ? "Ver resultado" : "Próxima"}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
