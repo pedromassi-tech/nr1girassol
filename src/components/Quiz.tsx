@@ -76,7 +76,7 @@ const Quiz = () => {
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
-          <a href="https://seulinkdogrupo.com" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+          <a href="https://chat.whatsapp.com/IPEUy34T4r68ZDUUuBAzyi?mode=gi_t" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
             <Button className="w-full gold-gradient border-0 text-primary font-semibold px-6 py-5 shadow-md">
               Entrar no grupo NR1 na Prática
             </Button>
