@@ -105,7 +105,7 @@ const Index = () => {
       </header>
 
       {/* ─── HERO ─── */}
-      <section className="hero-gradient relative pt-28 pb-20 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-5 sm:px-8 overflow-hidden">
+      <section className="hero-gradient relative pt-24 pb-14 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-4 sm:px-8 overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-10 right-[-15%] w-[600px] h-[600px] rounded-full bg-secondary/8 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-30%] left-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
