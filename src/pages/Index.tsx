@@ -361,7 +361,7 @@ const Index = () => {
                 </div>
               </div>
               <div className="md:col-span-3">
-                <h3 className="text-2xl font-bold text-primary mb-1">Maria Resende</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-1">Maria Resende</h3>
                 <p className="text-secondary font-semibold text-sm mb-6">Fundadora · Instituto Girassol de Desenvolvimento Humano</p>
                 <div className="text-foreground/70 text-[0.93rem] leading-[1.85] space-y-4">
                   <p>
