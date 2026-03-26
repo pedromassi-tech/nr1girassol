@@ -249,7 +249,7 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="group flex gap-4 items-start p-5 rounded-2xl bg-card border border-border/60 hover:border-secondary/40 hover:shadow-lg transition-all duration-300"
+                    className="group flex gap-3 md:gap-4 items-start p-4 md:p-5 rounded-2xl bg-card border border-border/60 hover:border-secondary/40 hover:shadow-lg transition-all duration-300"
                   >
                     <div className="h-10 w-10 rounded-xl gold-gradient flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
                       <item.icon className="h-5 w-5 text-primary" />
