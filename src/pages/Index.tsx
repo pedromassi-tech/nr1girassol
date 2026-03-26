@@ -178,12 +178,12 @@ const Index = () => {
                       <div className="h-11 w-11 rounded-xl gold-gradient flex items-center justify-center flex-shrink-0 shadow-sm">
                         <stat.icon className="h-5 w-5 text-primary" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-baseline gap-2 flex-wrap">
                           <span className="text-2xl font-bold text-primary-foreground">{stat.value}</span>
                           <span className="text-primary-foreground/40 text-xs font-medium">{stat.label}</span>
                         </div>
-                        <p className="text-primary-foreground/40 text-xs mt-0.5">{stat.desc}</p>
+                        <p className="text-primary-foreground/40 text-xs mt-0.5 truncate">{stat.desc}</p>
                       </div>
                     </div>
                   ))}
