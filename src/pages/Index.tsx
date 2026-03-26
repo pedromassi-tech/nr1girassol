@@ -363,7 +363,7 @@ const Index = () => {
               <div className="md:col-span-3">
                 <h3 className="text-xl md:text-2xl font-bold text-primary mb-1">Maria Resende</h3>
                 <p className="text-secondary font-semibold text-sm mb-6">Fundadora · Instituto Girassol de Desenvolvimento Humano</p>
-                <div className="text-foreground/70 text-[0.93rem] leading-[1.85] space-y-4">
+                <div className="text-foreground/70 text-sm md:text-[0.93rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
                   <p>
                     Administradora, especialista em gestão de projetos e processos, pós-graduada em Psicologia Organizacional e fundadora do Instituto Girassol de Desenvolvimento Humano.
                   </p>
