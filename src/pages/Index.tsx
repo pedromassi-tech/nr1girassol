@@ -221,7 +221,7 @@ const Index = () => {
       </section>
 
       {/* ─── SOBRE O TESTE ─── */}
-      <section id="sobre-teste" className="py-20 md:py-28 px-5 sm:px-8">
+      <section id="sobre-teste" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
