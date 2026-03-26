@@ -41,21 +41,21 @@ const Quiz = () => {
   };
 
   const getResultIcon = () => {
-    if (totalScore <= 30) return <AlertTriangle className="h-12 w-12 text-red-500" />;
-    if (totalScore <= 60) return <ShieldCheck className="h-12 w-12 text-amber-500" />;
-    return <CheckCircle className="h-12 w-12 text-emerald-500" />;
+    if (totalScore <= 30) return <AlertTriangle className="h-12 w-12 text-destructive" />;
+    if (totalScore <= 60) return <ShieldCheck className="h-12 w-12 text-secondary" />;
+    return <CheckCircle className="h-12 w-12 text-secondary" />;
   };
 
   const getResultBorderColor = () => {
-    if (totalScore <= 30) return "border-red-500/30 bg-red-50";
-    if (totalScore <= 60) return "border-amber-500/30 bg-amber-50";
-    return "border-emerald-500/30 bg-emerald-50";
+    if (totalScore <= 30) return "border-destructive/30 bg-destructive/5";
+    if (totalScore <= 60) return "border-secondary/30 bg-secondary/5";
+    return "border-secondary/40 bg-secondary/10";
   };
 
   const getScoreColor = () => {
-    if (totalScore <= 30) return "text-red-600";
-    if (totalScore <= 60) return "text-amber-600";
-    return "text-emerald-600";
+    if (totalScore <= 30) return "text-destructive";
+    if (totalScore <= 60) return "text-secondary";
+    return "text-secondary";
   };
 
   if (showResult) {
