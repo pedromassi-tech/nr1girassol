@@ -24,6 +24,8 @@ export interface AdminUser {
 
 export interface QuizCompletion {
   id: string;
+  nome: string;
+  email: string;
   score: number;
   level: string;
   createdAt: string;
