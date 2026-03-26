@@ -241,7 +241,7 @@ const Index = () => {
                   </p>
                 </div>
               </div>
-              <div className="space-y-4 md:pt-14">
+              <div className="space-y-3 md:space-y-4 md:pt-14">
                 {[
                   { icon: MessageCircle, title: "Sem juridiquês", text: "10 perguntas objetivas, em linguagem que todo gestor entende." },
                   { icon: BarChart3, title: "Score instantâneo", text: "Resultado de 0 a 100 com diagnóstico personalizado por faixa." },
