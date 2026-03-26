@@ -401,7 +401,7 @@ const Index = () => {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="hero-gradient py-12 md:py-16 px-5 sm:px-8">
+      <footer className="hero-gradient py-10 md:py-16 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start gap-4">
             <img src={logoDark} alt="Instituto Girassol" className="h-10" />
