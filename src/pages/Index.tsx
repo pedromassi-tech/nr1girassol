@@ -23,6 +23,7 @@ const Index = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    trackPageView();
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
