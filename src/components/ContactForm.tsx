@@ -12,6 +12,7 @@ const ContactForm = () => {
   const [form, setForm] = useState({
     nome: "",
     email: "",
+    whatsapp: "",
     empresa: "",
     cargo: "",
     desafio: "",
@@ -47,9 +48,15 @@ const ContactForm = () => {
         <Label htmlFor="nome" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">Nome</Label>
         <Input id="nome" required value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} className="mt-1.5 bg-background" placeholder="Seu nome completo" />
       </div>
-      <div>
-        <Label htmlFor="email" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">E-mail</Label>
-        <Input id="email" type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="mt-1.5 bg-background" placeholder="seu@email.com" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="email" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">E-mail</Label>
+          <Input id="email" type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="mt-1.5 bg-background" placeholder="seu@email.com" />
+        </div>
+        <div>
+          <Label htmlFor="whatsapp" className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">WhatsApp</Label>
+          <Input id="whatsapp" type="tel" required value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} className="mt-1.5 bg-background" placeholder="(11) 99999-9999" />
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
