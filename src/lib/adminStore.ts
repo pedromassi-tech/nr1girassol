@@ -45,22 +45,50 @@ const DEFAULT_ADMIN: AdminUser = {
 
 function getItem<T>(key: string, fallback: T): T {
   try {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : fallback;
+    if (typeof window === "undefined") return fallback;
+    const data = window.localStorage.getItem(key);
+    return data ? JSON.parse(data) as T : fallback;
   } catch {
     return fallback;
   }
 }
 
 function setItem(key: string, value: unknown) {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignora falhas de storage para não quebrar a UI
+  }
+}
+
+function removeItem(key: string) {
+  try {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(key);
+  } catch {
+    // ignora falhas de storage para não quebrar a UI
+  }
+}
+
+function getArray<T>(key: string): T[] {
+  const value = getItem<unknown>(key, []);
+  return Array.isArray(value) ? (value.filter(Boolean) as T[]) : [];
 }
 
 // ─── ADMINS ───
 export function getAdmins(): AdminUser[] {
-  const admins = getItem<AdminUser[]>(ADMINS_KEY, []);
-  const withoutDefault = admins.filter((admin) => admin.email !== DEFAULT_ADMIN.email);
-  const nextAdmins = [DEFAULT_ADMIN, ...withoutDefault];
+  const admins = getArray<Partial<AdminUser>>(ADMINS_KEY)
+    .filter((admin): admin is Partial<AdminUser> => typeof admin?.email === "string")
+    .filter((admin) => admin.email !== DEFAULT_ADMIN.email)
+    .map((admin) => ({
+      email: admin.email!,
+      password: typeof admin.password === "string" && admin.password ? admin.password : "",
+      nome: typeof admin.nome === "string" && admin.nome ? admin.nome : "Administrador",
+      createdAt: typeof admin.createdAt === "string" ? admin.createdAt : new Date().toISOString(),
+    }));
+
+  const nextAdmins = [DEFAULT_ADMIN, ...admins];
   setItem(ADMINS_KEY, nextAdmins);
   return nextAdmins;
 }
@@ -91,16 +119,38 @@ export function loginAdmin(email: string, password: string): boolean {
 }
 
 export function getSession(): { email: string; nome: string } | null {
-  return getItem(SESSION_KEY, null);
+  const session = getItem<unknown>(SESSION_KEY, null);
+  if (!session || typeof session !== "object") return null;
+
+  const parsed = session as { email?: string; nome?: string };
+  if (typeof parsed.email !== "string" || !parsed.email) return null;
+
+  return {
+    email: parsed.email,
+    nome: typeof parsed.nome === "string" && parsed.nome ? parsed.nome : "Administrador",
+  };
 }
 
 export function logout() {
-  localStorage.removeItem(SESSION_KEY);
+  removeItem(SESSION_KEY);
 }
 
 // ─── LEADS ───
 export function getLeads(): Lead[] {
-  return getItem<Lead[]>(LEADS_KEY, []);
+  return getArray<Partial<Lead>>(LEADS_KEY)
+    .filter((lead): lead is Partial<Lead> => typeof lead?.id === "string")
+    .map((lead) => ({
+      id: lead.id!,
+      nome: typeof lead.nome === "string" ? lead.nome : "",
+      email: typeof lead.email === "string" ? lead.email : "",
+      whatsapp: typeof lead.whatsapp === "string" ? lead.whatsapp : "",
+      empresa: typeof lead.empresa === "string" ? lead.empresa : "",
+      cargo: typeof lead.cargo === "string" ? lead.cargo : "",
+      desafio: typeof lead.desafio === "string" ? lead.desafio : "",
+      status: lead.status === "novo" || lead.status === "em_contato" || lead.status === "negociando" || lead.status === "fechado" || lead.status === "perdido" ? lead.status : "novo",
+      notas: typeof lead.notas === "string" ? lead.notas : "",
+      createdAt: typeof lead.createdAt === "string" ? lead.createdAt : new Date().toISOString(),
+    }));
 }
 
 export function addLead(lead: Omit<Lead, "id" | "createdAt" | "status" | "notas">) {
@@ -130,7 +180,14 @@ export function deleteLead(id: string) {
 
 // ─── QUIZ ───
 export function getQuizCompletions(): QuizCompletion[] {
-  return getItem<QuizCompletion[]>(QUIZ_KEY, []);
+  return getArray<Partial<QuizCompletion>>(QUIZ_KEY)
+    .filter((item): item is Partial<QuizCompletion> => typeof item?.id === "string")
+    .map((item) => ({
+      id: item.id!,
+      score: typeof item.score === "number" ? item.score : 0,
+      level: typeof item.level === "string" ? item.level : "",
+      createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
+    }));
 }
 
 export function addQuizCompletion(score: number, level: string) {
@@ -146,7 +203,8 @@ export function addQuizCompletion(score: number, level: string) {
 
 // ─── PAGE VIEWS ───
 export function getPageViews(): number {
-  return getItem<number>(VIEWS_KEY, 0);
+  const views = getItem<unknown>(VIEWS_KEY, 0);
+  return typeof views === "number" && Number.isFinite(views) ? views : 0;
 }
 
 export function trackPageView() {
