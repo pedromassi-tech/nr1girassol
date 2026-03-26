@@ -106,7 +106,7 @@ const Quiz = () => {
           exit={{ opacity: 0, x: -30 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <h3 className="text-base sm:text-lg font-semibold text-primary mb-6 leading-relaxed">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-primary mb-4 sm:mb-6 leading-relaxed">
             {question.question}
           </h3>
 
