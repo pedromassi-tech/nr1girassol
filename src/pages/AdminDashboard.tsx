@@ -32,8 +32,9 @@ function formatWhatsAppLink(phone: string) {
 }
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
   const [session, setSession] = useState(getSession());
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
   const [tab, setTab] = useState<"crm" | "metricas" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
@@ -56,9 +57,9 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (!session) { navigate("/admin/login"); return; }
     refreshData();
-  }, [session, navigate]);
+    setSession(getSession());
+  }, []);
 
   const handleLogout = () => { logout(); setSession(null); };
 
