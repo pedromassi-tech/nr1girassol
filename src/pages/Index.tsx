@@ -126,7 +126,7 @@ const Index = () => {
                 variants={fadeUp}
                 className="text-2xl sm:text-3xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.15] tracking-tight text-balance"
               >
-                Qual é o nível de maturidade da sua empresa na{" "}
+                Sua empresa está realmente preparada para a{" "}
                 <span className="text-secondary">NR-1</span> na prática?
               </motion.h1>
               <motion.p
