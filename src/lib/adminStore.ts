@@ -192,15 +192,29 @@ export function getQuizCompletions(): QuizCompletion[] {
     }));
 }
 
-export function addQuizCompletion(score: number, level: string) {
+export function addQuizCompletion(score: number, level: string, nome: string = "", email: string = "") {
   const completions = getQuizCompletions();
   completions.unshift({
     id: crypto.randomUUID(),
+    nome,
+    email,
     score,
     level,
     createdAt: new Date().toISOString(),
   });
   setItem(QUIZ_KEY, completions);
+
+  // Also add as a lead for CRM
+  if (nome && email) {
+    addLead({
+      nome,
+      email,
+      whatsapp: "",
+      empresa: "",
+      cargo: "",
+      desafio: `Quiz NR-1 — Score: ${score}/100 — ${level}`,
+    });
+  }
 }
 
 // ─── PAGE VIEWS ───
