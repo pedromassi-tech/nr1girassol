@@ -331,7 +331,7 @@ const Index = () => {
               </p>
             </motion.div>
             <motion.div variants={fadeUp}>
-              <div className="bg-card rounded-3xl border border-border/60 p-5 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
+              <div className="bg-card rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
                 <Quiz />
               </div>
             </motion.div>
