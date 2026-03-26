@@ -50,15 +50,23 @@ const AdminDashboard = () => {
   const [noteText, setNoteText] = useState("");
 
   const refreshData = () => {
-    setLeads(getLeads());
-    setQuizzes(getQuizCompletions());
-    setViews(getPageViews());
-    setAdmins(getAdmins());
+    try {
+      setLeads(getLeads());
+      setQuizzes(getQuizCompletions());
+      setViews(getPageViews());
+      setAdmins(getAdmins());
+    } catch {
+      setLeads([]);
+      setQuizzes([]);
+      setViews(0);
+      setAdmins([]);
+      setLoginError("Não foi possível carregar o painel. Recarregue a página.");
+    }
   };
 
   useEffect(() => {
-    refreshData();
     setSession(getSession());
+    refreshData();
   }, []);
 
   const handleLogout = () => { logout(); setSession(null); setLoginForm({ email: "", password: "" }); };
