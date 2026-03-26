@@ -386,7 +386,7 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
               <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Próximo passo</span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">
                 Fale com a especialista
               </h2>
               <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
