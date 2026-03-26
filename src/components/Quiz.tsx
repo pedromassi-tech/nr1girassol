@@ -4,6 +4,7 @@ import { quizQuestions, getScoreResult } from "@/data/quizQuestions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, RotateCcw, AlertTriangle, ShieldCheck, CheckCircle } from "lucide-react";
+import { addQuizCompletion } from "@/lib/adminStore";
 
 const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
