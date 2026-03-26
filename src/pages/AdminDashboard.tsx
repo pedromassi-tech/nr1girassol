@@ -61,7 +61,7 @@ const AdminDashboard = () => {
     setSession(getSession());
   }, []);
 
-  const handleLogout = () => { logout(); setSession(null); };
+  const handleLogout = () => { logout(); setSession(null); setLoginForm({ email: "", password: "" }); };
 
   const handleStatusChange = (id: string, status: LeadStatus) => {
     updateLead(id, { status });
