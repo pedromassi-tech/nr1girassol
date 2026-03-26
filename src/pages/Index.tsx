@@ -133,7 +133,7 @@ const Index = () => {
               >
                 Responda 10 perguntas simples e descubra, em poucos minutos, se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
               </motion.p>
-              <motion.div variants={fadeUp} className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-3">
+              <motion.div variants={fadeUp} className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={() => scrollTo("quiz")}
                   className="gold-gradient border-0 text-primary px-8 py-6 text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
