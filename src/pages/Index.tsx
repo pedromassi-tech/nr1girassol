@@ -272,7 +272,7 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
               <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Público</span>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
                 Para quem é esse teste
               </h2>
             </motion.div>
