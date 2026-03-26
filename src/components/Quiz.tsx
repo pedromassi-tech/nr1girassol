@@ -67,7 +67,7 @@ const Quiz = () => {
           <p className="mt-2 text-secondary font-bold text-lg">{result.level}</p>
         </div>
 
-        <div className="mt-6 text-foreground/75 text-[0.92rem] leading-[1.8] whitespace-pre-line">
+        <div className="mt-5 sm:mt-6 text-foreground/75 text-xs sm:text-[0.92rem] leading-[1.7] sm:leading-[1.8] whitespace-pre-line">
           {result.text}
         </div>
 
