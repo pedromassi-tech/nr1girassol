@@ -136,7 +136,7 @@ const Index = () => {
               <motion.div variants={fadeUp} className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={() => scrollTo("quiz")}
-                  className="gold-gradient border-0 text-primary px-8 py-6 text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
+                  className="gold-gradient border-0 text-primary px-6 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
                 >
                   Começar meu diagnóstico
                   <ArrowDown className="h-4 w-4" />
