@@ -227,7 +227,7 @@ const Index = () => {
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
               <div>
                 <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Entenda</span>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-6 leading-tight">
+                <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-5 leading-tight">
                   Por que fazer esse teste?
                 </h2>
                 <div className="text-foreground/70 text-[0.95rem] leading-[1.85] space-y-4">
