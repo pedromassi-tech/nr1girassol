@@ -391,10 +391,10 @@ const Index = () => {
                     Administradora, especialista em gestão de projetos e processos, pós-graduada em Psicologia Organizacional e fundadora do Instituto Girassol de Desenvolvimento Humano.
                   </p>
                   <p>
-                    Há mais de 20 anos atua com autogestão, liderança, organização do trabalho e produtividade saudável, integrando gestão, comportamento e estrutura organizacional com visão prática e executável.
+                    Há mais de 20 anos atua com autogestão, liderança, organização do trabalho e produtividade saudável, integrando gestão, comportamento e estrutura organizacional com visão prática.
                   </p>
                   <p>
-                    Autora do livro <em className="text-secondary font-semibold not-italic">Coragem para Mudar</em>, Maria é referência em transformar a exigência legal da NR-1 em governança, produtividade e sustentabilidade organizacional.
+                    Autora do livro <em className="text-secondary font-semibold not-italic">Coragem para Ser Livre</em>, Maria é referência em transformar a exigência legal da NR-1 em governança, produtividade e sustentabilidade organizacional.
                   </p>
                 </div>
               </div>
