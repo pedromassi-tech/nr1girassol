@@ -50,7 +50,7 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    question: "O modelo de trabalho (carga, metas, ritmo, autonomia) é revisado à luz dos riscos psicossociais?",
+    question: "O modelo de trabalho da sua empresa (carga, metas, ritmo, autonomia) é revisado considerando os riscos psicossociais?",
     options: [
       { text: "Não, o modelo é definido só por demanda de negócio.", points: 0 },
       { text: "Revisamos em alguns casos, quando o problema já ficou evidente.", points: 5 },
