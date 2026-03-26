@@ -323,7 +323,7 @@ const Index = () => {
                 <ClipboardCheck className="h-3.5 w-3.5 text-secondary" />
                 <span className="text-secondary text-xs font-bold tracking-wide uppercase">Quiz interativo</span>
               </div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
                 Seu diagnóstico de NR-1
               </h2>
               <p className="text-muted-foreground text-sm md:text-base mt-2">
