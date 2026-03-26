@@ -349,7 +349,7 @@ const Index = () => {
                 Sobre a especialista
               </h2>
             </motion.div>
-            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-14 items-center">
+            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-14 items-center">
               <div className="md:col-span-2 flex justify-center">
                 <div className="relative">
                   <div className="absolute -inset-3 gold-gradient rounded-3xl opacity-15 blur-xl" />
