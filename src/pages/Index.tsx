@@ -293,7 +293,7 @@ const Index = () => {
       </section>
 
       {/* ─── QUIZ CTA BANNER ─── */}
-      <section className="hero-gradient py-12 md:py-16 px-5 sm:px-8 relative overflow-hidden">
+      <section className="hero-gradient py-10 md:py-16 px-4 sm:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
