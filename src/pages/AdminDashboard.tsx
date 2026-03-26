@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   getSession, logout, getLeads, getPageViews, getQuizCompletions,
-  getAdmins, addAdmin, removeAdmin, updateLead, deleteLead,
+  getAdmins, addAdmin, removeAdmin, updateLead, deleteLead, loginAdmin,
   type Lead, type AdminUser, type QuizCompletion, type LeadStatus,
 } from "@/lib/adminStore";
 import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote,
+  BarChart3, StickyNote, Lock,
 } from "lucide-react";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
@@ -33,8 +32,9 @@ function formatWhatsAppLink(phone: string) {
 }
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
   const [session, setSession] = useState(getSession());
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
   const [tab, setTab] = useState<"crm" | "metricas" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
@@ -57,11 +57,11 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (!session) { navigate("/admin/login"); return; }
     refreshData();
-  }, [session, navigate]);
+    setSession(getSession());
+  }, []);
 
-  const handleLogout = () => { logout(); setSession(null); };
+  const handleLogout = () => { logout(); setSession(null); setLoginForm({ email: "", password: "" }); };
 
   const handleStatusChange = (id: string, status: LeadStatus) => {
     updateLead(id, { status });
@@ -102,7 +102,50 @@ const AdminDashboard = () => {
     refreshData();
   };
 
-  if (!session) return null;
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    if (loginAdmin(loginForm.email, loginForm.password)) {
+      setSession(getSession());
+      refreshData();
+      return;
+    }
+    setLoginError("E-mail ou senha incorretos.");
+  };
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <div className="h-14 w-14 rounded-2xl hero-gradient flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Lock className="h-7 w-7 text-primary-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold text-primary">Painel Admin</h1>
+            <p className="text-muted-foreground text-sm mt-1">Instituto Girassol</p>
+          </div>
+          <form onSubmit={handleLogin} className="bg-card rounded-2xl border p-6 space-y-4 shadow-sm">
+            <div>
+              <Label htmlFor="admin-email" className="text-xs font-semibold uppercase tracking-wide text-foreground/70">E-mail</Label>
+              <Input id="admin-email" type="email" required value={loginForm.email} onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} className="mt-1.5" placeholder="admin@girassol.com" />
+            </div>
+            <div>
+              <Label htmlFor="admin-password" className="text-xs font-semibold uppercase tracking-wide text-foreground/70">Senha</Label>
+              <Input id="admin-password" type="password" required value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} className="mt-1.5" placeholder="••••••••" />
+            </div>
+            {loginError && <p className="text-destructive text-sm font-medium">{loginError}</p>}
+            <Button type="submit" className="w-full hero-gradient border-0 text-primary-foreground py-5 font-semibold">
+              Entrar
+            </Button>
+          </form>
+          <p className="text-center text-muted-foreground text-xs mt-6">
+            Use <strong className="text-foreground">admin@girassol.com</strong> e <strong className="text-foreground">girassol2026</strong>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
 
   const filteredLeads = leads.filter((l) => {
     const matchSearch = !searchTerm || 
