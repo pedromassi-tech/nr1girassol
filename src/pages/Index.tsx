@@ -122,7 +122,7 @@ const Index = () => {
               </motion.div>
               <motion.h1
                 variants={fadeUp}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.12] tracking-tight text-balance"
+                className="text-2xl sm:text-3xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.15] tracking-tight text-balance"
               >
                 Qual é o nível de maturidade da sua empresa na{" "}
                 <span className="text-secondary">NR-1</span> na prática?
