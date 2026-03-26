@@ -110,7 +110,7 @@ const Quiz = () => {
             {question.question}
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {question.options.map((option, idx) => (
               <button
                 key={idx}
