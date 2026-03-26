@@ -300,7 +300,7 @@ const Index = () => {
             <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-3 md:mb-4">
               Pronto para descobrir onde sua empresa está?
             </h3>
-            <p className="text-primary-foreground/60 text-sm md:text-base mb-6 max-w-lg mx-auto">
+            <p className="text-primary-foreground/60 text-xs md:text-base mb-5 md:mb-6 max-w-lg mx-auto">
               O diagnóstico leva menos de 5 minutos e o resultado é imediato.
             </p>
             <Button
