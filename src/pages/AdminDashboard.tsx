@@ -285,7 +285,16 @@ const AdminDashboard = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-primary truncate">{lead.nome}</p>
                           <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
-                            <Building2 className="h-3 w-3 flex-shrink-0" />{lead.empresa} · {lead.cargo}
+                            {lead.desafio?.startsWith("Quiz NR-1") ? (
+                              <>
+                                <ClipboardCheck className="h-3 w-3 flex-shrink-0 text-secondary" />
+                                <span className="text-secondary font-medium">{lead.desafio}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Building2 className="h-3 w-3 flex-shrink-0" />{lead.empresa || "—"} {lead.cargo ? `· ${lead.cargo}` : ""}
+                              </>
+                            )}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
