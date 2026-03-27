@@ -285,7 +285,16 @@ const AdminDashboard = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-primary truncate">{lead.nome}</p>
                           <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
-                            <Building2 className="h-3 w-3 flex-shrink-0" />{lead.empresa} · {lead.cargo}
+                            {lead.desafio?.startsWith("Quiz NR-1") ? (
+                              <>
+                                <ClipboardCheck className="h-3 w-3 flex-shrink-0 text-secondary" />
+                                <span className="text-secondary font-medium">{lead.desafio}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Building2 className="h-3 w-3 flex-shrink-0" />{lead.empresa || "—"} {lead.cargo ? `· ${lead.cargo}` : ""}
+                              </>
+                            )}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -488,16 +497,23 @@ const AdminDashboard = () => {
               {quizzes.length === 0 ? (
                 <p className="text-muted-foreground text-sm text-center py-4">Nenhum teste realizado ainda.</p>
               ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {quizzes.slice(0, 20).map((q) => (
-                    <div key={q.id} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-bold ${q.score <= 30 ? "text-destructive" : q.score <= 60 ? "text-yellow-600" : "text-green-600"}`}>
-                          {q.score}/100
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {quizzes.slice(0, 30).map((q) => (
+                    <div key={q.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 text-sm gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className={`font-bold text-base flex-shrink-0 ${q.score <= 30 ? "text-destructive" : q.score <= 60 ? "text-yellow-600" : "text-green-600"}`}>
+                          {q.score}
                         </span>
-                        <span className="text-muted-foreground text-xs">{q.level}</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-primary truncate">
+                            {q.nome || <span className="text-muted-foreground italic">Sem nome</span>}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {q.email || "Sem e-mail"} · {q.level}
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-[10px] text-muted-foreground flex-shrink-0 whitespace-nowrap">
                         {new Date(q.createdAt).toLocaleString("pt-BR")}
                       </span>
                     </div>
