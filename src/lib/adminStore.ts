@@ -1,4 +1,7 @@
-// Simple localStorage-based store for admin panel
+import { supabase } from "@/integrations/supabase/client";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
 
 export type LeadStatus = "novo" | "em_contato" | "negociando" | "fechado" | "perdido";
 
@@ -15,13 +18,6 @@ export interface Lead {
   createdAt: string;
 }
 
-export interface AdminUser {
-  email: string;
-  password: string;
-  nome: string;
-  createdAt: string;
-}
-
 export interface QuizCompletion {
   id: string;
   nome: string;
@@ -31,184 +27,98 @@ export interface QuizCompletion {
   createdAt: string;
 }
 
-const LEADS_KEY = "girassol_leads";
-const ADMINS_KEY = "girassol_admins";
-const QUIZ_KEY = "girassol_quiz_completions";
-const VIEWS_KEY = "girassol_page_views";
-const SESSION_KEY = "girassol_admin_session";
-
-// Default admin account
-const DEFAULT_ADMIN: AdminUser = {
-  email: "admin@girassol.com",
-  password: "girassol2026",
-  nome: "Administrador",
-  createdAt: new Date().toISOString(),
-};
-
-function getItem<T>(key: string, fallback: T): T {
-  try {
-    if (typeof window === "undefined") return fallback;
-    const data = window.localStorage.getItem(key);
-    return data ? JSON.parse(data) as T : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function setItem(key: string, value: unknown) {
-  try {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // ignora falhas de storage para não quebrar a UI
-  }
-}
-
-function removeItem(key: string) {
-  try {
-    if (typeof window === "undefined") return;
-    window.localStorage.removeItem(key);
-  } catch {
-    // ignora falhas de storage para não quebrar a UI
-  }
-}
-
-function getArray<T>(key: string): T[] {
-  const value = getItem<unknown>(key, []);
-  return Array.isArray(value) ? (value.filter(Boolean) as T[]) : [];
-}
-
-// ─── ADMINS ───
-export function getAdmins(): AdminUser[] {
-  const admins = getArray<Partial<AdminUser>>(ADMINS_KEY)
-    .filter((admin): admin is Partial<AdminUser> => typeof admin?.email === "string")
-    .filter((admin) => admin.email !== DEFAULT_ADMIN.email)
-    .map((admin) => ({
-      email: admin.email!,
-      password: typeof admin.password === "string" && admin.password ? admin.password : "",
-      nome: typeof admin.nome === "string" && admin.nome ? admin.nome : "Administrador",
-      createdAt: typeof admin.createdAt === "string" ? admin.createdAt : new Date().toISOString(),
-    }));
-
-  const nextAdmins = [DEFAULT_ADMIN, ...admins];
-  setItem(ADMINS_KEY, nextAdmins);
-  return nextAdmins;
-}
-
-export function addAdmin(admin: Omit<AdminUser, "createdAt">): boolean {
-  const admins = getAdmins();
-  if (admins.find((a) => a.email === admin.email)) return false;
-  admins.push({ ...admin, createdAt: new Date().toISOString() });
-  setItem(ADMINS_KEY, admins);
-  return true;
-}
-
-export function removeAdmin(email: string): boolean {
-  const admins = getAdmins();
-  if (admins.length <= 1) return false;
-  setItem(ADMINS_KEY, admins.filter((a) => a.email !== email));
-  return true;
-}
-
-export function loginAdmin(email: string, password: string): boolean {
-  const admins = getAdmins();
-  const found = admins.find((a) => a.email === email && a.password === password);
-  if (found) {
-    setItem(SESSION_KEY, { email: found.email, nome: found.nome });
-    return true;
-  }
-  return false;
-}
-
-export function getSession(): { email: string; nome: string } | null {
-  const session = getItem<unknown>(SESSION_KEY, null);
-  if (!session || typeof session !== "object") return null;
-
-  const parsed = session as { email?: string; nome?: string };
-  if (typeof parsed.email !== "string" || !parsed.email) return null;
-
-  return {
-    email: parsed.email,
-    nome: typeof parsed.nome === "string" && parsed.nome ? parsed.nome : "Administrador",
-  };
-}
-
-export function logout() {
-  removeItem(SESSION_KEY);
-}
-
 // ─── LEADS ───
-export function getLeads(): Lead[] {
-  return getArray<Partial<Lead>>(LEADS_KEY)
-    .filter((lead): lead is Partial<Lead> => typeof lead?.id === "string")
-    .map((lead) => ({
-      id: lead.id!,
-      nome: typeof lead.nome === "string" ? lead.nome : "",
-      email: typeof lead.email === "string" ? lead.email : "",
-      whatsapp: typeof lead.whatsapp === "string" ? lead.whatsapp : "",
-      empresa: typeof lead.empresa === "string" ? lead.empresa : "",
-      cargo: typeof lead.cargo === "string" ? lead.cargo : "",
-      desafio: typeof lead.desafio === "string" ? lead.desafio : "",
-      status: lead.status === "novo" || lead.status === "em_contato" || lead.status === "negociando" || lead.status === "fechado" || lead.status === "perdido" ? lead.status : "novo",
-      notas: typeof lead.notas === "string" ? lead.notas : "",
-      createdAt: typeof lead.createdAt === "string" ? lead.createdAt : new Date().toISOString(),
-    }));
-}
+export async function getLeads(): Promise<Lead[]> {
+  const { data, error } = await db
+    .from("leads")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-export function addLead(lead: Omit<Lead, "id" | "createdAt" | "status" | "notas">) {
-  const leads = getLeads();
-  leads.unshift({
-    ...lead,
-    id: crypto.randomUUID(),
-    status: "novo",
-    notas: "",
-    createdAt: new Date().toISOString(),
-  });
-  setItem(LEADS_KEY, leads);
-}
-
-export function updateLead(id: string, updates: Partial<Lead>) {
-  const leads = getLeads();
-  const idx = leads.findIndex((l) => l.id === id);
-  if (idx >= 0) {
-    leads[idx] = { ...leads[idx], ...updates };
-    setItem(LEADS_KEY, leads);
+  if (error) {
+    console.error("Error fetching leads:", error);
+    return [];
   }
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    nome: row.nome ?? "",
+    email: row.email ?? "",
+    whatsapp: row.whatsapp ?? "",
+    empresa: row.empresa ?? "",
+    cargo: row.cargo ?? "",
+    desafio: row.desafio ?? "",
+    status: row.status ?? "novo",
+    notas: row.notas ?? "",
+    createdAt: row.created_at ?? new Date().toISOString(),
+  }));
 }
 
-export function deleteLead(id: string) {
-  setItem(LEADS_KEY, getLeads().filter((l) => l.id !== id));
+export async function addLead(lead: Omit<Lead, "id" | "createdAt" | "status" | "notas">) {
+  const { error } = await db.from("leads").insert({
+    nome: lead.nome,
+    email: lead.email,
+    whatsapp: lead.whatsapp,
+    empresa: lead.empresa,
+    cargo: lead.cargo,
+    desafio: lead.desafio,
+  });
+  if (error) console.error("Error adding lead:", error);
+}
+
+export async function updateLead(id: string, updates: Partial<Lead>) {
+  const dbUpdates: any = {};
+  if (updates.nome !== undefined) dbUpdates.nome = updates.nome;
+  if (updates.email !== undefined) dbUpdates.email = updates.email;
+  if (updates.whatsapp !== undefined) dbUpdates.whatsapp = updates.whatsapp;
+  if (updates.empresa !== undefined) dbUpdates.empresa = updates.empresa;
+  if (updates.cargo !== undefined) dbUpdates.cargo = updates.cargo;
+  if (updates.desafio !== undefined) dbUpdates.desafio = updates.desafio;
+  if (updates.status !== undefined) dbUpdates.status = updates.status;
+  if (updates.notas !== undefined) dbUpdates.notas = updates.notas;
+
+  const { error } = await db.from("leads").update(dbUpdates).eq("id", id);
+  if (error) console.error("Error updating lead:", error);
+}
+
+export async function deleteLead(id: string) {
+  const { error } = await db.from("leads").delete().eq("id", id);
+  if (error) console.error("Error deleting lead:", error);
 }
 
 // ─── QUIZ ───
-export function getQuizCompletions(): QuizCompletion[] {
-  return getArray<Partial<QuizCompletion>>(QUIZ_KEY)
-    .filter((item): item is Partial<QuizCompletion> => typeof item?.id === "string")
-    .map((item) => ({
-      id: item.id!,
-      nome: typeof item.nome === "string" ? item.nome : "",
-      email: typeof item.email === "string" ? item.email : "",
-      score: typeof item.score === "number" ? item.score : 0,
-      level: typeof item.level === "string" ? item.level : "",
-      createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
-    }));
+export async function getQuizCompletions(): Promise<QuizCompletion[]> {
+  const { data, error } = await db
+    .from("quiz_completions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching quiz completions:", error);
+    return [];
+  }
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    nome: row.nome ?? "",
+    email: row.email ?? "",
+    score: row.score ?? 0,
+    level: row.level ?? "",
+    createdAt: row.created_at ?? new Date().toISOString(),
+  }));
 }
 
-export function addQuizCompletion(score: number, level: string, nome: string = "", email: string = "") {
-  const completions = getQuizCompletions();
-  completions.unshift({
-    id: crypto.randomUUID(),
+export async function addQuizCompletion(score: number, level: string, nome: string = "", email: string = "") {
+  const { error } = await db.from("quiz_completions").insert({
     nome,
     email,
     score,
     level,
-    createdAt: new Date().toISOString(),
   });
-  setItem(QUIZ_KEY, completions);
+  if (error) console.error("Error adding quiz completion:", error);
 
   // Also add as a lead for CRM
   if (nome && email) {
-    addLead({
+    await addLead({
       nome,
       email,
       whatsapp: "",
@@ -220,11 +130,101 @@ export function addQuizCompletion(score: number, level: string, nome: string = "
 }
 
 // ─── PAGE VIEWS ───
-export function getPageViews(): number {
-  const views = getItem<unknown>(VIEWS_KEY, 0);
-  return typeof views === "number" && Number.isFinite(views) ? views : 0;
+export async function getPageViews(): Promise<number> {
+  const { count, error } = await db
+    .from("page_views")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    console.error("Error fetching page views:", error);
+    return 0;
+  }
+  return count ?? 0;
 }
 
-export function trackPageView() {
-  setItem(VIEWS_KEY, getPageViews() + 1);
+export async function trackPageView() {
+  const { error } = await db.from("page_views").insert({});
+  if (error) console.error("Error tracking page view:", error);
+}
+
+// ─── ADMIN AUTH (kept in localStorage - admin-only) ───
+export interface AdminUser {
+  email: string;
+  password: string;
+  nome: string;
+  createdAt: string;
+}
+
+const ADMINS_KEY = "girassol_admins";
+const SESSION_KEY = "girassol_admin_session";
+
+const DEFAULT_ADMIN: AdminUser = {
+  email: "admin@girassol.com",
+  password: "girassol2026",
+  nome: "Administrador",
+  createdAt: new Date().toISOString(),
+};
+
+function getItem<T>(key: string, fallback: T): T {
+  try {
+    const data = window.localStorage.getItem(key);
+    return data ? JSON.parse(data) as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setItem(key: string, value: unknown) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+
+function removeItem(key: string) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {}
+}
+
+export function getAdmins(): AdminUser[] {
+  const stored = getItem<AdminUser[]>(ADMINS_KEY, []);
+  const admins = Array.isArray(stored) ? stored.filter(a => a?.email && a.email !== DEFAULT_ADMIN.email) : [];
+  const result = [DEFAULT_ADMIN, ...admins];
+  setItem(ADMINS_KEY, result);
+  return result;
+}
+
+export function addAdmin(admin: Omit<AdminUser, "createdAt">): boolean {
+  const admins = getAdmins();
+  if (admins.find(a => a.email === admin.email)) return false;
+  admins.push({ ...admin, createdAt: new Date().toISOString() });
+  setItem(ADMINS_KEY, admins);
+  return true;
+}
+
+export function removeAdmin(email: string): boolean {
+  const admins = getAdmins();
+  if (admins.length <= 1) return false;
+  setItem(ADMINS_KEY, admins.filter(a => a.email !== email));
+  return true;
+}
+
+export function loginAdmin(email: string, password: string): boolean {
+  const admins = getAdmins();
+  const found = admins.find(a => a.email === email && a.password === password);
+  if (found) {
+    setItem(SESSION_KEY, { email: found.email, nome: found.nome });
+    return true;
+  }
+  return false;
+}
+
+export function getSession(): { email: string; nome: string } | null {
+  const session = getItem<any>(SESSION_KEY, null);
+  if (!session || typeof session.email !== "string") return null;
+  return { email: session.email, nome: session.nome || "Administrador" };
+}
+
+export function logout() {
+  removeItem(SESSION_KEY);
 }

@@ -49,11 +49,16 @@ const AdminDashboard = () => {
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const refreshData = () => {
+  const refreshData = async () => {
     try {
-      setLeads(getLeads());
-      setQuizzes(getQuizCompletions());
-      setViews(getPageViews());
+      const [leadsData, quizzesData, viewsData] = await Promise.all([
+        getLeads(),
+        getQuizCompletions(),
+        getPageViews(),
+      ]);
+      setLeads(leadsData);
+      setQuizzes(quizzesData);
+      setViews(viewsData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
@@ -71,19 +76,19 @@ const AdminDashboard = () => {
 
   const handleLogout = () => { logout(); setSession(null); setLoginForm({ email: "", password: "" }); };
 
-  const handleStatusChange = (id: string, status: LeadStatus) => {
-    updateLead(id, { status });
+  const handleStatusChange = async (id: string, status: LeadStatus) => {
+    await updateLead(id, { status });
     refreshData();
   };
 
-  const handleSaveNotes = (id: string) => {
-    updateLead(id, { notas: noteText });
+  const handleSaveNotes = async (id: string) => {
+    await updateLead(id, { notas: noteText });
     setEditingNotes(null);
     refreshData();
   };
 
-  const handleDeleteLead = (id: string) => {
-    deleteLead(id);
+  const handleDeleteLead = async (id: string) => {
+    await deleteLead(id);
     setExpandedLead(null);
     refreshData();
   };

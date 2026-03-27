@@ -18,9 +18,9 @@ const ContactForm = () => {
     desafio: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addLead(form);
+    await addLead(form);
     setSubmitted(true);
   };
 
