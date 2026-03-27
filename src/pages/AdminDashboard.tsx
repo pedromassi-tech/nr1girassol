@@ -76,8 +76,8 @@ const AdminDashboard = () => {
 
   const handleLogout = () => { logout(); setSession(null); setLoginForm({ email: "", password: "" }); };
 
-  const handleStatusChange = (id: string, status: LeadStatus) => {
-    updateLead(id, { status });
+  const handleStatusChange = async (id: string, status: LeadStatus) => {
+    await updateLead(id, { status });
     refreshData();
   };
 
