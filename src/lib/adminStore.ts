@@ -29,7 +29,7 @@ export interface QuizCompletion {
 
 // ─── LEADS ───
 export async function getLeads(): Promise<Lead[]> {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("leads")
     .select("*")
     .order("created_at", { ascending: false });
@@ -54,7 +54,7 @@ export async function getLeads(): Promise<Lead[]> {
 }
 
 export async function addLead(lead: Omit<Lead, "id" | "createdAt" | "status" | "notas">) {
-  const { error } = await supabase.from("leads").insert({
+  const { error } = await db.from("leads").insert({
     nome: lead.nome,
     email: lead.email,
     whatsapp: lead.whatsapp,
@@ -76,18 +76,18 @@ export async function updateLead(id: string, updates: Partial<Lead>) {
   if (updates.status !== undefined) dbUpdates.status = updates.status;
   if (updates.notas !== undefined) dbUpdates.notas = updates.notas;
 
-  const { error } = await supabase.from("leads").update(dbUpdates).eq("id", id);
+  const { error } = await db.from("leads").update(dbUpdates).eq("id", id);
   if (error) console.error("Error updating lead:", error);
 }
 
 export async function deleteLead(id: string) {
-  const { error } = await supabase.from("leads").delete().eq("id", id);
+  const { error } = await db.from("leads").delete().eq("id", id);
   if (error) console.error("Error deleting lead:", error);
 }
 
 // ─── QUIZ ───
 export async function getQuizCompletions(): Promise<QuizCompletion[]> {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("quiz_completions")
     .select("*")
     .order("created_at", { ascending: false });
@@ -108,7 +108,7 @@ export async function getQuizCompletions(): Promise<QuizCompletion[]> {
 }
 
 export async function addQuizCompletion(score: number, level: string, nome: string = "", email: string = "") {
-  const { error } = await supabase.from("quiz_completions").insert({
+  const { error } = await db.from("quiz_completions").insert({
     nome,
     email,
     score,
@@ -131,7 +131,7 @@ export async function addQuizCompletion(score: number, level: string, nome: stri
 
 // ─── PAGE VIEWS ───
 export async function getPageViews(): Promise<number> {
-  const { count, error } = await supabase
+  const { count, error } = await db
     .from("page_views")
     .select("*", { count: "exact", head: true });
 
@@ -143,7 +143,7 @@ export async function getPageViews(): Promise<number> {
 }
 
 export async function trackPageView() {
-  const { error } = await supabase.from("page_views").insert({});
+  const { error } = await db.from("page_views").insert({});
   if (error) console.error("Error tracking page view:", error);
 }
 
