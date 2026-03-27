@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
+
 export type LeadStatus = "novo" | "em_contato" | "negociando" | "fechado" | "perdido";
 
 export interface Lead {
