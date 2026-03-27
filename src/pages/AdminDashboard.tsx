@@ -49,11 +49,16 @@ const AdminDashboard = () => {
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const refreshData = () => {
+  const refreshData = async () => {
     try {
-      setLeads(getLeads());
-      setQuizzes(getQuizCompletions());
-      setViews(getPageViews());
+      const [leadsData, quizzesData, viewsData] = await Promise.all([
+        getLeads(),
+        getQuizCompletions(),
+        getPageViews(),
+      ]);
+      setLeads(leadsData);
+      setQuizzes(quizzesData);
+      setViews(viewsData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
