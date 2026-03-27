@@ -81,8 +81,8 @@ const AdminDashboard = () => {
     refreshData();
   };
 
-  const handleSaveNotes = (id: string) => {
-    updateLead(id, { notas: noteText });
+  const handleSaveNotes = async (id: string) => {
+    await updateLead(id, { notas: noteText });
     setEditingNotes(null);
     refreshData();
   };
