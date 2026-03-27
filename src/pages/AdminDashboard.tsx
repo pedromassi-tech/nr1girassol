@@ -87,8 +87,8 @@ const AdminDashboard = () => {
     refreshData();
   };
 
-  const handleDeleteLead = (id: string) => {
-    deleteLead(id);
+  const handleDeleteLead = async (id: string) => {
+    await deleteLead(id);
     setExpandedLead(null);
     refreshData();
   };

@@ -34,11 +34,11 @@ const Quiz = () => {
     }
   };
 
-  const handleCaptureSubmit = (e: React.FormEvent) => {
+  const handleCaptureSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const total = answers.reduce((a, b) => a + b, 0);
     const res = getScoreResult(total);
-    addQuizCompletion(total, res.level, captureForm.nome, captureForm.email);
+    await addQuizCompletion(total, res.level, captureForm.nome, captureForm.email);
     setShowCapture(false);
     setShowResult(true);
   };
