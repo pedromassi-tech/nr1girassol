@@ -37,6 +37,7 @@ const Index = () => {
 
   const navLinks = [
     { label: "Sobre o teste", id: "sobre-teste" },
+    { label: "Calculadora", id: "calculadora" },
     { label: "Para quem é", id: "para-quem" },
     { label: "Especialista", id: "especialista" },
   ];
