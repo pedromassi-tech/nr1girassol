@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          cargo: string
+          created_at: string
+          desafio: string
+          email: string
+          empresa: string
+          id: string
+          nome: string
+          notas: string
+          status: Database["public"]["Enums"]["lead_status"]
+          whatsapp: string
+        }
+        Insert: {
+          cargo?: string
+          created_at?: string
+          desafio?: string
+          email?: string
+          empresa?: string
+          id?: string
+          nome?: string
+          notas?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          whatsapp?: string
+        }
+        Update: {
+          cargo?: string
+          created_at?: string
+          desafio?: string
+          email?: string
+          empresa?: string
+          id?: string
+          nome?: string
+          notas?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      page_views: {
+        Row: {
+          id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          viewed_at?: string
+        }
+        Relationships: []
+      }
+      quiz_completions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          level: string
+          nome: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          id?: string
+          level?: string
+          nome?: string
+          score?: number
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          level?: string
+          nome?: string
+          score?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +103,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      lead_status: "novo" | "em_contato" | "negociando" | "fechado" | "perdido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +230,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      lead_status: ["novo", "em_contato", "negociando", "fechado", "perdido"],
+    },
   },
 } as const
