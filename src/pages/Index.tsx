@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { trackPageView } from "@/lib/adminStore";
 import { motion } from "framer-motion";
-import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award } from "lucide-react";
+import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
+import RiskCalculator from "@/components/RiskCalculator";
 import ContactForm from "@/components/ContactForm";
 import logoLight from "@/assets/logo-girassol-light.png";
 import logoDark from "@/assets/logo-girassol-dark.png";
