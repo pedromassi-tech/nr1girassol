@@ -365,7 +365,31 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── ESPECIALISTA ─── */}
+      {/* ─── CALCULADORA DE RISCO ─── */}
+      <section id="calculadora" className="py-14 md:py-28 px-4 sm:px-8 bg-card">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
+            <motion.div variants={fadeUp} className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-1.5 mb-4">
+                <Calculator className="h-3.5 w-3.5 text-secondary" />
+                <span className="text-secondary text-xs font-bold tracking-wide uppercase">Simulador gratuito</span>
+              </div>
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
+                Calculadora de Risco NR-1
+              </h2>
+              <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-xl mx-auto">
+                Simule o nível real de risco, a faixa provável de multa e o impacto financeiro estimado da desorganização na sua empresa.
+              </p>
+            </motion.div>
+            <motion.div variants={fadeUp}>
+              <div className="bg-background rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
+                <RiskCalculator />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       <section id="especialista" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
