@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { trackPageView } from "@/lib/adminStore";
 import { motion } from "framer-motion";
-import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award, Calculator } from "lucide-react";
+import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award, Calculator, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
 import RiskCalculator from "@/components/RiskCalculator";
@@ -18,6 +18,33 @@ const fadeUp = {
 const stagger = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
+
+const calculatorPillars = [
+  "Sem número genérico",
+  "Respostas em etapas curtas",
+  "Resultado imediato",
+] as const;
+
+const calculatorOutputs = [
+  {
+    icon: Award,
+    eyebrow: "0–100",
+    title: "Score de risco real",
+    description: "Leitura objetiva do nível de exposição atual da empresa.",
+  },
+  {
+    icon: ShieldAlert,
+    eyebrow: "Fiscalização",
+    title: "Faixa provável de multa",
+    description: "Estimativa baseada no porte, estrutura e nível de não conformidade.",
+  },
+  {
+    icon: BarChart3,
+    eyebrow: "Por ano",
+    title: "Impacto financeiro estimado",
+    description: "Visão de perdas invisíveis, rotatividade e outros custos que pesam na operação.",
+  },
+] as const;
 
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -366,23 +393,116 @@ const Index = () => {
       </section>
 
       {/* ─── CALCULADORA DE RISCO ─── */}
-      <section id="calculadora" className="py-14 md:py-28 px-4 sm:px-8 bg-card">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
-            <motion.div variants={fadeUp} className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-1.5 mb-4">
-                <Calculator className="h-3.5 w-3.5 text-secondary" />
-                <span className="text-secondary text-xs font-bold tracking-wide uppercase">Simulador gratuito</span>
+      <section id="calculadora" className="relative overflow-hidden bg-muted/20 py-14 md:py-28 px-4 sm:px-8">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-secondary/10 to-transparent" />
+        <div className="pointer-events-none absolute right-[-4rem] top-24 h-40 w-40 rounded-full bg-secondary/10 blur-3xl sm:h-56 sm:w-56" />
+        <div className="pointer-events-none absolute left-[-4rem] bottom-10 h-40 w-40 rounded-full bg-primary/5 blur-3xl sm:h-56 sm:w-56" />
+
+        <div className="relative max-w-5xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={stagger}
+            className="space-y-6 md:space-y-8"
+          >
+            <motion.div variants={fadeUp} className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1.1fr_0.9fr] md:gap-6">
+              <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-xl shadow-primary/5 sm:p-8 md:p-10">
+                <div className="inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-secondary/10 px-4 py-1.5">
+                  <Calculator className="h-3.5 w-3.5 text-secondary" />
+                  <span className="text-secondary text-xs font-bold tracking-wide uppercase">Simulador gratuito</span>
+                </div>
+
+                <h2 className="mt-5 text-2xl font-bold leading-tight text-primary md:text-4xl">
+                  Calculadora de Risco NR-1
+                </h2>
+
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                  Nada de número genérico: a calculadora traduz a realidade da sua empresa em três saídas claras — score de risco, faixa provável de multa e impacto financeiro anual estimado.
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {calculatorPillars.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-border/60 bg-card px-3 py-1.5 text-[0.72rem] font-semibold text-foreground/75"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Button
+                    onClick={() => scrollTo("simulacao-calculadora")}
+                    className="gold-gradient w-full border-0 px-6 py-5 text-sm font-bold text-primary shadow-lg transition-all hover:scale-[1.01] hover:shadow-xl sm:w-auto"
+                  >
+                    Fazer minha simulação
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                  <p className="text-xs leading-relaxed text-muted-foreground sm:max-w-xs sm:text-sm">
+                    Você responde alguns pontos e recebe a leitura completa na hora.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
-                Calculadora de Risco NR-1
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-xl mx-auto">
-                Simule o nível real de risco, a faixa provável de multa e o impacto financeiro estimado da desorganização na sua empresa.
-              </p>
+
+              <div className="rounded-3xl hero-gradient p-px shadow-xl shadow-primary/10">
+                <div className="h-full rounded-[1.45rem] bg-primary px-5 py-6 sm:px-6 sm:py-7">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-foreground/10">
+                      <Calculator className="h-5 w-5 text-secondary" />
+                    </div>
+                    <div>
+                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-primary-foreground/45">
+                        O que você recebe
+                      </p>
+                      <h3 className="text-lg font-bold text-primary-foreground">Uma leitura prática do seu risco</h3>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-3">
+                    {calculatorOutputs.map((item) => (
+                      <div key={item.title} className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-foreground/10">
+                            <item.icon className="h-4 w-4 text-secondary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground/45">
+                              {item.eyebrow}
+                            </p>
+                            <p className="mt-1 text-sm font-bold text-primary-foreground">{item.title}</p>
+                            <p className="mt-1 text-xs leading-relaxed text-primary-foreground/65">{item.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </motion.div>
-            <motion.div variants={fadeUp}>
-              <div className="bg-background rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
+
+            <motion.div
+              variants={fadeUp}
+              id="simulacao-calculadora"
+              className="rounded-[2rem] border border-border/60 bg-background/80 p-2 shadow-xl shadow-primary/5 backdrop-blur-sm sm:p-3"
+            >
+              <div className="rounded-[1.7rem] border border-border/50 bg-card p-4 sm:p-8 md:p-10">
+                <div className="mb-6 flex flex-col gap-3 border-b border-border/60 pb-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-primary">Faça sua simulação</p>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      Preencha em etapas curtas e veja score, multa e impacto financeiro no mesmo fluxo.
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-secondary/10 px-4 py-2">
+                    <Calculator className="h-4 w-4 text-secondary" />
+                    <span className="text-[0.7rem] font-bold uppercase tracking-wide text-secondary">
+                      Guiado • rápido • responsivo
+                    </span>
+                  </div>
+                </div>
+
                 <RiskCalculator />
               </div>
             </motion.div>
