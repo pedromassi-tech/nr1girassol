@@ -36,9 +36,10 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
+  const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
   const [views, setViews] = useState(0);
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [showNewAdmin, setShowNewAdmin] = useState(false);
@@ -52,14 +53,16 @@ const AdminDashboard = () => {
 
   const refreshData = async () => {
     try {
-      const [leadsData, quizzesData, viewsData] = await Promise.all([
+      const [leadsData, quizzesData, viewsData, calcData] = await Promise.all([
         getLeads(),
         getQuizCompletions(),
         getPageViews(),
+        getCalculatorCompletions(),
       ]);
       setLeads(leadsData);
       setQuizzes(quizzesData);
       setViews(viewsData);
+      setCalcResults(calcData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
