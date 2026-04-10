@@ -6,13 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   getSession, logout, getLeads, getPageViews, getQuizCompletions,
   getAdmins, addAdmin, removeAdmin, updateLead, deleteLead, loginAdmin,
-  type Lead, type AdminUser, type QuizCompletion, type LeadStatus,
+  getCalculatorCompletions,
+  type Lead, type AdminUser, type QuizCompletion, type CalculatorCompletion, type LeadStatus,
 } from "@/lib/adminStore";
 import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote, Lock,
+  BarChart3, StickyNote, Lock, Calculator,
 } from "lucide-react";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
