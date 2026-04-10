@@ -129,6 +129,96 @@ export async function addQuizCompletion(score: number, level: string, nome: stri
   }
 }
 
+// ─── CALCULATOR ───
+export interface CalculatorCompletion {
+  id: string;
+  nome: string;
+  email: string;
+  whatsapp: string;
+  empresa: string;
+  num_colaboradores: string;
+  faturamento: string;
+  momento: string;
+  estrutura: string;
+  risk_score: number;
+  risk_level: string;
+  bloco_nr1: number;
+  bloco_sinais: number;
+  bloco_gestao: number;
+  multa_min: number;
+  multa_max: number;
+  impacto_min: number;
+  impacto_max: number;
+  respostas: any;
+  createdAt: string;
+}
+
+export async function getCalculatorCompletions(): Promise<CalculatorCompletion[]> {
+  const { data, error } = await db
+    .from("calculator_completions")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) { console.error("Error fetching calculator completions:", error); return []; }
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    nome: row.nome ?? "",
+    email: row.email ?? "",
+    whatsapp: row.whatsapp ?? "",
+    empresa: row.empresa ?? "",
+    num_colaboradores: row.num_colaboradores ?? "",
+    faturamento: row.faturamento ?? "",
+    momento: row.momento ?? "",
+    estrutura: row.estrutura ?? "",
+    risk_score: row.risk_score ?? 0,
+    risk_level: row.risk_level ?? "",
+    bloco_nr1: row.bloco_nr1 ?? 0,
+    bloco_sinais: row.bloco_sinais ?? 0,
+    bloco_gestao: row.bloco_gestao ?? 0,
+    multa_min: row.multa_min ?? 0,
+    multa_max: row.multa_max ?? 0,
+    impacto_min: row.impacto_min ?? 0,
+    impacto_max: row.impacto_max ?? 0,
+    respostas: row.respostas ?? {},
+    createdAt: row.created_at ?? new Date().toISOString(),
+  }));
+}
+
+export async function addCalculatorCompletion(data: Omit<CalculatorCompletion, "id" | "createdAt">) {
+  const { error } = await db.from("calculator_completions").insert({
+    nome: data.nome,
+    email: data.email,
+    whatsapp: data.whatsapp,
+    empresa: data.empresa,
+    num_colaboradores: data.num_colaboradores,
+    faturamento: data.faturamento,
+    momento: data.momento,
+    estrutura: data.estrutura,
+    risk_score: data.risk_score,
+    risk_level: data.risk_level,
+    bloco_nr1: data.bloco_nr1,
+    bloco_sinais: data.bloco_sinais,
+    bloco_gestao: data.bloco_gestao,
+    multa_min: data.multa_min,
+    multa_max: data.multa_max,
+    impacto_min: data.impacto_min,
+    impacto_max: data.impacto_max,
+    respostas: data.respostas,
+  });
+  if (error) console.error("Error adding calculator completion:", error);
+
+  // Also add as lead
+  if (data.nome && data.email) {
+    await addLead({
+      nome: data.nome,
+      email: data.email,
+      whatsapp: data.whatsapp || "",
+      empresa: data.empresa || "",
+      cargo: "",
+      desafio: `Calculadora NR-1 — Score: ${data.risk_score}/100 — ${data.risk_level} — Impacto: R$${Math.round(data.impacto_min/1000)}k–R$${Math.round(data.impacto_max/1000)}k`,
+    });
+  }
+}
+
 // ─── PAGE VIEWS ───
 export async function getPageViews(): Promise<number> {
   const { count, error } = await db

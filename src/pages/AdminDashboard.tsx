@@ -6,13 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   getSession, logout, getLeads, getPageViews, getQuizCompletions,
   getAdmins, addAdmin, removeAdmin, updateLead, deleteLead, loginAdmin,
-  type Lead, type AdminUser, type QuizCompletion, type LeadStatus,
+  getCalculatorCompletions,
+  type Lead, type AdminUser, type QuizCompletion, type CalculatorCompletion, type LeadStatus,
 } from "@/lib/adminStore";
 import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote, Lock,
+  BarChart3, StickyNote, Lock, Calculator,
 } from "lucide-react";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
@@ -35,9 +36,10 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
+  const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
   const [views, setViews] = useState(0);
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [showNewAdmin, setShowNewAdmin] = useState(false);
@@ -51,14 +53,16 @@ const AdminDashboard = () => {
 
   const refreshData = async () => {
     try {
-      const [leadsData, quizzesData, viewsData] = await Promise.all([
+      const [leadsData, quizzesData, viewsData, calcData] = await Promise.all([
         getLeads(),
         getQuizCompletions(),
         getPageViews(),
+        getCalculatorCompletions(),
       ]);
       setLeads(leadsData);
       setQuizzes(quizzesData);
       setViews(viewsData);
+      setCalcResults(calcData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
@@ -197,10 +201,11 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Stats cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
             { icon: Eye, label: "Acessos", value: views, color: "bg-blue-500/10 text-blue-600" },
-            { icon: ClipboardCheck, label: "Testes feitos", value: quizzes.length, color: "bg-secondary/10 text-secondary" },
+            { icon: ClipboardCheck, label: "Testes", value: quizzes.length, color: "bg-secondary/10 text-secondary" },
+            { icon: Calculator, label: "Simulações", value: calcResults.length, color: "bg-orange-500/10 text-orange-600" },
             { icon: Users, label: "Leads", value: leads.length, color: "bg-green-500/10 text-green-600" },
             { icon: TrendingUp, label: "Conversão", value: `${conversionRate}%`, color: "bg-purple-500/10 text-purple-600" },
           ].map((s, i) => (
@@ -219,6 +224,7 @@ const AdminDashboard = () => {
           {[
             { key: "crm" as const, label: `CRM (${leads.length})` },
             { key: "metricas" as const, label: "Métricas" },
+            { key: "calculadora" as const, label: `Calculadora (${calcResults.length})` },
             { key: "admins" as const, label: `Admins (${admins.length})` },
           ].map((t) => (
             <button
@@ -293,6 +299,11 @@ const AdminDashboard = () => {
                             {lead.desafio?.startsWith("Quiz NR-1") ? (
                               <>
                                 <ClipboardCheck className="h-3 w-3 flex-shrink-0 text-secondary" />
+                                <span className="text-secondary font-medium">{lead.desafio}</span>
+                              </>
+                            ) : lead.desafio?.startsWith("Calculadora NR-1") ? (
+                              <>
+                                <Calculator className="h-3 w-3 flex-shrink-0 text-secondary" />
                                 <span className="text-secondary font-medium">{lead.desafio}</span>
                               </>
                             ) : (
@@ -521,6 +532,93 @@ const AdminDashboard = () => {
                       <span className="text-[10px] text-muted-foreground flex-shrink-0 whitespace-nowrap">
                         {new Date(q.createdAt).toLocaleString("pt-BR")}
                       </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── CALCULADORA TAB ─── */}
+        {tab === "calculadora" && (
+          <div className="space-y-6">
+            {/* Calc metrics */}
+            <div className="bg-card rounded-xl border p-5">
+              <h3 className="text-sm font-bold text-primary mb-4 flex items-center gap-2">
+                <Calculator className="h-4 w-4" /> Métricas da Calculadora
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">{calcResults.length}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Total simulações</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {calcResults.length > 0 ? Math.round(calcResults.reduce((a, c) => a + c.risk_score, 0) / calcResults.length) : 0}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Score médio</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-destructive">
+                    {calcResults.filter(c => c.risk_score > 70).length}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Risco crítico</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-secondary">
+                    {calcResults.filter(c => c.risk_score <= 30).length}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Risco baixo</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent calculator completions */}
+            <div className="bg-card rounded-xl border p-5">
+              <h3 className="text-sm font-bold text-primary mb-4">Últimas simulações</h3>
+              {calcResults.length === 0 ? (
+                <p className="text-muted-foreground text-sm text-center py-4">Nenhuma simulação realizada ainda.</p>
+              ) : (
+                <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                  {calcResults.slice(0, 50).map((c) => (
+                    <div key={c.id} className="p-3 rounded-lg bg-muted/30 text-sm">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <span className={`font-bold text-base flex-shrink-0 ${c.risk_score > 70 ? "text-destructive" : c.risk_score > 30 ? "text-secondary" : "text-primary"}`}>
+                            {c.risk_score}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-primary truncate">{c.nome || "Sem nome"}</p>
+                            <p className="text-xs text-muted-foreground truncate">{c.email} · {c.empresa || "—"}</p>
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground flex-shrink-0 whitespace-nowrap">
+                          {new Date(c.createdAt).toLocaleString("pt-BR")}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div className="bg-background rounded p-1.5 text-center">
+                          <span className="text-muted-foreground">NR-1: </span>
+                          <span className="font-semibold text-foreground">{c.bloco_nr1}/70</span>
+                        </div>
+                        <div className="bg-background rounded p-1.5 text-center">
+                          <span className="text-muted-foreground">Sinais: </span>
+                          <span className="font-semibold text-foreground">{c.bloco_sinais}/70</span>
+                        </div>
+                        <div className="bg-background rounded p-1.5 text-center">
+                          <span className="text-muted-foreground">Gestão: </span>
+                          <span className="font-semibold text-foreground">{c.bloco_gestao}/60</span>
+                        </div>
+                        <div className="bg-background rounded p-1.5 text-center">
+                          <span className="text-muted-foreground">Multa: </span>
+                          <span className="font-semibold text-foreground">R${Math.round(c.multa_min/1000)}k–{Math.round(c.multa_max/1000)}k</span>
+                        </div>
+                      </div>
+                      <div className="mt-1.5 text-xs text-center bg-secondary/5 rounded p-1.5">
+                        <span className="text-muted-foreground">Impacto total: </span>
+                        <span className="font-bold text-primary">R${Math.round(c.impacto_min/1000)}k – R${Math.round(c.impacto_max/1000)}k/ano</span>
+                      </div>
                     </div>
                   ))}
                 </div>
