@@ -85,14 +85,26 @@ export const blocoGestao: CalcQuestion[] = [
   { id: "lideranca", question: "Rotina estruturada de liderança?", options: [{ text: "Sim", points: 0 }, { text: "Parcial", points: 5 }, { text: "Não", points: 10 }] },
 ];
 
+// ─── STEP 5: Reputation (max 50 pts) ───
+export const blocoReputacao: CalcQuestion[] = [
+  { id: "lideranca_percebida", question: "Como a liderança é percebida internamente?", options: [{ text: "Positivamente", points: 0 }, { text: "Neutra", points: 5 }, { text: "Negativamente", points: 10 }] },
+  { id: "canal_escuta", question: "Existe canal de escuta seguro e confiável?", options: [{ text: "Sim, funciona bem", points: 0 }, { text: "Existe mas pouco usado", points: 5 }, { text: "Não existe", points: 10 }] },
+  { id: "seguranca_psicologica", question: "Colaboradores sentem segurança psicológica para falar?", options: [{ text: "Sim", points: 0 }, { text: "Parcialmente", points: 5 }, { text: "Não", points: 10 }] },
+  { id: "exposicao_publica", question: "Risco de exposição pública (denúncia, processo, afastamento notório)?", options: [{ text: "Nunca ocorreu", points: 0 }, { text: "Já houve caso isolado", points: 5 }, { text: "Recorrente ou em andamento", points: 10 }] },
+  { id: "employer_branding", question: "A empresa atrai ou repele talentos hoje?", options: [{ text: "Atrai bem", points: 0 }, { text: "Neutro / não se destaca", points: 5 }, { text: "Dificuldade em atrair", points: 10 }] },
+];
+
 // ─── SCORING ───
 export interface CalculatorResult {
   riskScore: number;
   riskLevel: string;
   riskColor: string;
+  reputationScore: number;
+  reputationLevel: string;
   blocoNR1Score: number;
   blocoSinaisScore: number;
   blocoGestaoScore: number;
+  blocoReputacaoScore: number;
   multaMin: number;
   multaMax: number;
   impactoMin: number;
@@ -171,8 +183,14 @@ export function calculateResult(
   const nr1Score = blocoNR1.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
   const sinaisScore = blocoSinais.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
   const gestaoScore = blocoGestao.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
-  const totalRaw = nr1Score + sinaisScore + gestaoScore; // max 200
-  const riskScore = Math.round((totalRaw / 200) * 100);
+  const reputacaoScore = blocoReputacao.reduce((s, q) => s + (answers[q.id] ?? 0), 0);
+
+  // Risk score: based on NR1 + sinais + gestao (max 200)
+  const totalRiskRaw = nr1Score + sinaisScore + gestaoScore;
+  const riskScore = Math.round((totalRiskRaw / 200) * 100);
+
+  // Reputation score: based on blocoReputacao (max 50)
+  const reputationScore = Math.round((reputacaoScore / 50) * 100);
 
   let riskLevel: string;
   let riskColor: string;
@@ -185,6 +203,15 @@ export function calculateResult(
   } else {
     riskLevel = "Risco Crítico";
     riskColor = "destructive";
+  }
+
+  let reputationLevel: string;
+  if (reputationScore <= 30) {
+    reputationLevel = "Reputação Protegida";
+  } else if (reputationScore <= 60) {
+    reputationLevel = "Reputação em Alerta";
+  } else {
+    reputationLevel = "Reputação em Risco";
   }
 
   const porte = getPorte(company.num_colaboradores);
@@ -222,7 +249,9 @@ export function calculateResult(
 
   return {
     riskScore, riskLevel, riskColor,
+    reputationScore, reputationLevel,
     blocoNR1Score: nr1Score, blocoSinaisScore: sinaisScore, blocoGestaoScore: gestaoScore,
+    blocoReputacaoScore: reputacaoScore,
     multaMin, multaMax,
     impactoMin, impactoMax,
     perdaProdMin, perdaProdMax,

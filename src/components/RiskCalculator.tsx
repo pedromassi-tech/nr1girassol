@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label";
 import {
   ArrowRight, ArrowLeft, AlertTriangle, ShieldCheck, ShieldAlert,
   User, Mail, Phone, Building2, Calculator, Users, TrendingUp,
-  FileWarning, BarChart3, CheckCircle,
+  FileWarning, BarChart3, CheckCircle, Star, Eye,
 } from "lucide-react";
 import {
-  companyFields, blocoNR1, blocoSinais, blocoGestao,
+  companyFields, blocoNR1, blocoSinais, blocoGestao, blocoReputacao,
   calculateResult, type CalculatorResult, type CalcQuestion,
 } from "@/data/calculatorQuestions";
 import { addCalculatorCompletion } from "@/lib/adminStore";
@@ -25,6 +25,7 @@ const STEPS = [
   { label: "Estrutura NR-1", icon: FileWarning, desc: "Conformidade" },
   { label: "Sinais de risco", icon: AlertTriangle, desc: "Operação" },
   { label: "Gestão", icon: BarChart3, desc: "Performance" },
+  { label: "Reputação", icon: Star, desc: "Imagem & talentos" },
   { label: "Seus dados", icon: User, desc: "Resultado" },
 ] as const;
 
@@ -42,7 +43,8 @@ const RiskCalculator = () => {
     if (step === 1) return blocoNR1.every(q => answers[q.id] !== undefined);
     if (step === 2) return blocoSinais.every(q => answers[q.id] !== undefined);
     if (step === 3) return blocoGestao.every(q => answers[q.id] !== undefined);
-    if (step === 4) return captureForm.nome.trim() !== "" && captureForm.email.trim() !== "";
+    if (step === 4) return blocoReputacao.every(q => answers[q.id] !== undefined);
+    if (step === 5) return captureForm.nome.trim() !== "" && captureForm.email.trim() !== "";
     return false;
   };
 
@@ -88,60 +90,107 @@ const RiskCalculator = () => {
     setResult(null);
   };
 
-  // ─── RESULT SCREEN ───
-  if (result) {
-    const getIcon = () => {
-      if (result.riskScore <= 30) return <ShieldCheck className="h-10 w-10 text-secondary" />;
-      if (result.riskScore <= 70) return <ShieldAlert className="h-10 w-10 text-secondary" />;
-      return <AlertTriangle className="h-10 w-10 text-destructive" />;
+  // ─── SCORE GAUGE ───
+  const ScoreGauge = ({ score, label, sublabel, color }: { score: number; label: string; sublabel: string; color: "risk" | "reputation" }) => {
+    const getColor = () => {
+      if (color === "risk") {
+        if (score <= 30) return { ring: "text-green-500", bg: "bg-green-500/10", text: "text-green-600" };
+        if (score <= 70) return { ring: "text-amber-500", bg: "bg-amber-500/10", text: "text-amber-600" };
+        return { ring: "text-red-500", bg: "bg-red-500/10", text: "text-red-600" };
+      }
+      if (score <= 30) return { ring: "text-green-500", bg: "bg-green-500/10", text: "text-green-600" };
+      if (score <= 60) return { ring: "text-amber-500", bg: "bg-amber-500/10", text: "text-amber-600" };
+      return { ring: "text-red-500", bg: "bg-red-500/10", text: "text-red-600" };
     };
-    const getBg = () => {
-      if (result.riskScore <= 30) return "from-secondary/10 to-secondary/5 border-secondary/20";
-      if (result.riskScore <= 70) return "from-secondary/10 to-secondary/5 border-secondary/30";
-      return "from-destructive/10 to-destructive/5 border-destructive/20";
-    };
+    const c = getColor();
+    const circumference = 2 * Math.PI * 45;
+    const offset = circumference - (score / 100) * circumference;
 
     return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className={`rounded-2xl border bg-gradient-to-b ${getBg()} p-5 sm:p-8 text-center`}>
-          <div className="flex justify-center mb-3">{getIcon()}</div>
-          <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Score de risco</p>
-          <div className="text-4xl sm:text-6xl font-extrabold text-primary">
-            {result.riskScore}<span className="text-xl sm:text-2xl font-semibold text-muted-foreground">/100</span>
+      <div className="flex flex-col items-center">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="6" className="text-border" />
+            <circle
+              cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="6"
+              className={c.ring}
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              style={{ transition: "stroke-dashoffset 1s ease-out" }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className={`text-2xl sm:text-3xl font-extrabold ${c.text}`}>{score}</span>
+            <span className="text-[10px] text-muted-foreground font-medium">/100</span>
           </div>
-          <p className="mt-2 font-bold text-lg" style={{ color: result.riskScore > 70 ? "hsl(var(--destructive))" : "hsl(var(--secondary))" }}>
-            {result.riskLevel}
-          </p>
+        </div>
+        <p className={`mt-2 text-sm font-bold ${c.text}`}>{sublabel}</p>
+        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{label}</p>
+      </div>
+    );
+  };
+
+  // ─── RESULT SCREEN ───
+  if (result) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
+        {/* Two score gauges */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-2xl border bg-card p-4 sm:p-6 flex justify-center">
+            <ScoreGauge score={result.riskScore} label="Score de Risco" sublabel={result.riskLevel} color="risk" />
+          </div>
+          <div className="rounded-2xl border bg-card p-4 sm:p-6 flex justify-center">
+            <ScoreGauge score={result.reputationScore} label="Score de Reputação" sublabel={result.reputationLevel} color="reputation" />
+          </div>
         </div>
 
-        <div className="mt-6 space-y-3">
-          <h4 className="text-sm font-bold text-primary">Simulação de impacto financeiro anual</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Financial breakdown */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Eye className="h-4 w-4 text-secondary" />
+            <h4 className="text-sm font-bold text-primary">Exposição financeira estimada</h4>
+          </div>
+
+          <div className="space-y-2">
             {[
-              { label: "Multa potencial (NR-1)", value: `${formatBRL(result.multaMin)} – ${formatBRL(result.multaMax)}` },
-              { label: "Perda de produtividade", value: `${formatBRL(result.perdaProdMin)} – ${formatBRL(result.perdaProdMax)}` },
-              { label: "Custo com rotatividade", value: `${formatBRL(result.custoRotatividade)}/ano` },
-              ...(result.riscoTrabMax > 0 ? [{ label: "Risco trabalhista", value: `${formatBRL(result.riscoTrabMin)} – ${formatBRL(result.riscoTrabMax)}` }] : []),
+              { label: "Perda estimada de produtividade", value: `${formatBRL(result.perdaProdMin)} – ${formatBRL(result.perdaProdMax)}`, suffix: "/ano", icon: "📉" },
+              { label: "Custo estimado com rotatividade", value: `${formatBRL(result.custoRotatividade)}`, suffix: "/ano", icon: "🔄" },
+              ...(result.riscoTrabMax > 0 ? [{ label: "Risco trabalhista estimado", value: `${formatBRL(result.riscoTrabMin)} – ${formatBRL(result.riscoTrabMax)}`, suffix: "", icon: "⚖️" }] : []),
+              { label: "Multa potencial NR-1", value: `${formatBRL(result.multaMin)} – ${formatBRL(result.multaMax)}`, suffix: "", icon: "🚨" },
             ].map((item, i) => (
-              <div key={i} className="rounded-xl border bg-card p-4">
-                <p className="text-xs text-muted-foreground font-medium mb-1">{item.label}</p>
-                <p className="text-base font-bold text-primary">{item.value}</p>
+              <div key={i} className="flex items-center justify-between rounded-xl border bg-card px-4 py-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-base">{item.icon}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground font-medium">{item.label}</span>
+                </div>
+                <span className="text-sm sm:text-base font-bold text-primary whitespace-nowrap">
+                  {item.value}{item.suffix && <span className="text-xs text-muted-foreground font-normal">{item.suffix}</span>}
+                </span>
               </div>
             ))}
           </div>
-          <div className="rounded-xl border-2 border-secondary/30 bg-secondary/5 p-4 text-center">
-            <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">Impacto financeiro total estimado</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-primary">
+
+          {/* Total impact - highlighted */}
+          <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-5 text-center">
+            <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-2">
+              Impacto financeiro total estimado
+            </p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-destructive">
               {formatBRL(result.impactoMin)} – {formatBRL(result.impactoMax)}
-              <span className="text-sm font-medium text-muted-foreground">/ano</span>
+              <span className="text-sm font-medium text-muted-foreground ml-1">/ano</span>
+            </p>
+            <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-md mx-auto">
+              Esse é o custo estimado de não estruturar a gestão de riscos psicossociais hoje.
             </p>
           </div>
-          <p className="text-[0.7rem] text-muted-foreground leading-relaxed italic">
-            Faixas estimadas com base em porte da empresa, nível de não conformidade com NR-1 e parâmetros de multas praticadas no mercado atualmente. Os valores são uma ordem de grandeza e não constituem consultoria jurídica.
+
+          <p className="text-[0.65rem] text-muted-foreground leading-relaxed italic">
+            Faixas estimadas com base em porte da empresa, nível de não conformidade com NR-1 e parâmetros de multas praticadas no mercado. Os valores são uma ordem de grandeza e não constituem consultoria jurídica.
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <a href="https://chat.whatsapp.com/Dj8pvjQAaNJE06oqDzfeya?mode=gi_t" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
             <Button className="w-full gold-gradient border-0 text-primary font-semibold px-6 py-5 shadow-md">
               Entrar no grupo NR1 na Prática
@@ -158,7 +207,6 @@ const RiskCalculator = () => {
   // ─── STEP INDICATOR ───
   const renderStepIndicator = () => (
     <div className="mb-6 sm:mb-8">
-      {/* Desktop step indicator */}
       <div className="hidden sm:flex items-center justify-between mb-2">
         {STEPS.map((s, i) => {
           const StepIcon = s.icon;
@@ -189,7 +237,6 @@ const RiskCalculator = () => {
           );
         })}
       </div>
-      {/* Mobile step indicator */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -209,7 +256,7 @@ const RiskCalculator = () => {
     </div>
   );
 
-  // ─── QUESTIONS RENDERER (improved) ───
+  // ─── QUESTIONS RENDERER ───
   const renderQuestions = (questions: CalcQuestion[]) => {
     const answeredCount = questions.filter(q => answers[q.id] !== undefined).length;
     return (
@@ -226,16 +273,12 @@ const RiskCalculator = () => {
               <div
                 key={q.id}
                 className={`rounded-xl border-2 p-3.5 sm:p-4 transition-all ${
-                  isAnswered
-                    ? "border-secondary/20 bg-secondary/[0.03]"
-                    : "border-border bg-card"
+                  isAnswered ? "border-secondary/20 bg-secondary/[0.03]" : "border-border bg-card"
                 }`}
               >
                 <div className="flex gap-2.5 items-start mb-3">
                   <span className={`flex-shrink-0 h-5 w-5 rounded-full text-[10px] font-bold flex items-center justify-center mt-0.5 ${
-                    isAnswered
-                      ? "bg-secondary/20 text-secondary"
-                      : "bg-muted text-muted-foreground"
+                    isAnswered ? "bg-secondary/20 text-secondary" : "bg-muted text-muted-foreground"
                   }`}>
                     {isAnswered ? "✓" : qIdx + 1}
                   </span>
@@ -264,7 +307,7 @@ const RiskCalculator = () => {
     );
   };
 
-  // ─── COMPANY FIELDS (improved) ───
+  // ─── COMPANY FIELDS ───
   const renderCompanyStep = () => (
     <div className="space-y-5 sm:space-y-6">
       <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-md mx-auto">
@@ -302,7 +345,7 @@ const RiskCalculator = () => {
     </div>
   );
 
-  // ─── CAPTURE FORM (improved) ───
+  // ─── CAPTURE FORM ───
   const renderCapture = () => (
     <div className="max-w-sm mx-auto">
       <div className="text-center mb-6">
@@ -311,7 +354,7 @@ const RiskCalculator = () => {
         </div>
         <h3 className="text-lg font-bold text-primary mb-1">Simulação pronta!</h3>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Preencha seus dados para ver o resultado completo com score de risco, multas e impacto financeiro.
+          Preencha seus dados para ver o resultado completo com score de risco, reputação e impacto financeiro.
         </p>
       </div>
       <div className="space-y-3.5">
@@ -349,7 +392,8 @@ const RiskCalculator = () => {
       case 1: return renderQuestions(blocoNR1);
       case 2: return renderQuestions(blocoSinais);
       case 3: return renderQuestions(blocoGestao);
-      case 4: return renderCapture();
+      case 4: return renderQuestions(blocoReputacao);
+      case 5: return renderCapture();
       default: return null;
     }
   };
