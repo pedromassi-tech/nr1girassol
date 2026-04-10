@@ -146,11 +146,12 @@ const Index = () => {
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button
-                  onClick={() => scrollTo("sobre-teste")}
-                  variant="ghost"
-                  className="text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/10 py-6"
+                  onClick={() => scrollTo("calculadora")}
+                  variant="outline"
+                  className="border-secondary/40 text-primary-foreground hover:bg-primary-foreground/10 py-5 gap-2"
                 >
-                  Saiba mais
+                  <Calculator className="h-4 w-4" />
+                  Calculadora de risco
                 </Button>
               </motion.div>
             </motion.div>
