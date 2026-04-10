@@ -201,10 +201,11 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Stats cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
             { icon: Eye, label: "Acessos", value: views, color: "bg-blue-500/10 text-blue-600" },
-            { icon: ClipboardCheck, label: "Testes feitos", value: quizzes.length, color: "bg-secondary/10 text-secondary" },
+            { icon: ClipboardCheck, label: "Testes", value: quizzes.length, color: "bg-secondary/10 text-secondary" },
+            { icon: Calculator, label: "Simulações", value: calcResults.length, color: "bg-orange-500/10 text-orange-600" },
             { icon: Users, label: "Leads", value: leads.length, color: "bg-green-500/10 text-green-600" },
             { icon: TrendingUp, label: "Conversão", value: `${conversionRate}%`, color: "bg-purple-500/10 text-purple-600" },
           ].map((s, i) => (
