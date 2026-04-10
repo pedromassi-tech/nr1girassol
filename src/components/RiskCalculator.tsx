@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowRight, ArrowLeft, AlertTriangle, ShieldCheck, ShieldAlert,
-  User, Mail, Phone, Building2, Calculator,
+  User, Mail, Phone, Building2, Calculator, Users, TrendingUp,
+  FileWarning, BarChart3, CheckCircle,
 } from "lucide-react";
 import {
   companyFields, blocoNR1, blocoSinais, blocoGestao,
-  calculateResult, type CalculatorResult,
+  calculateResult, type CalculatorResult, type CalcQuestion,
 } from "@/data/calculatorQuestions";
 import { addCalculatorCompletion } from "@/lib/adminStore";
 
@@ -21,11 +21,11 @@ function formatBRL(value: number): string {
 }
 
 const STEPS = [
-  { label: "Dados da empresa", key: "company" },
-  { label: "Estrutura NR-1", key: "nr1" },
-  { label: "Sinais de risco", key: "sinais" },
-  { label: "Gestão e performance", key: "gestao" },
-  { label: "Seus dados", key: "capture" },
+  { label: "Sua empresa", icon: Building2, desc: "Dados básicos" },
+  { label: "Estrutura NR-1", icon: FileWarning, desc: "Conformidade" },
+  { label: "Sinais de risco", icon: AlertTriangle, desc: "Operação" },
+  { label: "Gestão", icon: BarChart3, desc: "Performance" },
+  { label: "Seus dados", icon: User, desc: "Resultado" },
 ] as const;
 
 const RiskCalculator = () => {
@@ -36,9 +36,7 @@ const RiskCalculator = () => {
   const [result, setResult] = useState<CalculatorResult | null>(null);
 
   const totalSteps = STEPS.length;
-  const progress = (step / totalSteps) * 100;
 
-  // Step validation
   const isStepComplete = () => {
     if (step === 0) return companyFields.every(f => company[f.id]);
     if (step === 1) return blocoNR1.every(q => answers[q.id] !== undefined);
@@ -105,7 +103,6 @@ const RiskCalculator = () => {
 
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Score */}
         <div className={`rounded-2xl border bg-gradient-to-b ${getBg()} p-5 sm:p-8 text-center`}>
           <div className="flex justify-center mb-3">{getIcon()}</div>
           <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-1">Score de risco</p>
@@ -117,31 +114,21 @@ const RiskCalculator = () => {
           </p>
         </div>
 
-        {/* Financial impact breakdown */}
         <div className="mt-6 space-y-3">
           <h4 className="text-sm font-bold text-primary">Simulação de impacto financeiro anual</h4>
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-xl border bg-card p-4">
-              <p className="text-xs text-muted-foreground font-medium mb-1">Multa potencial (NR-1)</p>
-              <p className="text-base font-bold text-primary">{formatBRL(result.multaMin)} – {formatBRL(result.multaMax)}</p>
-            </div>
-            <div className="rounded-xl border bg-card p-4">
-              <p className="text-xs text-muted-foreground font-medium mb-1">Perda de produtividade</p>
-              <p className="text-base font-bold text-primary">{formatBRL(result.perdaProdMin)} – {formatBRL(result.perdaProdMax)}</p>
-            </div>
-            <div className="rounded-xl border bg-card p-4">
-              <p className="text-xs text-muted-foreground font-medium mb-1">Custo com rotatividade</p>
-              <p className="text-base font-bold text-primary">{formatBRL(result.custoRotatividade)}/ano</p>
-            </div>
-            {result.riscoTrabMax > 0 && (
-              <div className="rounded-xl border bg-card p-4">
-                <p className="text-xs text-muted-foreground font-medium mb-1">Risco trabalhista</p>
-                <p className="text-base font-bold text-primary">{formatBRL(result.riscoTrabMin)} – {formatBRL(result.riscoTrabMax)}</p>
+            {[
+              { label: "Multa potencial (NR-1)", value: `${formatBRL(result.multaMin)} – ${formatBRL(result.multaMax)}` },
+              { label: "Perda de produtividade", value: `${formatBRL(result.perdaProdMin)} – ${formatBRL(result.perdaProdMax)}` },
+              { label: "Custo com rotatividade", value: `${formatBRL(result.custoRotatividade)}/ano` },
+              ...(result.riscoTrabMax > 0 ? [{ label: "Risco trabalhista", value: `${formatBRL(result.riscoTrabMin)} – ${formatBRL(result.riscoTrabMax)}` }] : []),
+            ].map((item, i) => (
+              <div key={i} className="rounded-xl border bg-card p-4">
+                <p className="text-xs text-muted-foreground font-medium mb-1">{item.label}</p>
+                <p className="text-base font-bold text-primary">{item.value}</p>
               </div>
-            )}
+            ))}
           </div>
-
           <div className="rounded-xl border-2 border-secondary/30 bg-secondary/5 p-4 text-center">
             <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">Impacto financeiro total estimado</p>
             <p className="text-xl sm:text-2xl font-extrabold text-primary">
@@ -149,7 +136,6 @@ const RiskCalculator = () => {
               <span className="text-sm font-medium text-muted-foreground">/ano</span>
             </p>
           </div>
-
           <p className="text-[0.7rem] text-muted-foreground leading-relaxed italic">
             Faixas estimadas com base em porte da empresa, nível de não conformidade com NR-1 e parâmetros de multas praticadas no mercado atualmente. Os valores são uma ordem de grandeza e não constituem consultoria jurídica.
           </p>
@@ -169,91 +155,191 @@ const RiskCalculator = () => {
     );
   }
 
-  // ─── QUESTIONS RENDERER ───
-  const renderQuestions = (questions: typeof blocoNR1) => (
-    <div className="space-y-3">
-      {questions.map((q) => (
-        <div key={q.id} className="rounded-xl border bg-card p-3 sm:p-4">
-          <p className="text-xs sm:text-sm font-medium text-primary mb-2">{q.question}</p>
-          <div className="flex flex-wrap gap-2">
-            {q.options.map((opt, i) => (
-              <button
-                key={i}
-                onClick={() => setAnswers({ ...answers, [q.id]: opt.points })}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all ${
-                  answers[q.id] === opt.points
-                    ? "border-secondary bg-secondary/10 text-secondary"
-                    : "border-border hover:border-secondary/40 text-muted-foreground"
-                }`}
-              >
-                {opt.text}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  // ─── COMPANY FIELDS ───
-  const renderCompanyStep = () => (
-    <div className="space-y-4">
-      {companyFields.map((field) => (
-        <div key={field.id}>
-          <Label className="text-foreground/70 text-xs font-semibold tracking-wide uppercase mb-2 block">
-            {field.label}
-          </Label>
-          <div className="flex flex-wrap gap-2">
-            {field.options.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setCompany({ ...company, [field.id]: opt.value })}
-                className={`px-3 py-2 rounded-lg text-xs font-medium border-2 transition-all ${
-                  company[field.id] === opt.value
-                    ? "border-secondary bg-secondary/10 text-secondary"
-                    : "border-border hover:border-secondary/40 text-muted-foreground"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  // ─── CAPTURE FORM ───
-  const renderCapture = () => (
-    <div className="space-y-4 max-w-sm mx-auto">
-      <div className="text-center mb-4">
-        <Calculator className="h-10 w-10 text-secondary mx-auto mb-2" />
-        <p className="text-muted-foreground text-sm">Preencha seus dados para ver a simulação completa.</p>
+  // ─── STEP INDICATOR ───
+  const renderStepIndicator = () => (
+    <div className="mb-6 sm:mb-8">
+      {/* Desktop step indicator */}
+      <div className="hidden sm:flex items-center justify-between mb-2">
+        {STEPS.map((s, i) => {
+          const StepIcon = s.icon;
+          const isDone = i < step;
+          const isCurrent = i === step;
+          return (
+            <div key={i} className="flex flex-col items-center flex-1 relative">
+              {i > 0 && (
+                <div className={`absolute top-4 right-1/2 w-full h-0.5 -translate-y-1/2 ${
+                  isDone ? "bg-secondary" : "bg-border"
+                }`} />
+              )}
+              <div className={`relative z-10 h-8 w-8 rounded-full flex items-center justify-center transition-all ${
+                isCurrent
+                  ? "bg-secondary text-primary shadow-md shadow-secondary/30 scale-110"
+                  : isDone
+                    ? "bg-secondary/20 text-secondary"
+                    : "bg-muted text-muted-foreground"
+              }`}>
+                {isDone ? <CheckCircle className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
+              </div>
+              <span className={`text-[10px] mt-1.5 font-medium text-center leading-tight ${
+                isCurrent ? "text-secondary" : isDone ? "text-foreground/60" : "text-muted-foreground/50"
+              }`}>
+                {s.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
-      {[
-        { id: "nome", label: "Nome", icon: User, type: "text", placeholder: "Seu nome", required: true },
-        { id: "email", label: "E-mail", icon: Mail, type: "email", placeholder: "seu@email.com", required: true },
-        { id: "whatsapp", label: "WhatsApp", icon: Phone, type: "tel", placeholder: "(11) 99999-0000", required: false },
-        { id: "empresa", label: "Empresa", icon: Building2, type: "text", placeholder: "Nome da empresa", required: false },
-      ].map((f) => (
-        <div key={f.id}>
-          <Label htmlFor={`calc-${f.id}`} className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">
-            {f.label} {f.required && <span className="text-destructive">*</span>}
-          </Label>
-          <div className="relative mt-1.5">
-            <f.icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              id={`calc-${f.id}`}
-              type={f.type}
-              required={f.required}
-              value={(captureForm as any)[f.id]}
-              onChange={e => setCaptureForm({ ...captureForm, [f.id]: e.target.value })}
-              className="pl-10 bg-background"
-              placeholder={f.placeholder}
-            />
+      {/* Mobile step indicator */}
+      <div className="sm:hidden">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            {(() => { const Icon = STEPS[step].icon; return <Icon className="h-4 w-4 text-secondary" />; })()}
+            <span className="text-sm font-bold text-primary">{STEPS[step].label}</span>
           </div>
+          <span className="text-xs text-muted-foreground font-medium">{step + 1}/{totalSteps}</span>
         </div>
-      ))}
+        <div className="flex gap-1">
+          {STEPS.map((_, i) => (
+            <div key={i} className={`h-1 flex-1 rounded-full transition-all ${
+              i <= step ? "bg-secondary" : "bg-border"
+            }`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ─── QUESTIONS RENDERER (improved) ───
+  const renderQuestions = (questions: CalcQuestion[]) => {
+    const answeredCount = questions.filter(q => answers[q.id] !== undefined).length;
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-xs text-muted-foreground">
+            <span className="text-secondary font-bold">{answeredCount}</span> de {questions.length} respondidas
+          </p>
+        </div>
+        <div className="space-y-2.5 sm:space-y-3">
+          {questions.map((q, qIdx) => {
+            const isAnswered = answers[q.id] !== undefined;
+            return (
+              <div
+                key={q.id}
+                className={`rounded-xl border-2 p-3.5 sm:p-4 transition-all ${
+                  isAnswered
+                    ? "border-secondary/20 bg-secondary/[0.03]"
+                    : "border-border bg-card"
+                }`}
+              >
+                <div className="flex gap-2.5 items-start mb-3">
+                  <span className={`flex-shrink-0 h-5 w-5 rounded-full text-[10px] font-bold flex items-center justify-center mt-0.5 ${
+                    isAnswered
+                      ? "bg-secondary/20 text-secondary"
+                      : "bg-muted text-muted-foreground"
+                  }`}>
+                    {isAnswered ? "✓" : qIdx + 1}
+                  </span>
+                  <p className="text-xs sm:text-sm font-semibold text-primary leading-snug">{q.question}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pl-7">
+                  {q.options.map((opt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setAnswers({ ...answers, [q.id]: opt.points })}
+                      className={`py-2 sm:py-2.5 px-2 rounded-lg text-[11px] sm:text-xs font-semibold border-2 transition-all text-center leading-tight ${
+                        answers[q.id] === opt.points
+                          ? "border-secondary bg-secondary/15 text-secondary shadow-sm"
+                          : "border-border hover:border-secondary/30 text-muted-foreground hover:text-foreground bg-background"
+                      }`}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // ─── COMPANY FIELDS (improved) ───
+  const renderCompanyStep = () => (
+    <div className="space-y-5 sm:space-y-6">
+      <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-md mx-auto">
+        Comece informando o perfil da sua empresa para uma simulação precisa.
+      </p>
+      {companyFields.map((field, fIdx) => {
+        const icons = [Users, TrendingUp, BarChart3, Building2];
+        const FieldIcon = icons[fIdx] || Building2;
+        return (
+          <div key={field.id} className="rounded-xl border-2 border-border bg-card p-4 sm:p-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="h-7 w-7 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                <FieldIcon className="h-3.5 w-3.5 text-secondary" />
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-primary">{field.label}</span>
+            </div>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+              {field.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setCompany({ ...company, [field.id]: opt.value })}
+                  className={`py-2.5 px-3 rounded-lg text-xs sm:text-[13px] font-semibold border-2 transition-all text-center ${
+                    company[field.id] === opt.value
+                      ? "border-secondary bg-secondary/15 text-secondary shadow-sm"
+                      : "border-border hover:border-secondary/30 text-muted-foreground hover:text-foreground bg-background"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // ─── CAPTURE FORM (improved) ───
+  const renderCapture = () => (
+    <div className="max-w-sm mx-auto">
+      <div className="text-center mb-6">
+        <div className="h-14 w-14 rounded-2xl gold-gradient flex items-center justify-center mx-auto mb-4 shadow-md">
+          <Calculator className="h-7 w-7 text-primary" />
+        </div>
+        <h3 className="text-lg font-bold text-primary mb-1">Simulação pronta!</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Preencha seus dados para ver o resultado completo com score de risco, multas e impacto financeiro.
+        </p>
+      </div>
+      <div className="space-y-3.5">
+        {[
+          { id: "nome", label: "Nome", icon: User, type: "text", placeholder: "Seu nome completo", required: true },
+          { id: "email", label: "E-mail", icon: Mail, type: "email", placeholder: "seu@email.com", required: true },
+          { id: "whatsapp", label: "WhatsApp", icon: Phone, type: "tel", placeholder: "(11) 99999-0000", required: false },
+          { id: "empresa", label: "Empresa", icon: Building2, type: "text", placeholder: "Nome da empresa", required: false },
+        ].map((f) => (
+          <div key={f.id}>
+            <Label htmlFor={`calc-${f.id}`} className="text-foreground/70 text-xs font-semibold tracking-wide uppercase">
+              {f.label} {f.required && <span className="text-destructive">*</span>}
+            </Label>
+            <div className="relative mt-1.5">
+              <f.icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id={`calc-${f.id}`}
+                type={f.type}
+                required={f.required}
+                value={(captureForm as any)[f.id]}
+                onChange={e => setCaptureForm({ ...captureForm, [f.id]: e.target.value })}
+                className="pl-10 bg-background"
+                placeholder={f.placeholder}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
@@ -270,14 +356,7 @@ const RiskCalculator = () => {
 
   return (
     <div>
-      {/* Progress */}
-      <div className="mb-5">
-        <div className="flex justify-between text-xs font-medium text-muted-foreground mb-2">
-          <span>{STEPS[step].label}</span>
-          <span>Etapa {step + 1} de {totalSteps}</span>
-        </div>
-        <Progress value={progress} className="h-1.5" />
-      </div>
+      {renderStepIndicator()}
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -291,9 +370,9 @@ const RiskCalculator = () => {
         </motion.div>
       </AnimatePresence>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 sm:mt-8 flex justify-between items-center">
         {step > 0 ? (
-          <Button variant="outline" onClick={() => setStep(step - 1)} className="gap-2 py-5">
+          <Button variant="outline" onClick={() => setStep(step - 1)} className="gap-2 py-5 text-sm">
             <ArrowLeft className="h-4 w-4" /> Voltar
           </Button>
         ) : <div />}
@@ -302,7 +381,7 @@ const RiskCalculator = () => {
           disabled={!isStepComplete()}
           className="hero-gradient border-0 text-primary-foreground px-7 py-5 text-sm font-semibold gap-2 shadow-md disabled:opacity-40"
         >
-          {step === totalSteps - 1 ? "Ver simulação" : "Próxima"}
+          {step === totalSteps - 1 ? "Ver simulação" : "Próxima etapa"}
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
