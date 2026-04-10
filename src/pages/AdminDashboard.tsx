@@ -300,6 +300,11 @@ const AdminDashboard = () => {
                                 <ClipboardCheck className="h-3 w-3 flex-shrink-0 text-secondary" />
                                 <span className="text-secondary font-medium">{lead.desafio}</span>
                               </>
+                            ) : lead.desafio?.startsWith("Calculadora NR-1") ? (
+                              <>
+                                <Calculator className="h-3 w-3 flex-shrink-0 text-secondary" />
+                                <span className="text-secondary font-medium">{lead.desafio}</span>
+                              </>
                             ) : (
                               <>
                                 <Building2 className="h-3 w-3 flex-shrink-0" />{lead.empresa || "—"} {lead.cargo ? `· ${lead.cargo}` : ""}
