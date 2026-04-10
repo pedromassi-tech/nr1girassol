@@ -148,9 +148,9 @@ const Index = () => {
                 <Button
                   onClick={() => scrollTo("calculadora")}
                   variant="outline"
-                  className="border-secondary/40 text-primary-foreground hover:bg-primary-foreground/10 py-5 gap-2"
+                  className="border-secondary bg-secondary/15 text-primary-foreground hover:bg-secondary/25 py-5 gap-2 font-bold"
                 >
-                  <Calculator className="h-4 w-4" />
+                  <Calculator className="h-4 w-4 text-secondary" />
                   Calculadora de risco
                 </Button>
               </motion.div>
