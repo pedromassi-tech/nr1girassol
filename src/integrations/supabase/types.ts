@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      calculator_completions: {
+        Row: {
+          bloco_gestao: number
+          bloco_nr1: number
+          bloco_sinais: number
+          created_at: string
+          email: string
+          empresa: string
+          estrutura: string
+          faturamento: string
+          id: string
+          impacto_max: number
+          impacto_min: number
+          momento: string
+          multa_max: number
+          multa_min: number
+          nome: string
+          num_colaboradores: string
+          respostas: Json
+          risk_level: string
+          risk_score: number
+          whatsapp: string
+        }
+        Insert: {
+          bloco_gestao?: number
+          bloco_nr1?: number
+          bloco_sinais?: number
+          created_at?: string
+          email?: string
+          empresa?: string
+          estrutura?: string
+          faturamento?: string
+          id?: string
+          impacto_max?: number
+          impacto_min?: number
+          momento?: string
+          multa_max?: number
+          multa_min?: number
+          nome?: string
+          num_colaboradores?: string
+          respostas?: Json
+          risk_level?: string
+          risk_score?: number
+          whatsapp?: string
+        }
+        Update: {
+          bloco_gestao?: number
+          bloco_nr1?: number
+          bloco_sinais?: number
+          created_at?: string
+          email?: string
+          empresa?: string
+          estrutura?: string
+          faturamento?: string
+          id?: string
+          impacto_max?: number
+          impacto_min?: number
+          momento?: string
+          multa_max?: number
+          multa_min?: number
+          nome?: string
+          num_colaboradores?: string
+          respostas?: Json
+          risk_level?: string
+          risk_score?: number
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           cargo: string
