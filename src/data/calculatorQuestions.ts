@@ -189,8 +189,17 @@ export function calculateResult(
   const totalRiskRaw = nr1Score + sinaisScore + gestaoScore;
   const riskScore = Math.round((totalRiskRaw / 200) * 100);
 
-  // Reputation score: based on blocoReputacao (max 50)
-  const reputationScore = Math.round((reputacaoScore / 50) * 100);
+  // Reputation score: hybrid — blocoReputacao (independente) + sinais derivados de risco
+  // Perguntas derivadas que impactam reputação: liderança, clareza de papéis, desgaste, conflitos, canal assédio
+  const derivedRepPoints =
+    (answers["lideranca"] ?? 0) +       // gestão: rotina de liderança
+    (answers["clareza_papeis"] ?? 0) +   // sinais: papéis confusos = reputação fraca
+    (answers["desgaste"] ?? 0) +         // sinais: desgaste emocional percebido
+    (answers["conflitos"] ?? 0) +        // sinais: conflitos/denúncias
+    (answers["assedio"] ?? 0);           // NR1: canal formal assédio
+  // blocoReputacao max = 50, derived max = 50 → total max = 100
+  const reputationRaw = reputacaoScore + derivedRepPoints;
+  const reputationScore = Math.round((reputationRaw / 100) * 100);
 
   let riskLevel: string;
   let riskColor: string;
