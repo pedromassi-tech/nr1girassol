@@ -252,6 +252,47 @@ export interface ParsedProposalData {
   detectados: string[];
 }
 
+// Lista de cargos reconhecidos (ordem importa: específicos antes de genéricos)
+const CARGOS_LIST = [
+  "CHRO", "CEO", "CFO", "COO", "CTO", "CMO",
+  "diretora de RH", "diretor de RH", "diretora de pessoas", "diretor de pessoas",
+  "diretora de gente", "diretor de gente", "diretora de SST", "diretor de SST",
+  "diretora geral", "diretor geral", "diretora executiva", "diretor executivo",
+  "diretora", "diretor",
+  "gerente de RH", "gerente de pessoas", "gerente de SST", "gerente de gente",
+  "gerente geral", "gerente",
+  "head de RH", "head de pessoas", "head de gente", "head de people", "head",
+  "coordenadora de RH", "coordenador de RH", "coordenadora de pessoas", "coordenador de pessoas",
+  "coordenadora de SST", "coordenador de SST", "coordenadora", "coordenador",
+  "supervisora de RH", "supervisor de RH", "supervisora", "supervisor",
+  "presidente", "vice-presidente",
+  "sócia-fundadora", "sócio-fundador", "sócia", "sócio",
+  "fundadora", "fundador", "co-fundadora", "co-fundador",
+  "people business partner", "business partner", "BP de RH", "HRBP",
+  "analista de RH", "analista de pessoas",
+  "owner", "proprietária", "proprietário", "dona", "dono",
+];
+
+const STOP_WORDS_NOME = new Set([
+  "Cliente","Empresa","Reunião","Reuniao","Call","Diagnóstico","Diagnostico","Resumo",
+  "Modelo","Grau","Risco","PGR","RH","SST","CNAE","Não","Nao","Sim","Tem","Sem",
+  "Já","Ja","Quer","Precisa","Hoje","Ontem","Amanhã","Amanha",
+  "Janeiro","Fevereiro","Março","Marco","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro",
+  "Segunda","Terça","Terca","Quarta","Quinta","Sexta","Sábado","Sabado","Domingo",
+  "São","Sao","Rio","Brasil","Brasília","Brasilia",
+]);
+
+function isPlausibleName(s: string): boolean {
+  const parts = s.trim().split(/\s+/);
+  if (parts.length < 1 || parts.length > 5) return false;
+  for (const p of parts) {
+    if (STOP_WORDS_NOME.has(p)) return false;
+    if (!/^[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ'’-]+$/.test(p) && !/^(de|da|do|das|dos|e)$/i.test(p)) return false;
+  }
+  // pelo menos uma palavra capitalizada com 3+ letras
+  return parts.some(p => /^[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]{2,}/.test(p));
+}
+
 // Extrai dados de contato do cliente a partir do texto livre
 function extractClienteData(text: string): {
   clienteNome?: string;
@@ -264,70 +305,110 @@ function extractClienteData(text: string): {
 } {
   const out: ReturnType<typeof extractClienteData> = {};
 
-  // Email
-  const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
-  if (emailMatch) out.clienteEmail = emailMatch[0];
-
-  // WhatsApp / telefone (BR): captura sequências com 10-13 dígitos, com ou sem máscara
-  const phoneMatch = text.match(/(?:\+?55\s*)?\(?\d{2}\)?[\s.-]?9?\d{4}[\s.-]?\d{4}/);
-  if (phoneMatch) out.clienteWhatsapp = phoneMatch[0].trim();
-
-  // Faturamento (ex.: "faturamento de 50 milhões", "fatura R$ 12mi")
-  const fatMatch = text.match(/fatura(?:mento|m|)[^.\n]{0,40}?(r?\$?\s*[\d.,]+\s*(?:mi|mil|milh[õo]es?|bi|bilh[õo]es?|k|m)?)/i);
-  if (fatMatch) out.faturamentoAnual = fatMatch[1].trim();
-
-  // CNAE (ex.: "CNAE 47.11-3")
-  const cnaeMatch = text.match(/cnae[^\d]{0,8}([\d.\-/]{4,})/i);
-  if (cnaeMatch) out.cnae = cnaeMatch[1];
-
-  // Empresa: "empresa X", "cliente é a X", "da X Ltda", "rede X"
-  const empresaPatterns = [
-    /(?:empresa|cliente|raz[ãa]o social|companhia|grupo|rede)\s*(?:é|e|:|chama(?:da|do)?|chamad[ao])?\s*(?:a |o |as |os )?["“]?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,60}?)["”]?(?=[.,;\n]| (?:com|que|tem|possui|atua|de \d|é |responsável|opera))/,
-    /\b([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,40}?)\s+(?:Ltda|S\.?A\.?|ME|EIRELI|S\/A)\b/,
+  // ─── Campos rotulados explicitamente: "Nome: João Silva", "Empresa - Acme" ───
+  const labelPatterns: Array<[RegExp, keyof typeof out]> = [
+    [/(?:^|\n)\s*(?:nome|cliente|respons[áa]vel|contato|interlocutor)\s*[:\-–]\s*([^\n,;]{2,80})/i, "clienteNome"],
+    [/(?:^|\n)\s*(?:empresa|raz[ãa]o social|companhia|organiza[çc][ãa]o)\s*[:\-–]\s*([^\n,;]{2,80})/i, "clienteEmpresa"],
+    [/(?:^|\n)\s*(?:cargo|fun[çc][ãa]o|posi[çc][ãa]o)\s*[:\-–]\s*([^\n,;]{2,80})/i, "clienteCargo"],
+    [/(?:^|\n)\s*(?:e-?mail|email)\s*[:\-–]\s*([^\s,;]+@[^\s,;]+)/i, "clienteEmail"],
+    [/(?:^|\n)\s*(?:whats(?:app)?|telefone|tel|celular|fone|contato telef[oô]nico)\s*[:\-–]\s*([+\d\s().-]{8,25})/i, "clienteWhatsapp"],
+    [/(?:^|\n)\s*(?:faturamento(?:\s*anual)?|receita)\s*[:\-–]\s*([^\n,;]{2,60})/i, "faturamentoAnual"],
+    [/(?:^|\n)\s*cnae\s*[:\-–]\s*([\d.\-/\s]{4,20})/i, "cnae"],
   ];
-  for (const re of empresaPatterns) {
+  for (const [re, key] of labelPatterns) {
     const m = text.match(re);
-    if (m && m[1]) {
-      out.clienteEmpresa = m[1].trim().replace(/\s{2,}/g, " ");
-      break;
+    if (m && m[1]) (out as Record<string, string>)[key] = m[1].trim().replace(/\s{2,}/g, " ");
+  }
+
+  // ─── Email ───
+  if (!out.clienteEmail) {
+    const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+    if (emailMatch) out.clienteEmail = emailMatch[0];
+  }
+
+  // ─── Telefone / WhatsApp ───
+  if (!out.clienteWhatsapp) {
+    const phoneMatch = text.match(/(?:\+?55[\s.-]?)?\(?\d{2}\)?[\s.-]?9?\d{4}[\s.-]?\d{4}/);
+    if (phoneMatch) out.clienteWhatsapp = phoneMatch[0].trim();
+  }
+
+  // ─── Faturamento ───
+  if (!out.faturamentoAnual) {
+    const fatMatch = text.match(/fatura(?:mento|m)?[^.\n]{0,40}?(r?\$?\s*[\d.,]+\s*(?:mi|mil|milh[õo]es?|bi|bilh[õo]es?|k|m)?)/i);
+    if (fatMatch) out.faturamentoAnual = fatMatch[1].trim();
+  }
+
+  // ─── CNAE ───
+  if (!out.cnae) {
+    const cnaeMatch = text.match(/cnae[^\d]{0,8}([\d.\-/]{4,})/i);
+    if (cnaeMatch) out.cnae = cnaeMatch[1];
+  }
+
+  // ─── Empresa ───
+  if (!out.clienteEmpresa) {
+    const empresaPatterns = [
+      // "empresa chamada Acme", "rede X", "grupo Y", "cliente é a Z"
+      /(?:empresa|cliente|raz[ãa]o social|companhia|grupo|rede|holding|franquia|loja|marca|neg[oó]cio)\s*(?:é|e|:|chama(?:da|do)?|chamad[ao]|denominad[ao])?\s*(?:a |o |as |os |um[a]? )?["“]([^"”\n]{2,60})["”]/i,
+      /(?:empresa|cliente|grupo|rede|holding|marca|neg[oó]cio)\s+(?:é|e)\s+(?:a |o )?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,50}?)(?=[.,;\n]| (?:com|que|tem|possui|atua|opera|emprega|de R\$|\d))/,
+      /(?:trabalha(?:mos)?\s+(?:com|para|junto\s+(?:à|a|ao)))\s+(?:a |o )?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,50}?)(?=[.,;\n])/,
+      // "Acme Ltda", "Beta S.A."
+      /\b([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,40}?)\s+(?:Ltda|S\.?A\.?|ME|EIRELI|S\/A|EPP)\b/,
+    ];
+    for (const re of empresaPatterns) {
+      const m = text.match(re);
+      if (m && m[1]) {
+        out.clienteEmpresa = m[1].trim().replace(/\s{2,}/g, " ").replace(/[.,;]+$/, "");
+        break;
+      }
     }
   }
 
-  // Cargo do responsável (busca cargos comuns)
-  const cargos = [
-    "CEO", "CFO", "COO", "CHRO", "CTO",
-    "diretor de RH", "diretora de RH", "diretor", "diretora",
-    "gerente de RH", "gerente de pessoas", "gerente de SST", "gerente",
-    "head de RH", "head de pessoas", "head",
-    "coordenador de RH", "coordenadora de RH", "coordenador", "coordenadora",
-    "supervisor de RH", "supervisora de RH",
-    "presidente", "sócio", "sócia", "sócio-fundador", "fundador", "fundadora",
-    "business partner", "BP de RH",
-  ];
-  for (const cargo of cargos) {
-    const re = new RegExp(`\\b${cargo.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}\\b`, "i");
-    if (re.test(text)) {
-      out.clienteCargo = cargo;
-      break;
+  // ─── Cargo ───
+  if (!out.clienteCargo) {
+    for (const cargo of CARGOS_LIST) {
+      const escaped = cargo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(`\\b${escaped}\\b`, "i");
+      if (re.test(text)) {
+        out.clienteCargo = cargo;
+        break;
+      }
     }
   }
 
-  // Nome do responsável: procura "responsável é X", "falamos com X", "reunião com X"
-  // ou "X (cargo)" / "X, cargo" próximo a um cargo detectado
-  const nomePatterns = [
-    /(?:respons[áa]vel|contato|interlocutor|falamos com|reuni[ãa]o com|call com|conversamos com|cliente é|cliente:|nome:)\s*(?:a |o )?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+){0,3})/,
-    /\b([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+){1,3})\s*(?:,|\(|\s-\s)\s*(?:CEO|CFO|COO|diretor|diretora|gerente|head|coordenador|coordenadora|supervisor|supervisora|presidente|s[óo]cio|fundador|fundadora)/i,
-  ];
-  for (const re of nomePatterns) {
-    const m = text.match(re);
-    if (m && m[1]) {
-      const candidate = m[1].trim();
-      // Evita pegar nomes de empresa já capturados
-      if (!out.clienteEmpresa || !out.clienteEmpresa.toLowerCase().includes(candidate.toLowerCase())) {
+  // ─── Nome do responsável ───
+  if (!out.clienteNome) {
+    const nomeRe = "([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ'’-]+(?:\\s+(?:de|da|do|das|dos|e|[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ'’-]+)){0,4})";
+    const cargosRe = CARGOS_LIST.map(c => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+
+    const nomePatterns: RegExp[] = [
+      // "responsável é a Maria Silva", "falamos com João Pedro"
+      new RegExp(`(?:respons[áa]vel|contato|interlocutor[a]?|ponto focal|decisor[a]?|sponsor|falamos com|reuni[ãa]o com|call com|conversamos com|reunido com|atendido por|cliente é|cliente:|nome:|chama(?:-se|do|da)|se chama|atende(?:mos)? a|atendemos o)[\\s,:]*\\s*(?:a |o |sra\\.?\\s*|sr\\.?\\s*|dra?\\.?\\s*)?${nomeRe}`, "i"),
+      // "Maria, diretora de RH", "João (CEO)", "Pedro - gerente"
+      new RegExp(`\\b${nomeRe}\\s*(?:,|\\(|\\s[-–]\\s)\\s*(?:é\\s*)?(?:a\\s+|o\\s+)?(?:${cargosRe})`, "i"),
+      // "diretora Maria Silva", "CEO João da Silva"
+      new RegExp(`\\b(?:${cargosRe})\\s+${nomeRe}\\b`, "i"),
+      // "(nome) da Empresa X" — nome seguido de "da/do" + capitalizada
+      new RegExp(`\\b${nomeRe}\\s+(?:da|do)\\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ]`, ""),
+    ];
+
+    for (const re of nomePatterns) {
+      const m = text.match(re);
+      if (m && m[1]) {
+        const candidate = m[1].trim().replace(/\s{2,}/g, " ");
+        if (!isPlausibleName(candidate)) continue;
+        if (out.clienteEmpresa && out.clienteEmpresa.toLowerCase().includes(candidate.toLowerCase())) continue;
+        // não confundir cargo com nome
+        if (CARGOS_LIST.some(c => c.toLowerCase() === candidate.toLowerCase())) continue;
         out.clienteNome = candidate;
         break;
       }
     }
+  }
+
+  // ─── Limpeza final: nome não pode ser igual à empresa ───
+  if (out.clienteNome && out.clienteEmpresa &&
+      out.clienteNome.toLowerCase() === out.clienteEmpresa.toLowerCase()) {
+    delete out.clienteNome;
   }
 
   return out;
