@@ -277,6 +277,7 @@ const AdminDashboard = () => {
             { key: "crm" as const, label: `CRM (${leads.length})` },
             { key: "metricas" as const, label: "Métricas" },
             { key: "calculadora" as const, label: `Calculadora (${calcResults.length})` },
+            { key: "propostas" as const, label: `Propostas (${proposals.length})` },
             { key: "admins" as const, label: `Admins (${admins.length})` },
           ].map((t) => (
             <button
