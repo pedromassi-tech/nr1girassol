@@ -125,6 +125,14 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     update("investimentoTotal", totalCalculado);
   };
 
+  // Auto-aplica o cálculo quando o investimento ainda está zerado (proposta nova)
+  useEffect(() => {
+    if (draft.investimentoTotal === 0 && totalCalculado > 0) {
+      update("investimentoTotal", totalCalculado);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalCalculado, draft.investimentoTotal]);
+
   const update = <K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) => {
     setDraft(d => ({ ...d, [key]: value }));
   };
