@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { getProposals, deleteProposal, type Proposal } from "@/lib/proposalsStore";
 import ProposalForm from "@/components/admin/ProposalForm";
+import ProposalCreatorChoice from "@/components/admin/ProposalCreatorChoice";
+import type { ProposalDraft } from "@/lib/proposalsStore";
 import { toast } from "@/hooks/use-toast";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
@@ -54,9 +56,10 @@ const AdminDashboard = () => {
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null }>({
-    open: false, lead: null, proposal: null,
+  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null; prefill: Partial<ProposalDraft> | null }>({
+    open: false, lead: null, proposal: null, prefill: null,
   });
+  const [creatorChoice, setCreatorChoice] = useState<{ open: boolean; lead: Lead | null }>({ open: false, lead: null });
   const [proposalsSearch, setProposalsSearch] = useState("");
 
   const refreshData = async () => {
@@ -126,11 +129,11 @@ const AdminDashboard = () => {
   };
 
   const handleNewProposalForLead = (lead: Lead) => {
-    setProposalForm({ open: true, lead, proposal: null });
+    setCreatorChoice({ open: true, lead });
   };
 
   const handleEditProposal = (proposal: Proposal) => {
-    setProposalForm({ open: true, lead: null, proposal });
+    setProposalForm({ open: true, lead: null, proposal, prefill: null });
   };
 
   const handleProposalSaved = () => {
@@ -731,7 +734,7 @@ const AdminDashboard = () => {
         {tab === "propostas" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <Button onClick={() => setProposalForm({ open: true, lead: null, proposal: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
+              <Button onClick={() => setCreatorChoice({ open: true, lead: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
                 <Plus className="h-4 w-4" /> Nova proposta
               </Button>
               <div className="relative sm:w-64">
@@ -835,11 +838,28 @@ const AdminDashboard = () => {
         )}
       </div>
 
+      <ProposalCreatorChoice
+        open={creatorChoice.open}
+        onOpenChange={(open) => setCreatorChoice(s => ({ ...s, open }))}
+        lead={creatorChoice.lead}
+        onPickBlank={() => {
+          const lead = creatorChoice.lead;
+          setCreatorChoice({ open: false, lead: null });
+          setProposalForm({ open: true, lead, proposal: null, prefill: null });
+        }}
+        onPickAI={(prefill) => {
+          const lead = creatorChoice.lead;
+          setCreatorChoice({ open: false, lead: null });
+          setProposalForm({ open: true, lead, proposal: null, prefill });
+        }}
+      />
+
       <ProposalForm
         open={proposalForm.open}
         onOpenChange={(open) => setProposalForm(s => ({ ...s, open }))}
         lead={proposalForm.lead}
         proposal={proposalForm.proposal}
+        prefill={proposalForm.prefill}
         onSaved={handleProposalSaved}
       />
     </div>
