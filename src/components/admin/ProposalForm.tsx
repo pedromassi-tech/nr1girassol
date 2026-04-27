@@ -366,6 +366,54 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, onSaved }: ProposalF
 
           {/* INVESTIMENTO */}
           <Section icon={DollarSign} title="Investimento">
+            {/* Calculadora de horas */}
+            <div className="border border-secondary/30 rounded-lg p-3 bg-secondary/5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-secondary" />
+                <span className="text-sm font-bold text-primary">Calculadora de horas</span>
+                <span className="text-[10px] text-muted-foreground ml-auto">Sugestão automática a partir do escopo</span>
+              </div>
+              <Grid>
+                <Field label="Horas estimadas (auto)">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={horasFinais}
+                    onChange={e => setHorasManual(+e.target.value || 0)}
+                  />
+                  {horasManual !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setHorasManual(null)}
+                      className="text-[10px] text-secondary hover:underline mt-1"
+                    >
+                      Restaurar sugestão ({horasEstimadas}h)
+                    </button>
+                  )}
+                </Field>
+                <Field label="Valor da hora (R$)">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={valorHora}
+                    onChange={e => setValorHora(+e.target.value || 0)}
+                  />
+                </Field>
+              </Grid>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
+                <div className="text-sm flex-1">
+                  <span className="text-muted-foreground">Total calculado:</span>{" "}
+                  <span className="font-bold text-primary">
+                    {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </span>
+                  <span className="text-xs text-muted-foreground ml-2">({horasFinais}h × R$ {valorHora})</span>
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={aplicarCalculo} className="gap-1.5 border-secondary text-secondary hover:bg-secondary/10">
+                  <Wand2 className="h-3.5 w-3.5" /> Aplicar ao investimento
+                </Button>
+              </div>
+            </div>
+
             <Grid>
               <Field label="Investimento total (R$)">
                 <Input type="number" min={0} value={draft.investimentoTotal} onChange={e => update("investimentoTotal", +e.target.value || 0)} />
