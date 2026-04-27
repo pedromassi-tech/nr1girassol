@@ -51,6 +51,7 @@ const emptyDraft = (lead?: Lead | null): ProposalDraft => ({
   investimentoParcelas: 4,
   investimentoObservacao: "Pagamento em até 4x sem juros via boleto ou PIX.",
   validadeDias: 15,
+  observacoesInternas: "",
 });
 
 const proposalToDraft = (p: Proposal): ProposalDraft => ({
