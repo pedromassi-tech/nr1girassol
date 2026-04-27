@@ -91,6 +91,111 @@ export const quizQuestions: QuizQuestion[] = [
   },
 ];
 
+// ============================================================
+// Reputação Organizacional (0–100) — dimensão independente
+// ============================================================
+export const reputationQuestions: QuizQuestion[] = [
+  {
+    question: "As pessoas se sentem à vontade para reportar erros ou problemas sem medo de punição?",
+    options: [
+      { text: "Não", points: 0 },
+      { text: "Parcialmente", points: 5 },
+      { text: "Sim", points: 10 },
+    ],
+  },
+  {
+    question: "A liderança é vista como exemplo de coerência e equilíbrio emocional?",
+    options: [
+      { text: "Não", points: 0 },
+      { text: "Parcialmente", points: 5 },
+      { text: "Sim", points: 10 },
+    ],
+  },
+  {
+    question: "Os papéis e responsabilidades da equipe estão claros no dia a dia?",
+    options: [
+      { text: "Não", points: 0 },
+      { text: "Parcialmente", points: 5 },
+      { text: "Sim", points: 10 },
+    ],
+  },
+  {
+    question: "A comunicação entre áreas acontece sem ruído ou tensão frequente?",
+    options: [
+      { text: "Não", points: 0 },
+      { text: "Parcialmente", points: 5 },
+      { text: "Sim", points: 10 },
+    ],
+  },
+  {
+    question: "A empresa age com transparência frente a crises ou erros?",
+    options: [
+      { text: "Não", points: 0 },
+      { text: "Parcialmente", points: 5 },
+      { text: "Sim", points: 10 },
+    ],
+  },
+];
+
+export interface ReputationResult {
+  score: number; // 0–100
+  level: string;
+  text: string;
+}
+
+export function getReputationResult(answers: number[]): ReputationResult {
+  const total = answers.reduce((a, b) => a + b, 0);
+  const max = reputationQuestions.length * 10;
+  const score = Math.round((total / max) * 100);
+  if (score <= 40) {
+    return {
+      score,
+      level: "Reputação Frágil",
+      text: "A percepção interna de segurança psicológica, liderança e clareza organizacional está baixa. Esse cenário enfraquece a marca empregadora e aumenta o risco de exposição pública.",
+    };
+  }
+  if (score <= 70) {
+    return {
+      score,
+      level: "Reputação em Construção",
+      text: "Há sinais positivos em segurança psicológica e liderança, mas ainda existem inconsistências que afetam a percepção interna e externa da empresa.",
+    };
+  }
+  return {
+    score,
+    level: "Reputação Sólida",
+    text: "A empresa já demonstra ambiente psicologicamente seguro, liderança coerente e clareza organizacional — fatores que fortalecem reputação e atração de talentos.",
+  };
+}
+
+// ============================================================
+// Impacto Financeiro Estimado (faixa em R$)
+// ============================================================
+export interface FinancialImpact {
+  min: number;
+  max: number;
+  label: string;
+}
+
+export function getFinancialImpact(riskScore: number, reputationScore: number): FinancialImpact {
+  // Quanto pior risco e reputação, maior o impacto estimado anual
+  const riskGap = 100 - riskScore;
+  const repGap = 100 - reputationScore;
+  const severity = (riskGap * 0.6 + repGap * 0.4) / 100; // 0–1
+  const min = Math.round(80_000 + severity * 420_000);
+  const max = Math.round(250_000 + severity * 1_750_000);
+  let label = "Impacto contido";
+  if (severity > 0.6) label = "Impacto crítico";
+  else if (severity > 0.35) label = "Impacto relevante";
+  return { min, max, label };
+}
+
+export function formatBRL(value: number): string {
+  if (value >= 1_000_000) return `R$ ${(value / 1_000_000).toFixed(1).replace(".", ",")}M`;
+  if (value >= 1_000) return `R$ ${Math.round(value / 1_000)}k`;
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+
 export interface ScoreResult {
   level: string;
   color: string;
