@@ -174,4 +174,30 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
   );
 };
 
+const MatchRow = ({ icon: Icon, label, match, searched }: {
+  icon: typeof ClipboardCheck; label: string; match: MatchInfo | null; searched: boolean;
+}) => {
+  const found = !!match;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      {found ? (
+        <CheckCircle2 className="h-4 w-4 text-secondary" />
+      ) : (
+        <Circle className="h-4 w-4 text-muted-foreground" />
+      )}
+      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      <span className="font-medium">{label}:</span>
+      {!searched ? (
+        <span className="text-muted-foreground">será buscado ao gerar</span>
+      ) : found ? (
+        <span className="text-secondary font-semibold">
+          encontrado · match por {match!.reason}
+        </span>
+      ) : (
+        <span className="text-muted-foreground">nenhum registro relacionado</span>
+      )}
+    </div>
+  );
+};
+
 export default ProposalCreatorChoice;
