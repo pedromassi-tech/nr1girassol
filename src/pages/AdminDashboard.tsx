@@ -108,6 +108,47 @@ const AdminDashboard = () => {
     refreshData();
   };
 
+  const proposalLink = (slug: string) => `${window.location.origin}/proposta/${slug}`;
+
+  const handleCopyProposalLink = async (slug: string) => {
+    try {
+      await navigator.clipboard.writeText(proposalLink(slug));
+      toast({ title: "Link copiado!", description: "Link da proposta copiado para a área de transferência." });
+    } catch {
+      toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteProposal = async (id: string) => {
+    if (!confirm("Excluir esta proposta? Essa ação não pode ser desfeita.")) return;
+    await deleteProposal(id);
+    refreshData();
+  };
+
+  const handleNewProposalForLead = (lead: Lead) => {
+    setProposalForm({ open: true, lead, proposal: null });
+  };
+
+  const handleEditProposal = (proposal: Proposal) => {
+    setProposalForm({ open: true, lead: null, proposal });
+  };
+
+  const handleProposalSaved = () => {
+    refreshData();
+  };
+
+  const proposalsByLead = (leadId: string) => proposals.filter(p => p.leadId === leadId);
+
+  const filteredProposals = proposals.filter(p => {
+    if (!proposalsSearch) return true;
+    const q = proposalsSearch.toLowerCase();
+    return (
+      p.clienteNome.toLowerCase().includes(q) ||
+      p.clienteEmpresa.toLowerCase().includes(q) ||
+      p.slug.toLowerCase().includes(q)
+    );
+  });
+
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
     setAdminError("");
