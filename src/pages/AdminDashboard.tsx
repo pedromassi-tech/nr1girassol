@@ -56,9 +56,10 @@ const AdminDashboard = () => {
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null }>({
-    open: false, lead: null, proposal: null,
+  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null; prefill: Partial<ProposalDraft> | null }>({
+    open: false, lead: null, proposal: null, prefill: null,
   });
+  const [creatorChoice, setCreatorChoice] = useState<{ open: boolean; lead: Lead | null }>({ open: false, lead: null });
   const [proposalsSearch, setProposalsSearch] = useState("");
 
   const refreshData = async () => {
