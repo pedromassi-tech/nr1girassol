@@ -280,7 +280,7 @@ const PublicProposal = () => {
             Para aceitar ou tirar dúvidas, entre em contato:
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={`https://wa.me/5511999999999?text=${aceitarMsg}`} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/553184346241?text=${aceitarMsg}`} target="_blank" rel="noopener noreferrer">
               <Button className="hero-gradient border-0 text-primary-foreground gap-2 px-6 py-6 text-base font-semibold w-full sm:w-auto">
                 <MessageCircle className="h-5 w-5" /> Aceitar proposta no WhatsApp
                 <ArrowRight className="h-5 w-5" />
