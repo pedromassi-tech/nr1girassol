@@ -39,7 +39,7 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "propostas" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
   const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
@@ -53,6 +53,11 @@ const AdminDashboard = () => {
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "todos">("todos");
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null }>({
+    open: false, lead: null, proposal: null,
+  });
+  const [proposalsSearch, setProposalsSearch] = useState("");
 
   const refreshData = async () => {
     try {
