@@ -49,8 +49,8 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
           </DialogTitle>
           <DialogDescription>
             {mode === "choose"
-              ? "Escolha começar do zero ou colar o resumo da reunião para preencher os campos automaticamente."
-              : "Cole o resumo da reunião. O sistema identifica número de unidades, colaboradores, líderes, modelo de trabalho, status do PGR e mais — você só revisa."}
+              ? "Escolha começar do zero ou colar o resumo da reunião para gerar uma proposta estruturada automaticamente."
+              : "Cole o resumo da reunião. O sistema transforma o texto em escopo, diferenciais, entregáveis, fases, prazo e notas internas — você só revisa antes de salvar."}
           </DialogDescription>
         </DialogHeader>
 
@@ -78,7 +78,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
                 <span className="text-[9px] bg-secondary text-primary px-1.5 py-0.5 rounded font-bold">RÁPIDO</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Cole o resumo e o sistema preenche escopo, números e notas internas automaticamente.
+                Cole o resumo e o sistema monta escopo, diferenciais, entregáveis, fases, prazo e notas internas.
               </p>
             </button>
           </div>
@@ -94,7 +94,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
                 rows={10}
                 value={transcricao}
                 onChange={e => setTranscricao(e.target.value)}
-                placeholder={`Cole aqui o resumo da call. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Modelo presencial. Não tem PGR. Tem equipe de RH interna. Sem prestadores. 12 líderes no total. Grau de risco 3. Quer fechar até o fim do mês."`}
+                placeholder={`Cole aqui o resumo da call. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Modelo presencial. Não tem PGR. Tem equipe de RH interna. Sem prestadores. 12 líderes no total. Grau de risco 3. Já teve afastamentos por burnout, sobrecarga nas equipes e conflitos entre áreas. Quer fechar até o fim do mês por risco de fiscalização."`}
                 className="mt-2 text-sm"
               />
               <p className="text-[10px] text-muted-foreground mt-1">
