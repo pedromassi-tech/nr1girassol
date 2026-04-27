@@ -838,11 +838,28 @@ const AdminDashboard = () => {
         )}
       </div>
 
+      <ProposalCreatorChoice
+        open={creatorChoice.open}
+        onOpenChange={(open) => setCreatorChoice(s => ({ ...s, open }))}
+        lead={creatorChoice.lead}
+        onPickBlank={() => {
+          const lead = creatorChoice.lead;
+          setCreatorChoice({ open: false, lead: null });
+          setProposalForm({ open: true, lead, proposal: null, prefill: null });
+        }}
+        onPickAI={(prefill) => {
+          const lead = creatorChoice.lead;
+          setCreatorChoice({ open: false, lead: null });
+          setProposalForm({ open: true, lead, proposal: null, prefill });
+        }}
+      />
+
       <ProposalForm
         open={proposalForm.open}
         onOpenChange={(open) => setProposalForm(s => ({ ...s, open }))}
         lead={proposalForm.lead}
         proposal={proposalForm.proposal}
+        prefill={proposalForm.prefill}
         onSaved={handleProposalSaved}
       />
     </div>
