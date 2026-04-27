@@ -467,6 +467,53 @@ const AdminDashboard = () => {
                             )}
                           </div>
 
+                          {/* Propostas do lead */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                                <FileText className="h-3 w-3" /> Propostas comerciais
+                              </p>
+                              <button
+                                onClick={() => handleNewProposalForLead(lead)}
+                                className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
+                              >
+                                <Plus className="h-3 w-3" /> Nova proposta
+                              </button>
+                            </div>
+                            {proposalsByLead(lead.id).length === 0 ? (
+                              <p className="text-xs text-muted-foreground italic bg-muted/20 rounded-lg p-2.5">
+                                Nenhuma proposta criada para este lead.
+                              </p>
+                            ) : (
+                              <div className="space-y-1.5">
+                                {proposalsByLead(lead.id).map(p => (
+                                  <div key={p.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 border border-border">
+                                    <Sparkles className="h-3.5 w-3.5 text-secondary flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-semibold text-primary truncate">
+                                        {p.clienteEmpresa} · {p.investimentoTotal > 0 ? `R$ ${(p.investimentoTotal / 1000).toFixed(0)}k` : "Sem valor"}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground">
+                                        {new Date(p.createdAt).toLocaleDateString("pt-BR")} · {p.status}
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button onClick={() => handleCopyProposalLink(p.slug)} title="Copiar link" className="h-7 w-7 rounded-md bg-card border hover:bg-secondary/10 flex items-center justify-center text-muted-foreground hover:text-secondary transition-colors">
+                                        <Copy className="h-3.5 w-3.5" />
+                                      </button>
+                                      <a href={proposalLink(p.slug)} target="_blank" rel="noopener noreferrer" title="Abrir" className="h-7 w-7 rounded-md bg-card border hover:bg-secondary/10 flex items-center justify-center text-muted-foreground hover:text-secondary transition-colors">
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                      </a>
+                                      <button onClick={() => handleEditProposal(p)} title="Editar" className="text-[10px] font-semibold text-primary hover:underline px-2">
+                                        Editar
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
                           {/* Meta + Delete */}
                           <div className="flex items-center justify-between pt-2 border-t">
                             <span className="text-[10px] text-muted-foreground">
