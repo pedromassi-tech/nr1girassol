@@ -13,8 +13,11 @@ import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote, Lock, Calculator,
+  BarChart3, StickyNote, Lock, Calculator, FileText, Plus, Copy, ExternalLink, Sparkles,
 } from "lucide-react";
+import { getProposals, deleteProposal, type Proposal } from "@/lib/proposalsStore";
+import ProposalForm from "@/components/admin/ProposalForm";
+import { toast } from "@/hooks/use-toast";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
   novo: { label: "Novo", color: "bg-blue-100 text-blue-700 border-blue-200", icon: AlertTriangle },
