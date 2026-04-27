@@ -94,7 +94,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
                 rows={10}
                 value={transcricao}
                 onChange={e => setTranscricao(e.target.value)}
-                placeholder={`Cole aqui o resumo da call. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Modelo presencial. Não tem PGR. Tem equipe de RH interna. Sem prestadores. 12 líderes no total. Grau de risco 3. Quer fechar até o fim do mês."`}
+                placeholder={`Cole aqui o resumo da call. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Modelo presencial. Não tem PGR. Tem equipe de RH interna. Sem prestadores. 12 líderes no total. Grau de risco 3. Já teve afastamentos por burnout, sobrecarga nas equipes e conflitos entre áreas. Quer fechar até o fim do mês por risco de fiscalização."`}
                 className="mt-2 text-sm"
               />
               <p className="text-[10px] text-muted-foreground mt-1">
