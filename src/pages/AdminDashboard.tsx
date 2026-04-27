@@ -61,21 +61,24 @@ const AdminDashboard = () => {
 
   const refreshData = async () => {
     try {
-      const [leadsData, quizzesData, viewsData, calcData] = await Promise.all([
+      const [leadsData, quizzesData, viewsData, calcData, proposalsData] = await Promise.all([
         getLeads(),
         getQuizCompletions(),
         getPageViews(),
         getCalculatorCompletions(),
+        getProposals(),
       ]);
       setLeads(leadsData);
       setQuizzes(quizzesData);
       setViews(viewsData);
       setCalcResults(calcData);
+      setProposals(proposalsData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
       setQuizzes([]);
       setViews(0);
+      setProposals([]);
       setAdmins([]);
       setLoginError("Não foi possível carregar o painel. Recarregue a página.");
     }
