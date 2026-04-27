@@ -252,12 +252,124 @@ export interface ParsedProposalData {
   detectados: string[];
 }
 
+// Extrai dados de contato do cliente a partir do texto livre
+function extractClienteData(text: string): {
+  clienteNome?: string;
+  clienteEmpresa?: string;
+  clienteEmail?: string;
+  clienteWhatsapp?: string;
+  clienteCargo?: string;
+  faturamentoAnual?: string;
+  cnae?: string;
+} {
+  const out: ReturnType<typeof extractClienteData> = {};
+
+  // Email
+  const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+  if (emailMatch) out.clienteEmail = emailMatch[0];
+
+  // WhatsApp / telefone (BR): captura sequências com 10-13 dígitos, com ou sem máscara
+  const phoneMatch = text.match(/(?:\+?55\s*)?\(?\d{2}\)?[\s.-]?9?\d{4}[\s.-]?\d{4}/);
+  if (phoneMatch) out.clienteWhatsapp = phoneMatch[0].trim();
+
+  // Faturamento (ex.: "faturamento de 50 milhões", "fatura R$ 12mi")
+  const fatMatch = text.match(/fatura(?:mento|m|)[^.\n]{0,40}?(r?\$?\s*[\d.,]+\s*(?:mi|mil|milh[õo]es?|bi|bilh[õo]es?|k|m)?)/i);
+  if (fatMatch) out.faturamentoAnual = fatMatch[1].trim();
+
+  // CNAE (ex.: "CNAE 47.11-3")
+  const cnaeMatch = text.match(/cnae[^\d]{0,8}([\d.\-/]{4,})/i);
+  if (cnaeMatch) out.cnae = cnaeMatch[1];
+
+  // Empresa: "empresa X", "cliente é a X", "da X Ltda", "rede X"
+  const empresaPatterns = [
+    /(?:empresa|cliente|raz[ãa]o social|companhia|grupo|rede)\s*(?:é|e|:|chama(?:da|do)?|chamad[ao])?\s*(?:a |o |as |os )?["“]?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,60}?)["”]?(?=[.,;\n]| (?:com|que|tem|possui|atua|de \d|é |responsável|opera))/,
+    /\b([A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wÀ-ÿ&.\- ]{2,40}?)\s+(?:Ltda|S\.?A\.?|ME|EIRELI|S\/A)\b/,
+  ];
+  for (const re of empresaPatterns) {
+    const m = text.match(re);
+    if (m && m[1]) {
+      out.clienteEmpresa = m[1].trim().replace(/\s{2,}/g, " ");
+      break;
+    }
+  }
+
+  // Cargo do responsável (busca cargos comuns)
+  const cargos = [
+    "CEO", "CFO", "COO", "CHRO", "CTO",
+    "diretor de RH", "diretora de RH", "diretor", "diretora",
+    "gerente de RH", "gerente de pessoas", "gerente de SST", "gerente",
+    "head de RH", "head de pessoas", "head",
+    "coordenador de RH", "coordenadora de RH", "coordenador", "coordenadora",
+    "supervisor de RH", "supervisora de RH",
+    "presidente", "sócio", "sócia", "sócio-fundador", "fundador", "fundadora",
+    "business partner", "BP de RH",
+  ];
+  for (const cargo of cargos) {
+    const re = new RegExp(`\\b${cargo.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}\\b`, "i");
+    if (re.test(text)) {
+      out.clienteCargo = cargo;
+      break;
+    }
+  }
+
+  // Nome do responsável: procura "responsável é X", "falamos com X", "reunião com X"
+  // ou "X (cargo)" / "X, cargo" próximo a um cargo detectado
+  const nomePatterns = [
+    /(?:respons[áa]vel|contato|interlocutor|falamos com|reuni[ãa]o com|call com|conversamos com|cliente é|cliente:|nome:)\s*(?:a |o )?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+){0,3})/,
+    /\b([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-zà-ÿ]+){1,3})\s*(?:,|\(|\s-\s)\s*(?:CEO|CFO|COO|diretor|diretora|gerente|head|coordenador|coordenadora|supervisor|supervisora|presidente|s[óo]cio|fundador|fundadora)/i,
+  ];
+  for (const re of nomePatterns) {
+    const m = text.match(re);
+    if (m && m[1]) {
+      const candidate = m[1].trim();
+      // Evita pegar nomes de empresa já capturados
+      if (!out.clienteEmpresa || !out.clienteEmpresa.toLowerCase().includes(candidate.toLowerCase())) {
+        out.clienteNome = candidate;
+        break;
+      }
+    }
+  }
+
+  return out;
+}
+
 export function parseTranscricao(transcricao: string): ParsedProposalData {
   const detectados: string[] = [];
   const prefill: Partial<ProposalDraft> = {};
 
   if (!transcricao.trim()) {
     return { prefill: { observacoesInternas: "" }, detectados };
+  }
+
+  // Dados do cliente
+  const cliente = extractClienteData(transcricao);
+  if (cliente.clienteNome) {
+    prefill.clienteNome = cliente.clienteNome;
+    detectados.push(`responsável: ${cliente.clienteNome}`);
+  }
+  if (cliente.clienteEmpresa) {
+    prefill.clienteEmpresa = cliente.clienteEmpresa;
+    detectados.push(`empresa: ${cliente.clienteEmpresa}`);
+  }
+  if (cliente.clienteEmail) {
+    prefill.clienteEmail = cliente.clienteEmail;
+    detectados.push(`email: ${cliente.clienteEmail}`);
+  }
+  if (cliente.clienteWhatsapp) {
+    prefill.clienteWhatsapp = cliente.clienteWhatsapp;
+    detectados.push(`telefone: ${cliente.clienteWhatsapp}`);
+  }
+  if (cliente.clienteCargo) {
+    prefill.clienteCargo = cliente.clienteCargo;
+    detectados.push(`cargo: ${cliente.clienteCargo}`);
+  }
+  if (cliente.faturamentoAnual) {
+    prefill.faturamentoAnual = cliente.faturamentoAnual;
+    detectados.push(`faturamento: ${cliente.faturamentoAnual}`);
+  }
+  if (cliente.cnae) {
+    prefill.cnae = cliente.cnae;
+    detectados.push(`CNAE ${cliente.cnae}`);
   }
 
   const colaboradores = findNumberNear(transcricao, [
