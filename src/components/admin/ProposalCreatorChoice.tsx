@@ -50,8 +50,25 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
       const { data, error } = await supabase.functions.invoke("generate-proposal", {
         body: { transcricao, lead },
       });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+
+      // Captura erro do gateway (créditos, rate limit, etc.)
+      const errMsg = (error as { context?: { error?: string } })?.context?.error
+        ?? data?.error
+        ?? (error ? error.message : null);
+
+      if (errMsg) {
+        // Fallback: abre o formulário só com a transcrição nas notas internas
+        const ok = confirm(
+          `Não foi possível gerar com IA:\n\n${errMsg}\n\nQuer abrir o formulário em branco com a transcrição salva nas notas internas?`
+        );
+        if (ok) {
+          onPickAI({
+            observacoesInternas: `📝 Transcrição da reunião:\n\n${transcricao}`,
+          });
+          reset();
+        }
+        return;
+      }
 
       setQuizMatch(data?.matches?.quiz ?? null);
       setCalcMatch(data?.matches?.calculadora ?? null);
@@ -73,13 +90,24 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
         numLideres: ai.numLideres ?? 5,
         temEquipeSst: !!ai.temEquipeSst,
         prazoMeses: ai.prazoMeses ?? 4,
-        observacoesInternas: ai.observacoesInternas ?? "",
+        observacoesInternas: ai.observacoesInternas
+          ? `${ai.observacoesInternas}\n\n---\n📝 Transcrição original:\n${transcricao}`
+          : `📝 Transcrição da reunião:\n\n${transcricao}`,
       };
 
       onPickAI(prefilled);
       reset();
     } catch (e) {
-      alert("Erro ao gerar proposta com IA: " + (e instanceof Error ? e.message : String(e)));
+      const msg = e instanceof Error ? e.message : String(e);
+      const ok = confirm(
+        `Erro ao chamar IA: ${msg}\n\nQuer abrir o formulário em branco com a transcrição salva nas notas internas?`
+      );
+      if (ok) {
+        onPickAI({
+          observacoesInternas: `📝 Transcrição da reunião:\n\n${transcricao}`,
+        });
+        reset();
+      }
     } finally {
       setLoading(false);
     }
