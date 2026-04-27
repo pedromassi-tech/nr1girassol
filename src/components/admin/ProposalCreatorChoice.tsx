@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sparkles, FilePlus2, Wand2, Loader2, ClipboardCheck, Calculator } from "lucide-react";
+import { Sparkles, FilePlus2, Wand2, Loader2, ClipboardCheck, Calculator, CheckCircle2, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Lead } from "@/lib/adminStore";
 import {
@@ -19,22 +19,23 @@ interface Props {
   onPickAI: (prefilled: Partial<ProposalDraft>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as any;
+interface MatchInfo { reason: string; score: number }
 
 const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI }: Props) => {
   const [mode, setMode] = useState<"choose" | "ai">("choose");
   const [transcricao, setTranscricao] = useState("");
   const [loading, setLoading] = useState(false);
-  const [foundQuiz, setFoundQuiz] = useState<boolean | null>(null);
-  const [foundCalc, setFoundCalc] = useState<boolean | null>(null);
+  const [quizMatch, setQuizMatch] = useState<MatchInfo | null>(null);
+  const [calcMatch, setCalcMatch] = useState<MatchInfo | null>(null);
+  const [searched, setSearched] = useState(false);
 
   const reset = () => {
     setMode("choose");
     setTranscricao("");
     setLoading(false);
-    setFoundQuiz(null);
-    setFoundCalc(null);
+    setQuizMatch(null);
+    setCalcMatch(null);
+    setSearched(false);
   };
 
   const handleClose = (v: boolean) => {
@@ -44,26 +45,19 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
 
   const handleGenerate = async () => {
     setLoading(true);
+    setSearched(false);
     try {
-      // Busca quiz e calculadora pelo e-mail do lead
-      let quiz = null, calculadora = null;
-      if (lead?.email) {
-        const [{ data: q }, { data: c }] = await Promise.all([
-          db.from("quiz_completions").select("*").eq("email", lead.email).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-          db.from("calculator_completions").select("*").eq("email", lead.email).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-        ]);
-        quiz = q; calculadora = c;
-        setFoundQuiz(!!q); setFoundCalc(!!c);
-      }
-
       const { data, error } = await supabase.functions.invoke("generate-proposal", {
-        body: { transcricao, lead, quiz, calculadora },
+        body: { transcricao, lead },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      setQuizMatch(data?.matches?.quiz ?? null);
+      setCalcMatch(data?.matches?.calculadora ?? null);
+      setSearched(true);
+
       const ai = data.proposal ?? {};
-      // Mescla com defaults para garantir que nada fique vazio
       const prefilled: Partial<ProposalDraft> = {
         escopoResumo: ai.escopoResumo ?? "",
         diferenciais: Array.isArray(ai.diferenciais) && ai.diferenciais.length ? ai.diferenciais : [...DEFAULT_DIFERENCIAIS],
@@ -102,7 +96,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
           <DialogDescription>
             {mode === "choose"
               ? "Escolha começar do zero ou deixar a IA preencher tudo a partir da reunião e dos diagnósticos."
-              : "Cole o resumo/transcrição da reunião. A IA vai cruzar com o quiz e a calculadora do lead."}
+              : "Cole o resumo/transcrição da reunião. A IA cruza automaticamente com o quiz e a calculadora deste lead (busca inteligente por e-mail, telefone, nome ou empresa)."}
           </DialogDescription>
         </DialogHeader>
 
@@ -138,19 +132,16 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
 
         {mode === "ai" && (
           <div className="space-y-4 mt-2">
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted">
-                <ClipboardCheck className="h-3 w-3" /> Quiz: buscado por e-mail do lead
-              </span>
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted">
-                <Calculator className="h-3 w-3" /> Calculadora: buscada por e-mail do lead
-              </span>
-            </div>
-            {!lead?.email && (
-              <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-                ⚠ Este lead não tem e-mail cadastrado — a IA usará apenas a transcrição.
+            <div className="border rounded-lg p-3 bg-muted/30 space-y-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground/70">
+                Busca inteligente neste lead
               </div>
-            )}
+              <MatchRow icon={ClipboardCheck} label="Quiz NR-1" match={quizMatch} searched={searched} />
+              <MatchRow icon={Calculator} label="Calculadora de risco" match={calcMatch} searched={searched} />
+              <p className="text-[10px] text-muted-foreground">
+                Cruzamos por e-mail, telefone, nome e empresa — pega mesmo com pequenas variações.
+              </p>
+            </div>
             <div>
               <Label className="text-xs font-semibold uppercase tracking-wide text-foreground/70">
                 Resumo / transcrição da reunião diagnóstico
@@ -173,19 +164,39 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
                 className="hero-gradient border-0 text-primary-foreground gap-1.5"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                {loading ? "Gerando proposta..." : "Gerar e abrir formulário"}
+                {loading ? "Buscando dados e gerando..." : "Gerar e abrir formulário"}
               </Button>
             </div>
-            {foundQuiz !== null && (
-              <div className="text-xs text-muted-foreground">
-                {foundQuiz ? "✓ Quiz encontrado" : "○ Sem quiz para este e-mail"} ·{" "}
-                {foundCalc ? "✓ Calculadora encontrada" : "○ Sem calculadora para este e-mail"}
-              </div>
-            )}
           </div>
         )}
       </DialogContent>
     </Dialog>
+  );
+};
+
+const MatchRow = ({ icon: Icon, label, match, searched }: {
+  icon: typeof ClipboardCheck; label: string; match: MatchInfo | null; searched: boolean;
+}) => {
+  const found = !!match;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      {found ? (
+        <CheckCircle2 className="h-4 w-4 text-secondary" />
+      ) : (
+        <Circle className="h-4 w-4 text-muted-foreground" />
+      )}
+      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      <span className="font-medium">{label}:</span>
+      {!searched ? (
+        <span className="text-muted-foreground">será buscado ao gerar</span>
+      ) : found ? (
+        <span className="text-secondary font-semibold">
+          encontrado · match por {match!.reason}
+        </span>
+      ) : (
+        <span className="text-muted-foreground">nenhum registro relacionado</span>
+      )}
+    </div>
   );
 };
 
