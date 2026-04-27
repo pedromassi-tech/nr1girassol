@@ -13,7 +13,7 @@ import {
   DEFAULT_DIFERENCIAIS, DEFAULT_FASES, DEFAULT_ENTREGAVEIS,
   type Proposal, type ProposalDraft, type ProposalFase,
 } from "@/lib/proposalsStore";
-import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X } from "lucide-react";
+import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2 } from "lucide-react";
 import type { Lead } from "@/lib/adminStore";
 
 interface ProposalFormProps {
@@ -88,12 +88,41 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
 const ProposalForm = ({ open, onOpenChange, lead, proposal, onSaved }: ProposalFormProps) => {
   const [draft, setDraft] = useState<ProposalDraft>(() => proposal ? proposalToDraft(proposal) : emptyDraft(lead));
   const [saving, setSaving] = useState(false);
+  const [valorHora, setValorHora] = useState<number>(350);
+  const [horasManual, setHorasManual] = useState<number | null>(null);
 
   useEffect(() => {
     if (open) {
       setDraft(proposal ? proposalToDraft(proposal) : emptyDraft(lead));
+      setHorasManual(null);
     }
   }, [open, lead, proposal]);
+
+  // ── Calculadora de horas baseada no escopo ──
+  const horasEstimadas = (() => {
+    let h = 40; // base de gestão/coordenação
+    h += draft.numEstabelecimentos * 16;        // visitas/análise por unidade
+    h += draft.numFuncoes * 4;                   // análise por função
+    h += Math.ceil(draft.numColaboradores / 20) * 6; // escuta proporcional
+    h += draft.numLideres * 2;                   // mentoria de liderança
+    if (draft.maturidadePgr === "inexistente") h += 40;
+    else if (draft.maturidadePgr === "parcial") h += 24;
+    else h += 12;
+    if (draft.modeloTrabalho === "hibrido") h += 16;
+    if (draft.modeloTrabalho === "remoto") h += 24;
+    if (draft.temPrestadores) h += 20;
+    if (!draft.temEquipeSst) h += 30;            // mais documentação se não há SST interna
+    if (draft.grauRisco === "3") h += 16;
+    if (draft.grauRisco === "4") h += 32;
+    return Math.round(h);
+  })();
+
+  const horasFinais = horasManual ?? horasEstimadas;
+  const totalCalculado = horasFinais * valorHora;
+
+  const aplicarCalculo = () => {
+    update("investimentoTotal", totalCalculado);
+  };
 
   const update = <K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) => {
     setDraft(d => ({ ...d, [key]: value }));
@@ -337,6 +366,54 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, onSaved }: ProposalF
 
           {/* INVESTIMENTO */}
           <Section icon={DollarSign} title="Investimento">
+            {/* Calculadora de horas */}
+            <div className="border border-secondary/30 rounded-lg p-3 bg-secondary/5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-secondary" />
+                <span className="text-sm font-bold text-primary">Calculadora de horas</span>
+                <span className="text-[10px] text-muted-foreground ml-auto">Sugestão automática a partir do escopo</span>
+              </div>
+              <Grid>
+                <Field label="Horas estimadas (auto)">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={horasFinais}
+                    onChange={e => setHorasManual(+e.target.value || 0)}
+                  />
+                  {horasManual !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setHorasManual(null)}
+                      className="text-[10px] text-secondary hover:underline mt-1"
+                    >
+                      Restaurar sugestão ({horasEstimadas}h)
+                    </button>
+                  )}
+                </Field>
+                <Field label="Valor da hora (R$)">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={valorHora}
+                    onChange={e => setValorHora(+e.target.value || 0)}
+                  />
+                </Field>
+              </Grid>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
+                <div className="text-sm flex-1">
+                  <span className="text-muted-foreground">Total calculado:</span>{" "}
+                  <span className="font-bold text-primary">
+                    {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </span>
+                  <span className="text-xs text-muted-foreground ml-2">({horasFinais}h × R$ {valorHora})</span>
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={aplicarCalculo} className="gap-1.5 border-secondary text-secondary hover:bg-secondary/10">
+                  <Wand2 className="h-3.5 w-3.5" /> Aplicar ao investimento
+                </Button>
+              </div>
+            </div>
+
             <Grid>
               <Field label="Investimento total (R$)">
                 <Input type="number" min={0} value={draft.investimentoTotal} onChange={e => update("investimentoTotal", +e.target.value || 0)} />
