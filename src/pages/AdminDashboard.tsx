@@ -727,6 +727,68 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* ─── PROPOSTAS TAB ─── */}
+        {tab === "propostas" && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+              <Button onClick={() => setProposalForm({ open: true, lead: null, proposal: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
+                <Plus className="h-4 w-4" /> Nova proposta
+              </Button>
+              <div className="relative sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar proposta..."
+                  value={proposalsSearch}
+                  onChange={(e) => setProposalsSearch(e.target.value)}
+                  className="pl-9 bg-card"
+                />
+              </div>
+            </div>
+
+            {filteredProposals.length === 0 ? (
+              <div className="bg-card rounded-xl border p-8 text-center">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-muted-foreground text-sm">{proposals.length === 0 ? "Nenhuma proposta criada ainda." : "Nenhuma proposta encontrada."}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredProposals.map((p) => (
+                  <div key={p.id} className="bg-card rounded-xl border p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg gold-gradient flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-primary truncate">{p.clienteEmpresa || "Sem empresa"}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {p.clienteNome} · {p.investimentoTotal > 0 ? `R$ ${p.investimentoTotal.toLocaleString("pt-BR")}` : "Sem valor"} · {new Date(p.createdAt).toLocaleDateString("pt-BR")}
+                        </p>
+                        <p className="text-[10px] font-mono text-muted-foreground/70 mt-0.5">/{p.slug}</p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button variant="outline" size="sm" onClick={() => handleCopyProposalLink(p.slug)} className="gap-1 text-xs h-8">
+                          <Copy className="h-3 w-3" /> Link
+                        </Button>
+                        <a href={proposalLink(p.slug)} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="sm" className="gap-1 text-xs h-8">
+                            <ExternalLink className="h-3 w-3" /> Abrir
+                          </Button>
+                        </a>
+                        <Button variant="outline" size="sm" onClick={() => handleEditProposal(p)} className="text-xs h-8">
+                          Editar
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteProposal(p.id)} className="text-destructive h-8 w-8">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── ADMINS TAB ─── */}
         {tab === "admins" && (
           <div className="space-y-3">
