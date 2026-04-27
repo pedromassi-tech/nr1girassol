@@ -834,6 +834,14 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      <ProposalForm
+        open={proposalForm.open}
+        onOpenChange={(open) => setProposalForm(s => ({ ...s, open }))}
+        lead={proposalForm.lead}
+        proposal={proposalForm.proposal}
+        onSaved={handleProposalSaved}
+      />
     </div>
   );
 };
