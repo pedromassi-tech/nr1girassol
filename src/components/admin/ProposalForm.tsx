@@ -86,18 +86,18 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
   status: p.status,
 });
 
-const ProposalForm = ({ open, onOpenChange, lead, proposal, onSaved }: ProposalFormProps) => {
-  const [draft, setDraft] = useState<ProposalDraft>(() => proposal ? proposalToDraft(proposal) : emptyDraft(lead));
+const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: ProposalFormProps) => {
+  const [draft, setDraft] = useState<ProposalDraft>(() => proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) });
   const [saving, setSaving] = useState(false);
   const [valorHora, setValorHora] = useState<number>(350);
   const [horasManual, setHorasManual] = useState<number | null>(null);
 
   useEffect(() => {
     if (open) {
-      setDraft(proposal ? proposalToDraft(proposal) : emptyDraft(lead));
+      setDraft(proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) });
       setHorasManual(null);
     }
-  }, [open, lead, proposal]);
+  }, [open, lead, proposal, prefill]);
 
   // ── Calculadora de horas baseada no escopo ──
   const horasEstimadas = (() => {
