@@ -132,19 +132,16 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
 
         {mode === "ai" && (
           <div className="space-y-4 mt-2">
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted">
-                <ClipboardCheck className="h-3 w-3" /> Quiz: buscado por e-mail do lead
-              </span>
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted">
-                <Calculator className="h-3 w-3" /> Calculadora: buscada por e-mail do lead
-              </span>
-            </div>
-            {!lead?.email && (
-              <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-                ⚠ Este lead não tem e-mail cadastrado — a IA usará apenas a transcrição.
+            <div className="border rounded-lg p-3 bg-muted/30 space-y-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground/70">
+                Busca inteligente neste lead
               </div>
-            )}
+              <MatchRow icon={ClipboardCheck} label="Quiz NR-1" match={quizMatch} searched={searched} />
+              <MatchRow icon={Calculator} label="Calculadora de risco" match={calcMatch} searched={searched} />
+              <p className="text-[10px] text-muted-foreground">
+                Cruzamos por e-mail, telefone, nome e empresa — pega mesmo com pequenas variações.
+              </p>
+            </div>
             <div>
               <Label className="text-xs font-semibold uppercase tracking-wide text-foreground/70">
                 Resumo / transcrição da reunião diagnóstico
@@ -167,15 +164,9 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
                 className="hero-gradient border-0 text-primary-foreground gap-1.5"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                {loading ? "Gerando proposta..." : "Gerar e abrir formulário"}
+                {loading ? "Buscando dados e gerando..." : "Gerar e abrir formulário"}
               </Button>
             </div>
-            {foundQuiz !== null && (
-              <div className="text-xs text-muted-foreground">
-                {foundQuiz ? "✓ Quiz encontrado" : "○ Sem quiz para este e-mail"} ·{" "}
-                {foundCalc ? "✓ Calculadora encontrada" : "○ Sem calculadora para este e-mail"}
-              </div>
-            )}
           </div>
         )}
       </DialogContent>
