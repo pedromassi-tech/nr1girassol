@@ -3,13 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sparkles, FilePlus2, Wand2, Loader2, ClipboardCheck, Calculator, CheckCircle2, Circle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Sparkles, FilePlus2, Wand2, CheckCircle2 } from "lucide-react";
 import type { Lead } from "@/lib/adminStore";
-import {
-  DEFAULT_DIFERENCIAIS, DEFAULT_FASES, DEFAULT_ENTREGAVEIS,
-  type ProposalDraft,
-} from "@/lib/proposalsStore";
+import type { ProposalDraft } from "@/lib/proposalsStore";
+import { parseTranscricao } from "@/lib/parseTranscricao";
 
 interface Props {
   open: boolean;
@@ -19,23 +16,13 @@ interface Props {
   onPickAI: (prefilled: Partial<ProposalDraft>) => void;
 }
 
-interface MatchInfo { reason: string; score: number }
-
-const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI }: Props) => {
-  const [mode, setMode] = useState<"choose" | "ai">("choose");
+const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Props) => {
+  const [mode, setMode] = useState<"choose" | "transcricao">("choose");
   const [transcricao, setTranscricao] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [quizMatch, setQuizMatch] = useState<MatchInfo | null>(null);
-  const [calcMatch, setCalcMatch] = useState<MatchInfo | null>(null);
-  const [searched, setSearched] = useState(false);
 
   const reset = () => {
     setMode("choose");
     setTranscricao("");
-    setLoading(false);
-    setQuizMatch(null);
-    setCalcMatch(null);
-    setSearched(false);
   };
 
   const handleClose = (v: boolean) => {
@@ -43,88 +30,27 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
     onOpenChange(v);
   };
 
-  const handleGenerate = async () => {
-    setLoading(true);
-    setSearched(false);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-proposal", {
-        body: { transcricao, lead },
-      });
+  // Preview ao vivo do que vai ser detectado
+  const preview = transcricao.trim() ? parseTranscricao(transcricao) : null;
 
-      // Captura erro do gateway (créditos, rate limit, etc.)
-      const errMsg = (error as { context?: { error?: string } })?.context?.error
-        ?? data?.error
-        ?? (error ? error.message : null);
-
-      if (errMsg) {
-        // Fallback: abre o formulário só com a transcrição nas notas internas
-        const ok = confirm(
-          `Não foi possível gerar com IA:\n\n${errMsg}\n\nQuer abrir o formulário em branco com a transcrição salva nas notas internas?`
-        );
-        if (ok) {
-          onPickAI({
-            observacoesInternas: `📝 Transcrição da reunião:\n\n${transcricao}`,
-          });
-          reset();
-        }
-        return;
-      }
-
-      setQuizMatch(data?.matches?.quiz ?? null);
-      setCalcMatch(data?.matches?.calculadora ?? null);
-      setSearched(true);
-
-      const ai = data.proposal ?? {};
-      const prefilled: Partial<ProposalDraft> = {
-        escopoResumo: ai.escopoResumo ?? "",
-        diferenciais: Array.isArray(ai.diferenciais) && ai.diferenciais.length ? ai.diferenciais : [...DEFAULT_DIFERENCIAIS],
-        entregaveis: Array.isArray(ai.entregaveis) && ai.entregaveis.length ? ai.entregaveis : [...DEFAULT_ENTREGAVEIS],
-        fases: Array.isArray(ai.fases) && ai.fases.length ? ai.fases : DEFAULT_FASES.map(f => ({ ...f })),
-        numEstabelecimentos: ai.numEstabelecimentos ?? 1,
-        numFuncoes: ai.numFuncoes ?? 5,
-        numColaboradores: ai.numColaboradores ?? 50,
-        modeloTrabalho: ai.modeloTrabalho ?? "presencial",
-        maturidadePgr: ai.maturidadePgr ?? "inexistente",
-        grauRisco: ai.grauRisco ?? "2",
-        temPrestadores: !!ai.temPrestadores,
-        numLideres: ai.numLideres ?? 5,
-        temEquipeSst: !!ai.temEquipeSst,
-        prazoMeses: ai.prazoMeses ?? 4,
-        observacoesInternas: ai.observacoesInternas
-          ? `${ai.observacoesInternas}\n\n---\n📝 Transcrição original:\n${transcricao}`
-          : `📝 Transcrição da reunião:\n\n${transcricao}`,
-      };
-
-      onPickAI(prefilled);
-      reset();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      const ok = confirm(
-        `Erro ao chamar IA: ${msg}\n\nQuer abrir o formulário em branco com a transcrição salva nas notas internas?`
-      );
-      if (ok) {
-        onPickAI({
-          observacoesInternas: `📝 Transcrição da reunião:\n\n${transcricao}`,
-        });
-        reset();
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleAplicar = () => {
+    const { prefill } = parseTranscricao(transcricao);
+    onPickAI(prefill);
+    reset();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-primary text-xl flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-secondary" />
-            {mode === "choose" ? "Como deseja criar a proposta?" : "Gerar proposta com IA"}
+            {mode === "choose" ? "Como deseja criar a proposta?" : "Gerar a partir do resumo da reunião"}
           </DialogTitle>
           <DialogDescription>
             {mode === "choose"
-              ? "Escolha começar do zero ou deixar a IA preencher tudo a partir da reunião e dos diagnósticos."
-              : "Cole o resumo/transcrição da reunião. A IA cruza automaticamente com o quiz e a calculadora deste lead (busca inteligente por e-mail, telefone, nome ou empresa)."}
+              ? "Escolha começar do zero ou colar o resumo da reunião para preencher os campos automaticamente."
+              : "Cole o resumo da reunião. O sistema identifica número de unidades, colaboradores, líderes, modelo de trabalho, status do PGR e mais — você só revisa."}
           </DialogDescription>
         </DialogHeader>
 
@@ -133,98 +59,89 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
             <button
               type="button"
               onClick={onPickBlank}
-              className="border-2 rounded-xl p-5 text-left hover:border-secondary hover:bg-secondary/5 transition group"
+              className="border-2 rounded-xl p-5 text-left hover:border-secondary hover:bg-secondary/5 transition"
             >
               <FilePlus2 className="h-7 w-7 text-primary mb-3" />
               <div className="font-bold text-primary mb-1">Criar do zero</div>
               <p className="text-xs text-muted-foreground">
-                Preencha manualmente todos os campos da proposta. Ideal quando você já tem tudo claro.
+                Preenchimento manual de todos os campos.
               </p>
             </button>
             <button
               type="button"
-              onClick={() => setMode("ai")}
-              className="border-2 border-secondary/40 rounded-xl p-5 text-left hover:border-secondary hover:bg-secondary/10 transition group bg-secondary/5"
+              onClick={() => setMode("transcricao")}
+              className="border-2 border-secondary/40 rounded-xl p-5 text-left hover:border-secondary hover:bg-secondary/10 transition bg-secondary/5"
             >
               <Wand2 className="h-7 w-7 text-secondary mb-3" />
               <div className="font-bold text-primary mb-1 flex items-center gap-2">
-                Gerar com IA
-                <span className="text-[9px] bg-secondary text-primary px-1.5 py-0.5 rounded font-bold">RECOMENDADO</span>
+                Colar resumo da reunião
+                <span className="text-[9px] bg-secondary text-primary px-1.5 py-0.5 rounded font-bold">RÁPIDO</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                A IA cruza a transcrição da reunião com o quiz e a calculadora deste lead e preenche tudo automaticamente.
+                Cole o resumo e o sistema preenche escopo, números e notas internas automaticamente.
               </p>
             </button>
           </div>
         )}
 
-        {mode === "ai" && (
+        {mode === "transcricao" && (
           <div className="space-y-4 mt-2">
-            <div className="border rounded-lg p-3 bg-muted/30 space-y-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground/70">
-                Busca inteligente neste lead
-              </div>
-              <MatchRow icon={ClipboardCheck} label="Quiz NR-1" match={quizMatch} searched={searched} />
-              <MatchRow icon={Calculator} label="Calculadora de risco" match={calcMatch} searched={searched} />
-              <p className="text-[10px] text-muted-foreground">
-                Cruzamos por e-mail, telefone, nome e empresa — pega mesmo com pequenas variações.
-              </p>
-            </div>
             <div>
               <Label className="text-xs font-semibold uppercase tracking-wide text-foreground/70">
-                Resumo / transcrição da reunião diagnóstico
+                Resumo da reunião diagnóstico
               </Label>
               <Textarea
                 rows={10}
                 value={transcricao}
                 onChange={e => setTranscricao(e.target.value)}
-                placeholder={`Cole aqui o resumo da call ou a transcrição. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Não tem PGR atualizado. Já teve 2 afastamentos por burnout em 2024. Quer fechar até o fim do mês para evitar fiscalização. Decisor é o CEO. Receio principal: imagem da marca caso vire processo público..."`}
-                className="mt-2 font-mono text-xs"
+                placeholder={`Cole aqui o resumo da call. Ex.:\n\n"Cliente é diretor de RH de uma rede com 4 lojas e 180 colaboradores. Modelo presencial. Não tem PGR. Tem equipe de RH interna. Sem prestadores. 12 líderes no total. Grau de risco 3. Quer fechar até o fim do mês."`}
+                className="mt-2 text-sm"
               />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Dica: quanto mais explícito (números, palavras como "PGR", "remoto", "líderes"), melhor o preenchimento.
+              </p>
             </div>
+
+            {preview && preview.detectados.length > 0 && (
+              <div className="border border-secondary/40 rounded-lg p-3 bg-secondary/5">
+                <div className="text-xs font-semibold uppercase tracking-wide text-foreground/70 mb-2">
+                  Detectado automaticamente
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {preview.detectados.map((d, i) => (
+                    <span key={i} className="inline-flex items-center gap-1 text-xs bg-background border border-secondary/30 px-2 py-1 rounded-full">
+                      <CheckCircle2 className="h-3 w-3 text-secondary" /> {d}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  Você poderá ajustar tudo no formulário em seguida. A transcrição completa fica salva nas notas internas.
+                </p>
+              </div>
+            )}
+
+            {preview && preview.detectados.length === 0 && transcricao.trim() && (
+              <div className="text-xs text-muted-foreground bg-muted/40 p-3 rounded">
+                Nada foi detectado automaticamente, mas a transcrição será salva nas notas internas.
+              </div>
+            )}
+
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-              <Button variant="outline" onClick={() => setMode("choose")} disabled={loading}>
+              <Button variant="outline" onClick={() => setMode("choose")}>
                 Voltar
               </Button>
               <Button
-                onClick={handleGenerate}
-                disabled={loading || !transcricao.trim()}
+                onClick={handleAplicar}
+                disabled={!transcricao.trim()}
                 className="hero-gradient border-0 text-primary-foreground gap-1.5"
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                {loading ? "Buscando dados e gerando..." : "Gerar e abrir formulário"}
+                <Wand2 className="h-4 w-4" /> Preencher e abrir formulário
               </Button>
             </div>
           </div>
         )}
       </DialogContent>
     </Dialog>
-  );
-};
-
-const MatchRow = ({ icon: Icon, label, match, searched }: {
-  icon: typeof ClipboardCheck; label: string; match: MatchInfo | null; searched: boolean;
-}) => {
-  const found = !!match;
-  return (
-    <div className="flex items-center gap-2 text-xs">
-      {found ? (
-        <CheckCircle2 className="h-4 w-4 text-secondary" />
-      ) : (
-        <Circle className="h-4 w-4 text-muted-foreground" />
-      )}
-      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-      <span className="font-medium">{label}:</span>
-      {!searched ? (
-        <span className="text-muted-foreground">será buscado ao gerar</span>
-      ) : found ? (
-        <span className="text-secondary font-semibold">
-          encontrado · match por {match!.reason}
-        </span>
-      ) : (
-        <span className="text-muted-foreground">nenhum registro relacionado</span>
-      )}
-    </div>
   );
 };
 
