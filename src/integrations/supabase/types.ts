@@ -137,6 +137,119 @@ export type Database = {
         }
         Relationships: []
       }
+      proposals: {
+        Row: {
+          cliente_cargo: string
+          cliente_email: string
+          cliente_empresa: string
+          cliente_nome: string
+          cliente_whatsapp: string
+          cnae: string
+          created_at: string
+          diferenciais: Json
+          entregaveis: Json
+          escopo_resumo: string
+          fases: Json
+          faturamento_anual: string
+          grau_risco: string
+          id: string
+          investimento_observacao: string
+          investimento_parcelas: number
+          investimento_total: number
+          lead_id: string | null
+          maturidade_pgr: string
+          modelo_trabalho: string
+          num_colaboradores: number
+          num_estabelecimentos: number
+          num_funcoes: number
+          num_lideres: number
+          observacoes_internas: string
+          prazo_meses: number
+          slug: string
+          status: string
+          tem_equipe_sst: boolean
+          tem_prestadores: boolean
+          updated_at: string
+          validade_dias: number
+        }
+        Insert: {
+          cliente_cargo?: string
+          cliente_email?: string
+          cliente_empresa?: string
+          cliente_nome?: string
+          cliente_whatsapp?: string
+          cnae?: string
+          created_at?: string
+          diferenciais?: Json
+          entregaveis?: Json
+          escopo_resumo?: string
+          fases?: Json
+          faturamento_anual?: string
+          grau_risco?: string
+          id?: string
+          investimento_observacao?: string
+          investimento_parcelas?: number
+          investimento_total?: number
+          lead_id?: string | null
+          maturidade_pgr?: string
+          modelo_trabalho?: string
+          num_colaboradores?: number
+          num_estabelecimentos?: number
+          num_funcoes?: number
+          num_lideres?: number
+          observacoes_internas?: string
+          prazo_meses?: number
+          slug: string
+          status?: string
+          tem_equipe_sst?: boolean
+          tem_prestadores?: boolean
+          updated_at?: string
+          validade_dias?: number
+        }
+        Update: {
+          cliente_cargo?: string
+          cliente_email?: string
+          cliente_empresa?: string
+          cliente_nome?: string
+          cliente_whatsapp?: string
+          cnae?: string
+          created_at?: string
+          diferenciais?: Json
+          entregaveis?: Json
+          escopo_resumo?: string
+          fases?: Json
+          faturamento_anual?: string
+          grau_risco?: string
+          id?: string
+          investimento_observacao?: string
+          investimento_parcelas?: number
+          investimento_total?: number
+          lead_id?: string | null
+          maturidade_pgr?: string
+          modelo_trabalho?: string
+          num_colaboradores?: number
+          num_estabelecimentos?: number
+          num_funcoes?: number
+          num_lideres?: number
+          observacoes_internas?: string
+          prazo_meses?: number
+          slug?: string
+          status?: string
+          tem_equipe_sst?: boolean
+          tem_prestadores?: boolean
+          updated_at?: string
+          validade_dias?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quiz_completions: {
         Row: {
           created_at: string
