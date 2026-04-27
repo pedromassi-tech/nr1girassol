@@ -734,7 +734,7 @@ const AdminDashboard = () => {
         {tab === "propostas" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <Button onClick={() => setProposalForm({ open: true, lead: null, proposal: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
+              <Button onClick={() => setCreatorChoice({ open: true, lead: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
                 <Plus className="h-4 w-4" /> Nova proposta
               </Button>
               <div className="relative sm:w-64">
