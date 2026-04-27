@@ -49,8 +49,8 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
           </DialogTitle>
           <DialogDescription>
             {mode === "choose"
-              ? "Escolha começar do zero ou colar o resumo da reunião para preencher os campos automaticamente."
-              : "Cole o resumo da reunião. O sistema identifica número de unidades, colaboradores, líderes, modelo de trabalho, status do PGR e mais — você só revisa."}
+              ? "Escolha começar do zero ou colar o resumo da reunião para gerar uma proposta estruturada automaticamente."
+              : "Cole o resumo da reunião. O sistema transforma o texto em escopo, diferenciais, entregáveis, fases, prazo e notas internas — você só revisa antes de salvar."}
           </DialogDescription>
         </DialogHeader>
 
