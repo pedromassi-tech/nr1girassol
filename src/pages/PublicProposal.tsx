@@ -286,7 +286,7 @@ const PublicProposal = () => {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </a>
-            <a href="mailto:contato@institutogirassol.com.br?subject=Proposta NR-1">
+            <a href="mailto:contato@mariaresende.com.br?subject=Proposta NR-1">
               <Button variant="outline" className="gap-2 px-6 py-6 text-base font-semibold w-full sm:w-auto">
                 <Mail className="h-5 w-5" /> Enviar dúvida por e-mail
               </Button>
