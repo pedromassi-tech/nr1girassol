@@ -13,8 +13,11 @@ import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
   ChevronDown, ChevronUp, MessageCircle, Mail, Building2,
   Phone, Search, AlertTriangle, TrendingUp, CheckCircle, XCircle,
-  BarChart3, StickyNote, Lock, Calculator,
+  BarChart3, StickyNote, Lock, Calculator, FileText, Plus, Copy, ExternalLink, Sparkles,
 } from "lucide-react";
+import { getProposals, deleteProposal, type Proposal } from "@/lib/proposalsStore";
+import ProposalForm from "@/components/admin/ProposalForm";
+import { toast } from "@/hooks/use-toast";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
   novo: { label: "Novo", color: "bg-blue-100 text-blue-700 border-blue-200", icon: AlertTriangle },
@@ -36,7 +39,7 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "propostas" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
   const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
@@ -50,24 +53,32 @@ const AdminDashboard = () => {
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "todos">("todos");
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposalForm, setProposalForm] = useState<{ open: boolean; lead: Lead | null; proposal: Proposal | null }>({
+    open: false, lead: null, proposal: null,
+  });
+  const [proposalsSearch, setProposalsSearch] = useState("");
 
   const refreshData = async () => {
     try {
-      const [leadsData, quizzesData, viewsData, calcData] = await Promise.all([
+      const [leadsData, quizzesData, viewsData, calcData, proposalsData] = await Promise.all([
         getLeads(),
         getQuizCompletions(),
         getPageViews(),
         getCalculatorCompletions(),
+        getProposals(),
       ]);
       setLeads(leadsData);
       setQuizzes(quizzesData);
       setViews(viewsData);
       setCalcResults(calcData);
+      setProposals(proposalsData);
       setAdmins(getAdmins());
     } catch {
       setLeads([]);
       setQuizzes([]);
       setViews(0);
+      setProposals([]);
       setAdmins([]);
       setLoginError("Não foi possível carregar o painel. Recarregue a página.");
     }
@@ -96,6 +107,47 @@ const AdminDashboard = () => {
     setExpandedLead(null);
     refreshData();
   };
+
+  const proposalLink = (slug: string) => `${window.location.origin}/proposta/${slug}`;
+
+  const handleCopyProposalLink = async (slug: string) => {
+    try {
+      await navigator.clipboard.writeText(proposalLink(slug));
+      toast({ title: "Link copiado!", description: "Link da proposta copiado para a área de transferência." });
+    } catch {
+      toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteProposal = async (id: string) => {
+    if (!confirm("Excluir esta proposta? Essa ação não pode ser desfeita.")) return;
+    await deleteProposal(id);
+    refreshData();
+  };
+
+  const handleNewProposalForLead = (lead: Lead) => {
+    setProposalForm({ open: true, lead, proposal: null });
+  };
+
+  const handleEditProposal = (proposal: Proposal) => {
+    setProposalForm({ open: true, lead: null, proposal });
+  };
+
+  const handleProposalSaved = () => {
+    refreshData();
+  };
+
+  const proposalsByLead = (leadId: string) => proposals.filter(p => p.leadId === leadId);
+
+  const filteredProposals = proposals.filter(p => {
+    if (!proposalsSearch) return true;
+    const q = proposalsSearch.toLowerCase();
+    return (
+      p.clienteNome.toLowerCase().includes(q) ||
+      p.clienteEmpresa.toLowerCase().includes(q) ||
+      p.slug.toLowerCase().includes(q)
+    );
+  });
 
   const handleAddAdmin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,6 +277,7 @@ const AdminDashboard = () => {
             { key: "crm" as const, label: `CRM (${leads.length})` },
             { key: "metricas" as const, label: "Métricas" },
             { key: "calculadora" as const, label: `Calculadora (${calcResults.length})` },
+            { key: "propostas" as const, label: `Propostas (${proposals.length})` },
             { key: "admins" as const, label: `Admins (${admins.length})` },
           ].map((t) => (
             <button
@@ -411,6 +464,53 @@ const AdminDashboard = () => {
                               </div>
                             ) : (
                               lead.notas && <p className="text-sm text-foreground/70 bg-muted/30 rounded-lg p-3 leading-relaxed">{lead.notas}</p>
+                            )}
+                          </div>
+
+                          {/* Propostas do lead */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                                <FileText className="h-3 w-3" /> Propostas comerciais
+                              </p>
+                              <button
+                                onClick={() => handleNewProposalForLead(lead)}
+                                className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
+                              >
+                                <Plus className="h-3 w-3" /> Nova proposta
+                              </button>
+                            </div>
+                            {proposalsByLead(lead.id).length === 0 ? (
+                              <p className="text-xs text-muted-foreground italic bg-muted/20 rounded-lg p-2.5">
+                                Nenhuma proposta criada para este lead.
+                              </p>
+                            ) : (
+                              <div className="space-y-1.5">
+                                {proposalsByLead(lead.id).map(p => (
+                                  <div key={p.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 border border-border">
+                                    <Sparkles className="h-3.5 w-3.5 text-secondary flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-semibold text-primary truncate">
+                                        {p.clienteEmpresa} · {p.investimentoTotal > 0 ? `R$ ${(p.investimentoTotal / 1000).toFixed(0)}k` : "Sem valor"}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground">
+                                        {new Date(p.createdAt).toLocaleDateString("pt-BR")} · {p.status}
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button onClick={() => handleCopyProposalLink(p.slug)} title="Copiar link" className="h-7 w-7 rounded-md bg-card border hover:bg-secondary/10 flex items-center justify-center text-muted-foreground hover:text-secondary transition-colors">
+                                        <Copy className="h-3.5 w-3.5" />
+                                      </button>
+                                      <a href={proposalLink(p.slug)} target="_blank" rel="noopener noreferrer" title="Abrir" className="h-7 w-7 rounded-md bg-card border hover:bg-secondary/10 flex items-center justify-center text-muted-foreground hover:text-secondary transition-colors">
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                      </a>
+                                      <button onClick={() => handleEditProposal(p)} title="Editar" className="text-[10px] font-semibold text-primary hover:underline px-2">
+                                        Editar
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
 
@@ -627,6 +727,68 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* ─── PROPOSTAS TAB ─── */}
+        {tab === "propostas" && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+              <Button onClick={() => setProposalForm({ open: true, lead: null, proposal: null })} size="sm" className="gap-1.5 hero-gradient border-0 text-primary-foreground">
+                <Plus className="h-4 w-4" /> Nova proposta
+              </Button>
+              <div className="relative sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar proposta..."
+                  value={proposalsSearch}
+                  onChange={(e) => setProposalsSearch(e.target.value)}
+                  className="pl-9 bg-card"
+                />
+              </div>
+            </div>
+
+            {filteredProposals.length === 0 ? (
+              <div className="bg-card rounded-xl border p-8 text-center">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-muted-foreground text-sm">{proposals.length === 0 ? "Nenhuma proposta criada ainda." : "Nenhuma proposta encontrada."}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredProposals.map((p) => (
+                  <div key={p.id} className="bg-card rounded-xl border p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg gold-gradient flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-primary truncate">{p.clienteEmpresa || "Sem empresa"}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {p.clienteNome} · {p.investimentoTotal > 0 ? `R$ ${p.investimentoTotal.toLocaleString("pt-BR")}` : "Sem valor"} · {new Date(p.createdAt).toLocaleDateString("pt-BR")}
+                        </p>
+                        <p className="text-[10px] font-mono text-muted-foreground/70 mt-0.5">/{p.slug}</p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button variant="outline" size="sm" onClick={() => handleCopyProposalLink(p.slug)} className="gap-1 text-xs h-8">
+                          <Copy className="h-3 w-3" /> Link
+                        </Button>
+                        <a href={proposalLink(p.slug)} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="sm" className="gap-1 text-xs h-8">
+                            <ExternalLink className="h-3 w-3" /> Abrir
+                          </Button>
+                        </a>
+                        <Button variant="outline" size="sm" onClick={() => handleEditProposal(p)} className="text-xs h-8">
+                          Editar
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteProposal(p.id)} className="text-destructive h-8 w-8">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── ADMINS TAB ─── */}
         {tab === "admins" && (
           <div className="space-y-3">
@@ -672,6 +834,14 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      <ProposalForm
+        open={proposalForm.open}
+        onOpenChange={(open) => setProposalForm(s => ({ ...s, open }))}
+        lead={proposalForm.lead}
+        proposal={proposalForm.proposal}
+        onSaved={handleProposalSaved}
+      />
     </div>
   );
 };
