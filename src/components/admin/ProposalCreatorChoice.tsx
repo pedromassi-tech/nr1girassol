@@ -78,7 +78,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, onPickBlank, onPickAI }: Pr
                 <span className="text-[9px] bg-secondary text-primary px-1.5 py-0.5 rounded font-bold">RÁPIDO</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Cole o resumo e o sistema preenche escopo, números e notas internas automaticamente.
+                Cole o resumo e o sistema monta escopo, diferenciais, entregáveis, fases, prazo e notas internas.
               </p>
             </button>
           </div>
