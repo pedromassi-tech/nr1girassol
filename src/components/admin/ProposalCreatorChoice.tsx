@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Sparkles, FilePlus2, Wand2, Loader2, ClipboardCheck, Calculator } from "lucide-react";
+import { Sparkles, FilePlus2, Wand2, Loader2, ClipboardCheck, Calculator, CheckCircle2, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Lead } from "@/lib/adminStore";
 import {
@@ -19,22 +19,23 @@ interface Props {
   onPickAI: (prefilled: Partial<ProposalDraft>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as any;
+interface MatchInfo { reason: string; score: number }
 
 const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI }: Props) => {
   const [mode, setMode] = useState<"choose" | "ai">("choose");
   const [transcricao, setTranscricao] = useState("");
   const [loading, setLoading] = useState(false);
-  const [foundQuiz, setFoundQuiz] = useState<boolean | null>(null);
-  const [foundCalc, setFoundCalc] = useState<boolean | null>(null);
+  const [quizMatch, setQuizMatch] = useState<MatchInfo | null>(null);
+  const [calcMatch, setCalcMatch] = useState<MatchInfo | null>(null);
+  const [searched, setSearched] = useState(false);
 
   const reset = () => {
     setMode("choose");
     setTranscricao("");
     setLoading(false);
-    setFoundQuiz(null);
-    setFoundCalc(null);
+    setQuizMatch(null);
+    setCalcMatch(null);
+    setSearched(false);
   };
 
   const handleClose = (v: boolean) => {
@@ -44,26 +45,19 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
 
   const handleGenerate = async () => {
     setLoading(true);
+    setSearched(false);
     try {
-      // Busca quiz e calculadora pelo e-mail do lead
-      let quiz = null, calculadora = null;
-      if (lead?.email) {
-        const [{ data: q }, { data: c }] = await Promise.all([
-          db.from("quiz_completions").select("*").eq("email", lead.email).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-          db.from("calculator_completions").select("*").eq("email", lead.email).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-        ]);
-        quiz = q; calculadora = c;
-        setFoundQuiz(!!q); setFoundCalc(!!c);
-      }
-
       const { data, error } = await supabase.functions.invoke("generate-proposal", {
-        body: { transcricao, lead, quiz, calculadora },
+        body: { transcricao, lead },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
+      setQuizMatch(data?.matches?.quiz ?? null);
+      setCalcMatch(data?.matches?.calculadora ?? null);
+      setSearched(true);
+
       const ai = data.proposal ?? {};
-      // Mescla com defaults para garantir que nada fique vazio
       const prefilled: Partial<ProposalDraft> = {
         escopoResumo: ai.escopoResumo ?? "",
         diferenciais: Array.isArray(ai.diferenciais) && ai.diferenciais.length ? ai.diferenciais : [...DEFAULT_DIFERENCIAIS],
@@ -102,7 +96,7 @@ const ProposalCreatorChoice = ({ open, onOpenChange, lead, onPickBlank, onPickAI
           <DialogDescription>
             {mode === "choose"
               ? "Escolha começar do zero ou deixar a IA preencher tudo a partir da reunião e dos diagnósticos."
-              : "Cole o resumo/transcrição da reunião. A IA vai cruzar com o quiz e a calculadora do lead."}
+              : "Cole o resumo/transcrição da reunião. A IA cruza automaticamente com o quiz e a calculadora deste lead (busca inteligente por e-mail, telefone, nome ou empresa)."}
           </DialogDescription>
         </DialogHeader>
 
