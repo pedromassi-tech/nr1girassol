@@ -21,6 +21,7 @@ interface ProposalFormProps {
   onOpenChange: (open: boolean) => void;
   lead?: Lead | null;
   proposal?: Proposal | null;
+  prefill?: Partial<ProposalDraft> | null;
   onSaved: (p: Proposal) => void;
 }
 
