@@ -129,11 +129,11 @@ const AdminDashboard = () => {
   };
 
   const handleNewProposalForLead = (lead: Lead) => {
-    setProposalForm({ open: true, lead, proposal: null });
+    setCreatorChoice({ open: true, lead });
   };
 
   const handleEditProposal = (proposal: Proposal) => {
-    setProposalForm({ open: true, lead: null, proposal });
+    setProposalForm({ open: true, lead: null, proposal, prefill: null });
   };
 
   const handleProposalSaved = () => {
