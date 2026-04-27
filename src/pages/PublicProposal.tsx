@@ -63,7 +63,7 @@ const PublicProposal = () => {
 
   const whatsappLink = proposal.clienteWhatsapp
     ? `https://wa.me/55${proposal.clienteWhatsapp.replace(/\D/g, "")}`
-    : "https://wa.me/5511999999999";
+    : "https://wa.me/553184346241";
 
   const aceitarMsg = encodeURIComponent(
     `Olá! Estou aceitando a proposta para ${proposal.clienteEmpresa}. Vamos avançar! (Proposta ${proposal.slug})`
