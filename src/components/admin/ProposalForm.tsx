@@ -88,12 +88,41 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
 const ProposalForm = ({ open, onOpenChange, lead, proposal, onSaved }: ProposalFormProps) => {
   const [draft, setDraft] = useState<ProposalDraft>(() => proposal ? proposalToDraft(proposal) : emptyDraft(lead));
   const [saving, setSaving] = useState(false);
+  const [valorHora, setValorHora] = useState<number>(350);
+  const [horasManual, setHorasManual] = useState<number | null>(null);
 
   useEffect(() => {
     if (open) {
       setDraft(proposal ? proposalToDraft(proposal) : emptyDraft(lead));
+      setHorasManual(null);
     }
   }, [open, lead, proposal]);
+
+  // ── Calculadora de horas baseada no escopo ──
+  const horasEstimadas = (() => {
+    let h = 40; // base de gestão/coordenação
+    h += draft.numEstabelecimentos * 16;        // visitas/análise por unidade
+    h += draft.numFuncoes * 4;                   // análise por função
+    h += Math.ceil(draft.numColaboradores / 20) * 6; // escuta proporcional
+    h += draft.numLideres * 2;                   // mentoria de liderança
+    if (draft.maturidadePgr === "inexistente") h += 40;
+    else if (draft.maturidadePgr === "parcial") h += 24;
+    else h += 12;
+    if (draft.modeloTrabalho === "hibrido") h += 16;
+    if (draft.modeloTrabalho === "remoto") h += 24;
+    if (draft.temPrestadores) h += 20;
+    if (!draft.temEquipeSst) h += 30;            // mais documentação se não há SST interna
+    if (draft.grauRisco === "3") h += 16;
+    if (draft.grauRisco === "4") h += 32;
+    return Math.round(h);
+  })();
+
+  const horasFinais = horasManual ?? horasEstimadas;
+  const totalCalculado = horasFinais * valorHora;
+
+  const aplicarCalculo = () => {
+    update("investimentoTotal", totalCalculado);
+  };
 
   const update = <K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) => {
     setDraft(d => ({ ...d, [key]: value }));
