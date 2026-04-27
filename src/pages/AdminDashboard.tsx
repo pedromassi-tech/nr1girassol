@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { getProposals, deleteProposal, type Proposal } from "@/lib/proposalsStore";
 import ProposalForm from "@/components/admin/ProposalForm";
+import ProposalCreatorChoice from "@/components/admin/ProposalCreatorChoice";
+import type { ProposalDraft } from "@/lib/proposalsStore";
 import { toast } from "@/hooks/use-toast";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
