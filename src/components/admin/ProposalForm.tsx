@@ -81,6 +81,7 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
   investimentoParcelas: p.investimentoParcelas,
   investimentoObservacao: p.investimentoObservacao,
   validadeDias: p.validadeDias,
+  observacoesInternas: p.observacoesInternas,
   status: p.status,
 });
 
