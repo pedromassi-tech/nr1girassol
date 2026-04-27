@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle2, Sparkles, Calendar, Building2, Users, Briefcase,
   ShieldCheck, Target, Award, MessageCircle, Mail, Clock,
-  TrendingUp, FileText, Layers, ArrowRight, AlertCircle,
+  TrendingUp, Layers, ArrowRight, AlertCircle,
 } from "lucide-react";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import logoLight from "@/assets/logo-girassol-light.png";
