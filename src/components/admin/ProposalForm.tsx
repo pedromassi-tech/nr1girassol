@@ -13,7 +13,7 @@ import {
   DEFAULT_DIFERENCIAIS, DEFAULT_FASES, DEFAULT_ENTREGAVEIS,
   type Proposal, type ProposalDraft, type ProposalFase,
 } from "@/lib/proposalsStore";
-import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2, Upload, Image as ImageIcon } from "lucide-react";
 import type { Lead } from "@/lib/adminStore";
 
 interface ProposalFormProps {
