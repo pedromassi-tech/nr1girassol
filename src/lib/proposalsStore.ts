@@ -121,7 +121,8 @@ function rowToProposal(row: any): Proposal {
     investimentoObservacao: row.investimento_observacao ?? "",
     validadeDias: row.validade_dias ?? 15,
     status: (row.status as ProposalStatus) ?? "rascunho",
-    observacoesInternas: row.observacoes_internas ?? "",
+    observacoesInternas: splitLogo(row.observacoes_internas ?? "").rest,
+    clienteLogoUrl: splitLogo(row.observacoes_internas ?? "").logo,
     createdAt: row.created_at ?? new Date().toISOString(),
     updatedAt: row.updated_at ?? new Date().toISOString(),
   };
