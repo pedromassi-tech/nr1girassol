@@ -251,6 +251,45 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
         <div className="space-y-6 mt-2">
           {/* CLIENTE */}
           <Section icon={Building2} title="Dados do cliente">
+            {/* Logo do cliente */}
+            <div>
+              <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-2 block">
+                Logo do cliente <span className="text-muted-foreground normal-case font-normal">(opcional — aparece no topo da proposta)</span>
+              </Label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="h-20 w-20 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  {draft.clienteLogoUrl ? (
+                    <img src={draft.clienteLogoUrl} alt="Logo do cliente" className="max-h-full max-w-full object-contain" />
+                  ) : (
+                    <ImageIcon className="h-7 w-7 text-muted-foreground/50" />
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      className="hidden"
+                      onChange={e => handleLogoFile(e.target.files?.[0] ?? null)}
+                    />
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold border rounded-md px-3 py-2 hover:border-secondary hover:bg-secondary/5 transition">
+                      <Upload className="h-3.5 w-3.5" />
+                      {draft.clienteLogoUrl ? "Trocar logo" : "Enviar logo"}
+                    </span>
+                  </label>
+                  {draft.clienteLogoUrl && (
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="inline-flex items-center gap-1 text-[11px] text-destructive hover:underline self-start px-1"
+                    >
+                      <Trash2 className="h-3 w-3" /> Remover
+                    </button>
+                  )}
+                  <span className="text-[10px] text-muted-foreground">PNG, JPG, WEBP ou SVG · até 4 MB</span>
+                </div>
+              </div>
+            </div>
             <Grid>
               <Field label="Nome do cliente *">
                 <Input value={draft.clienteNome} onChange={e => update("clienteNome", e.target.value)} placeholder="Maria Silva" />
