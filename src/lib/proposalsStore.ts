@@ -55,8 +55,27 @@ export interface Proposal {
 
   status: ProposalStatus;
   observacoesInternas: string;
+  // Logo do cliente (data URL base64). Persistido embutido em observacoes_internas
+  // com marcador [CLIENT_LOGO]...[/CLIENT_LOGO] para evitar migration de schema.
+  clienteLogoUrl: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// ─── Logo embed helpers (no-migration trick) ───
+const LOGO_RE = /\[CLIENT_LOGO\]([\s\S]*?)\[\/CLIENT_LOGO\]\n?/;
+
+function splitLogo(internas: string): { logo: string; rest: string } {
+  if (!internas) return { logo: "", rest: "" };
+  const m = internas.match(LOGO_RE);
+  if (!m) return { logo: "", rest: internas };
+  return { logo: m[1].trim(), rest: internas.replace(LOGO_RE, "").trim() };
+}
+
+function joinLogo(logo: string, rest: string): string {
+  const cleanRest = rest.replace(LOGO_RE, "").trim();
+  if (!logo) return cleanRest;
+  return `[CLIENT_LOGO]${logo}[/CLIENT_LOGO]\n${cleanRest}`;
 }
 
 export type ProposalDraft = Omit<Proposal, "id" | "slug" | "createdAt" | "updatedAt" | "status"> & {
@@ -102,7 +121,8 @@ function rowToProposal(row: any): Proposal {
     investimentoObservacao: row.investimento_observacao ?? "",
     validadeDias: row.validade_dias ?? 15,
     status: (row.status as ProposalStatus) ?? "rascunho",
-    observacoesInternas: row.observacoes_internas ?? "",
+    observacoesInternas: splitLogo(row.observacoes_internas ?? "").rest,
+    clienteLogoUrl: splitLogo(row.observacoes_internas ?? "").logo,
     createdAt: row.created_at ?? new Date().toISOString(),
     updatedAt: row.updated_at ?? new Date().toISOString(),
   };
@@ -137,7 +157,7 @@ function draftToRow(draft: ProposalDraft) {
     investimento_observacao: draft.investimentoObservacao,
     validade_dias: draft.validadeDias,
     status: draft.status ?? "rascunho",
-    observacoes_internas: draft.observacoesInternas,
+    observacoes_internas: joinLogo(draft.clienteLogoUrl ?? "", draft.observacoesInternas ?? ""),
   };
 }
 

@@ -13,7 +13,7 @@ import {
   DEFAULT_DIFERENCIAIS, DEFAULT_FASES, DEFAULT_ENTREGAVEIS,
   type Proposal, type ProposalDraft, type ProposalFase,
 } from "@/lib/proposalsStore";
-import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2, Upload, Image as ImageIcon } from "lucide-react";
 import type { Lead } from "@/lib/adminStore";
 
 interface ProposalFormProps {
@@ -32,6 +32,7 @@ const emptyDraft = (lead?: Lead | null): ProposalDraft => ({
   clienteEmail: lead?.email ?? "",
   clienteWhatsapp: lead?.whatsapp ?? "",
   clienteCargo: lead?.cargo ?? "",
+  clienteLogoUrl: "",
   numEstabelecimentos: 1,
   numFuncoes: 5,
   numColaboradores: 50,
@@ -62,6 +63,7 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
   clienteEmail: p.clienteEmail,
   clienteWhatsapp: p.clienteWhatsapp,
   clienteCargo: p.clienteCargo,
+  clienteLogoUrl: p.clienteLogoUrl ?? "",
   numEstabelecimentos: p.numEstabelecimentos,
   numFuncoes: p.numFuncoes,
   numColaboradores: p.numColaboradores,
@@ -169,6 +171,52 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     setDraft(d => ({ ...d, fases: d.fases.filter((_, i) => i !== idx) }));
   };
 
+  // ── Logo do cliente: leitura + redimensionamento p/ data URL ──
+  const handleLogoFile = async (file: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Selecione um arquivo de imagem (PNG, JPG, SVG, WEBP).");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Imagem muito grande. Use até 4 MB.");
+      return;
+    }
+    // SVG mantém vetor — armazena direto como data URL
+    if (file.type === "image/svg+xml") {
+      const reader = new FileReader();
+      reader.onload = () => update("clienteLogoUrl", String(reader.result || ""));
+      reader.readAsDataURL(file);
+      return;
+    }
+    // Raster: redimensiona para no máx 480px no lado maior
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 480;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, w, h);
+      const isPng = file.type === "image/png" || file.type === "image/webp";
+      const out = canvas.toDataURL(isPng ? "image/png" : "image/jpeg", 0.9);
+      update("clienteLogoUrl", out);
+    };
+    img.src = dataUrl;
+  };
+
+  const removeLogo = () => update("clienteLogoUrl", "");
+
   const handleSave = async () => {
     if (!draft.clienteNome || !draft.clienteEmpresa) {
       alert("Preencha ao menos nome do cliente e empresa.");
@@ -203,6 +251,45 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
         <div className="space-y-6 mt-2">
           {/* CLIENTE */}
           <Section icon={Building2} title="Dados do cliente">
+            {/* Logo do cliente */}
+            <div>
+              <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-2 block">
+                Logo do cliente <span className="text-muted-foreground normal-case font-normal">(opcional — aparece no topo da proposta)</span>
+              </Label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="h-20 w-20 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  {draft.clienteLogoUrl ? (
+                    <img src={draft.clienteLogoUrl} alt="Logo do cliente" className="max-h-full max-w-full object-contain" />
+                  ) : (
+                    <ImageIcon className="h-7 w-7 text-muted-foreground/50" />
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      className="hidden"
+                      onChange={e => handleLogoFile(e.target.files?.[0] ?? null)}
+                    />
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold border rounded-md px-3 py-2 hover:border-secondary hover:bg-secondary/5 transition">
+                      <Upload className="h-3.5 w-3.5" />
+                      {draft.clienteLogoUrl ? "Trocar logo" : "Enviar logo"}
+                    </span>
+                  </label>
+                  {draft.clienteLogoUrl && (
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="inline-flex items-center gap-1 text-[11px] text-destructive hover:underline self-start px-1"
+                    >
+                      <Trash2 className="h-3 w-3" /> Remover
+                    </button>
+                  )}
+                  <span className="text-[10px] text-muted-foreground">PNG, JPG, WEBP ou SVG · até 4 MB</span>
+                </div>
+              </div>
+            </div>
             <Grid>
               <Field label="Nome do cliente *">
                 <Input value={draft.clienteNome} onChange={e => update("clienteNome", e.target.value)} placeholder="Maria Silva" />
