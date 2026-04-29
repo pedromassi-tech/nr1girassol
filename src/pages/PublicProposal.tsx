@@ -75,7 +75,23 @@ const PublicProposal = () => {
       <header className="hero-gradient text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,_white_0,_transparent_50%)]" />
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-16 relative">
-          <img src={logoDark} alt="Instituto Girassol" className="h-10 sm:h-12 mb-8" />
+          <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+            <img src={logoDark} alt="Instituto Girassol" className="h-10 sm:h-12" />
+            {proposal.clienteLogoUrl && (
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] uppercase tracking-wider text-primary-foreground/60 font-semibold hidden sm:inline">
+                  Proposta para
+                </span>
+                <div className="bg-white/95 rounded-xl p-2.5 sm:p-3 shadow-md">
+                  <img
+                    src={proposal.clienteLogoUrl}
+                    alt={`Logo ${proposal.clienteEmpresa}`}
+                    className="h-10 sm:h-12 max-w-[180px] object-contain"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 bg-secondary/20 text-secondary text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-secondary/30">
               <Sparkles className="h-3 w-3" /> Proposta Comercial
