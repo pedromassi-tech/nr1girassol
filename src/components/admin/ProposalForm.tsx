@@ -63,6 +63,7 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
   clienteEmail: p.clienteEmail,
   clienteWhatsapp: p.clienteWhatsapp,
   clienteCargo: p.clienteCargo,
+  clienteLogoUrl: p.clienteLogoUrl ?? "",
   numEstabelecimentos: p.numEstabelecimentos,
   numFuncoes: p.numFuncoes,
   numColaboradores: p.numColaboradores,
