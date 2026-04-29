@@ -171,6 +171,52 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     setDraft(d => ({ ...d, fases: d.fases.filter((_, i) => i !== idx) }));
   };
 
+  // ── Logo do cliente: leitura + redimensionamento p/ data URL ──
+  const handleLogoFile = async (file: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Selecione um arquivo de imagem (PNG, JPG, SVG, WEBP).");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Imagem muito grande. Use até 4 MB.");
+      return;
+    }
+    // SVG mantém vetor — armazena direto como data URL
+    if (file.type === "image/svg+xml") {
+      const reader = new FileReader();
+      reader.onload = () => update("clienteLogoUrl", String(reader.result || ""));
+      reader.readAsDataURL(file);
+      return;
+    }
+    // Raster: redimensiona para no máx 480px no lado maior
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 480;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, w, h);
+      const isPng = file.type === "image/png" || file.type === "image/webp";
+      const out = canvas.toDataURL(isPng ? "image/png" : "image/jpeg", 0.9);
+      update("clienteLogoUrl", out);
+    };
+    img.src = dataUrl;
+  };
+
+  const removeLogo = () => update("clienteLogoUrl", "");
+
   const handleSave = async () => {
     if (!draft.clienteNome || !draft.clienteEmpresa) {
       alert("Preencha ao menos nome do cliente e empresa.");
