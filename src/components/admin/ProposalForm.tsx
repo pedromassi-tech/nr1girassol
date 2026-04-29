@@ -32,6 +32,7 @@ const emptyDraft = (lead?: Lead | null): ProposalDraft => ({
   clienteEmail: lead?.email ?? "",
   clienteWhatsapp: lead?.whatsapp ?? "",
   clienteCargo: lead?.cargo ?? "",
+  clienteLogoUrl: "",
   numEstabelecimentos: 1,
   numFuncoes: 5,
   numColaboradores: 50,
