@@ -157,7 +157,7 @@ function draftToRow(draft: ProposalDraft) {
     investimento_observacao: draft.investimentoObservacao,
     validade_dias: draft.validadeDias,
     status: draft.status ?? "rascunho",
-    observacoes_internas: draft.observacoesInternas,
+    observacoes_internas: joinLogo(draft.clienteLogoUrl ?? "", draft.observacoesInternas ?? ""),
   };
 }
 
