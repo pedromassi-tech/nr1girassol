@@ -41,7 +41,7 @@ const PublicProposal = () => {
           },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["css", "legacy"], avoid: [".pdf-avoid-break"] },
-        })
+        } as any)
         .from(printRef.current)
         .save();
     } catch (e) {
