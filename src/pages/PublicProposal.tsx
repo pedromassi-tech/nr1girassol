@@ -18,6 +18,38 @@ const PublicProposal = () => {
   const { slug } = useParams<{ slug: string }>();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = async () => {
+    if (!printRef.current || !proposal) return;
+    setDownloading(true);
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const filename = `Proposta-${proposal.clienteEmpresa.replace(/[^a-z0-9]+/gi, "-")}-${proposal.slug}.pdf`;
+      await html2pdf()
+        .set({
+          margin: 0,
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            windowWidth: 1100,
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"], avoid: [".pdf-avoid-break"] },
+        })
+        .from(printRef.current)
+        .save();
+    } catch (e) {
+      console.error("Erro ao gerar PDF:", e);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!slug) return;
