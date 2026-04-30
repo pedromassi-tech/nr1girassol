@@ -90,6 +90,7 @@ function generateSlug(): string {
   return `${part1}${part2}`;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function rowToProposal(row: any): Proposal {
   const internas = splitLogo(row.observacoes_internas ?? "");
   return {
