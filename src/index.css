@@ -104,3 +104,20 @@
     text-wrap: balance;
   }
 }
+
+/* PDF rendering — evita cortar seções, cards e títulos no meio */
+.pdf-root section,
+.pdf-root header,
+.pdf-root footer,
+.pdf-avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.pdf-root h1, .pdf-root h2, .pdf-root h3 {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+.pdf-root img {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}

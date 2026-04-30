@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getProposalBySlug, type Proposal } from "@/lib/proposalsStore";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle2, Sparkles, Calendar, Building2, Users, Briefcase,
   ShieldCheck, Target, Award, MessageCircle, Mail, Clock,
-  TrendingUp, Layers, ArrowRight, AlertCircle,
+  TrendingUp, Layers, ArrowRight, AlertCircle, Download, Loader2,
 } from "lucide-react";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import logoLight from "@/assets/logo-girassol-light.png";
@@ -18,6 +18,38 @@ const PublicProposal = () => {
   const { slug } = useParams<{ slug: string }>();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = async () => {
+    if (!printRef.current || !proposal) return;
+    setDownloading(true);
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const filename = `Proposta-${proposal.clienteEmpresa.replace(/[^a-z0-9]+/gi, "-")}-${proposal.slug}.pdf`;
+      await html2pdf()
+        .set({
+          margin: 0,
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            windowWidth: 1100,
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"], avoid: [".pdf-avoid-break"] },
+        } as any)
+        .from(printRef.current)
+        .save();
+    } catch (e) {
+      console.error("Erro ao gerar PDF:", e);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!slug) return;
@@ -71,8 +103,24 @@ const PublicProposal = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Botão flutuante de download (não entra no PDF) */}
+      <div className="fixed top-4 right-4 z-50 print:hidden">
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={downloading}
+          className="hero-gradient border-0 text-primary-foreground gap-2 shadow-lg"
+        >
+          {downloading ? (
+            <><Loader2 className="h-4 w-4 animate-spin" /> Gerando PDF...</>
+          ) : (
+            <><Download className="h-4 w-4" /> Baixar PDF</>
+          )}
+        </Button>
+      </div>
+
+      <div ref={printRef} className="bg-background pdf-root">
       {/* HERO */}
-      <header className="hero-gradient text-primary-foreground relative overflow-hidden">
+      <header className="hero-gradient text-primary-foreground relative overflow-hidden pdf-avoid-break">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,_white_0,_transparent_50%)]" />
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-16 relative">
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
@@ -322,6 +370,7 @@ const PublicProposal = () => {
           </p>
         </footer>
       </main>
+      </div>
     </div>
   );
 };
