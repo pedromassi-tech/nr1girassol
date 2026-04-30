@@ -616,7 +616,13 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     detectados.push(`CNAE ${cliente.cnae}`);
   }
 
-  const colaboradores = findNumberNear(transcricao, [
+  // ─── Campos rotulados (prioridade máxima — vêm do resumo já curado) ───
+  const labColab = extractNumberFromLabel(transcricao, ["total\\s+de\\s+colaboradores", "colaboradores", "n[uú]mero\\s+de\\s+colaboradores", "headcount"]);
+  const labUnidades = extractNumberFromLabel(transcricao, ["estabelecimentos[^:\\n]*unidades?", "estabelecimentos", "unidades?", "lojas?", "filiais"]);
+  const labFuncoes = extractNumberFromLabel(transcricao, ["fun[çc][õo]es[^:\\n]*(?:cargos)?", "fun[çc][õo]es", "cargos?\\s+distintos"]);
+  const labLideres = extractNumberFromLabel(transcricao, ["n[ºo]\\s*de\\s+gestores", "gestores", "l[ií]deres", "lideran[çc]as?"]);
+
+  const colaboradores = labColab ?? findNumberNear(transcricao, [
     "colaboradores", "colaborador", "funcionarios", "funcionário", "funcionários", "empregados", "pessoas",
     "quadro", "headcount", "time", "equipe",
   ]);
@@ -625,7 +631,7 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     detectados.push(`${colaboradores} colaboradores`);
   }
 
-  const estabelecimentos = findNumberNear(transcricao, [
+  const estabelecimentos = labUnidades ?? findNumberNear(transcricao, [
     "unidades", "unidade", "lojas", "loja", "filiais", "filial", "estabelecimentos", "fabrica", "fabricas", "fábrica", "fábricas",
     "operacoes", "operações", "plantas", "sites",
   ]);
@@ -634,7 +640,7 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     detectados.push(`${estabelecimentos} unidade(s)`);
   }
 
-  const funcoes = findNumberNear(transcricao, [
+  const funcoes = labFuncoes ?? findNumberNear(transcricao, [
     "funcoes", "funções", "funcao", "função", "cargos", "cargo", "posicoes", "posições",
   ]);
   if (funcoes) {
@@ -642,7 +648,7 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     detectados.push(`${funcoes} função/cargos`);
   }
 
-  const lideres = findNumberNear(transcricao, [
+  const lideres = labLideres ?? findNumberNear(transcricao, [
     "lideres", "líderes", "lider", "líder", "gestores", "gestor", "gerentes", "gerente", "supervisores", "supervisor", "lideranca", "liderança",
   ]);
   if (lideres) {
@@ -650,69 +656,92 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     detectados.push(`${lideres} líder(es)`);
   }
 
-  if (hasAny(transcricao, ["hibrido", "híbrido", "home office parcial", "parte remoto", "parte presencial"])) {
-    prefill.modeloTrabalho = "hibrido";
-    detectados.push("modelo híbrido");
+  // Modelo (rótulo > heurística)
+  const modeloLabel = extractModeloFromLabel(transcricao);
+  if (modeloLabel) {
+    prefill.modeloTrabalho = modeloLabel;
+    detectados.push(`modelo ${modeloLabel}`);
+  } else if (hasAny(transcricao, ["hibrido", "híbrido", "home office parcial", "parte remoto", "parte presencial"])) {
+    prefill.modeloTrabalho = "hibrido"; detectados.push("modelo híbrido");
   } else if (hasAny(transcricao, ["100% remoto", "totalmente remoto", "remoto", "home office"])) {
-    prefill.modeloTrabalho = "remoto";
-    detectados.push("modelo remoto");
+    prefill.modeloTrabalho = "remoto"; detectados.push("modelo remoto");
   } else if (hasAny(transcricao, ["presencial", "no escritorio", "no escritório", "chao de fabrica", "chão de fábrica", "lojas fisicas", "lojas físicas"])) {
-    prefill.modeloTrabalho = "presencial";
-    detectados.push("modelo presencial");
+    prefill.modeloTrabalho = "presencial"; detectados.push("modelo presencial");
   }
 
-  if (hasAny(transcricao, [
+  // Maturidade PGR (rótulo > heurística)
+  const matLabel = detectMaturidadePgrFromLabel(transcricao);
+  if (matLabel) {
+    prefill.maturidadePgr = matLabel;
+    detectados.push(`PGR ${matLabel}`);
+  } else if (hasAny(transcricao, [
     "sem pgr", "nao tem pgr", "não tem pgr", "nao possui pgr", "não possui pgr",
     "pgr inexistente", "pgr nao existe", "pgr não existe", "do zero",
   ])) {
-    prefill.maturidadePgr = "inexistente";
-    detectados.push("PGR inexistente");
-  } else if (hasAny(transcricao, [
-    "pgr atualizado", "pgr completo", "pgr ok", "pgr em dia", "pgr pronto",
-  ])) {
-    prefill.maturidadePgr = "completo";
-    detectados.push("PGR completo");
-  } else if (hasAny(transcricao, [
-    "pgr parcial", "pgr desatualizado", "pgr antigo", "pgr incompleto",
-    "tem pgr mas", "tem um pgr", "pgr precisa",
-  ])) {
-    prefill.maturidadePgr = "parcial";
-    detectados.push("PGR parcial");
+    prefill.maturidadePgr = "inexistente"; detectados.push("PGR inexistente");
+  } else if (hasAny(transcricao, ["pgr atualizado", "pgr completo", "pgr ok", "pgr em dia", "pgr pronto"])) {
+    prefill.maturidadePgr = "completo"; detectados.push("PGR completo");
+  } else if (hasAny(transcricao, ["pgr parcial", "pgr desatualizado", "pgr antigo", "pgr incompleto", "tem pgr mas", "tem um pgr", "pgr precisa"])) {
+    prefill.maturidadePgr = "parcial"; detectados.push("PGR parcial");
   }
 
-  if (hasAny(transcricao, ["prestadores", "terceirizados", "terceiros", "pj no local", "pjs", "contratados"])) {
-    prefill.temPrestadores = true;
-    detectados.push("possui prestadores/PJ");
-  } else if (hasAny(transcricao, ["sem prestadores", "sem terceiros", "nao tem prestadores", "não tem prestadores", "nao tem terceiros", "não tem terceiros"])) {
-    prefill.temPrestadores = false;
-    detectados.push("sem prestadores/PJ");
+  // Prestadores (rótulo > heurística)
+  const prestLabel = detectBoolFromLabel(transcricao, /tem\s+prestadores(?:\/pj)?(?:\s+no\s+local)?\??/);
+  if (prestLabel !== null) {
+    prefill.temPrestadores = prestLabel;
+    detectados.push(prestLabel ? "possui prestadores/PJ" : "sem prestadores/PJ");
+  } else if (hasAny(transcricao, ["prestadores", "terceirizados", "terceiros", "pj no local", "pjs", "contratados"])) {
+    prefill.temPrestadores = true; detectados.push("possui prestadores/PJ");
+  } else if (hasAny(transcricao, ["sem prestadores", "sem terceiros", "nao tem prestadores", "não tem prestadores"])) {
+    prefill.temPrestadores = false; detectados.push("sem prestadores/PJ");
   }
 
-  if (hasAny(transcricao, [
-    "tem rh", "possui rh", "equipe de rh", "tem sst", "equipe sst",
-    "tecnico de seguranca", "técnico de segurança", "engenheiro de seguranca", "engenheiro de segurança",
-  ])) {
-    prefill.temEquipeSst = true;
-    detectados.push("equipe SST/RH interna");
+  // SST/RH (rótulo > heurística)
+  const sstLabel = detectBoolFromLabel(transcricao, /equipe\s+(?:interna\s+)?(?:de\s+)?(?:sst|rh|sst\/rh|rh\/sst)/);
+  if (sstLabel !== null) {
+    prefill.temEquipeSst = sstLabel;
+    detectados.push(sstLabel ? "equipe SST/RH interna" : "sem equipe SST/RH interna");
+  } else if (hasAny(transcricao, ["tem rh", "possui rh", "equipe de rh", "tem sst", "equipe sst", "tecnico de seguranca", "técnico de segurança", "engenheiro de seguranca", "engenheiro de segurança"])) {
+    prefill.temEquipeSst = true; detectados.push("equipe SST/RH interna");
   } else if (hasAny(transcricao, ["sem rh", "nao tem rh", "não tem rh", "sem sst", "nao tem sst", "não tem sst"])) {
-    prefill.temEquipeSst = false;
-    detectados.push("sem equipe SST/RH interna");
+    prefill.temEquipeSst = false; detectados.push("sem equipe SST/RH interna");
   }
 
-  const grauMatch = norm(transcricao).match(/grau\s*(?:de\s*)?risco\s*([1-4])/i);
-  if (grauMatch) {
-    prefill.grauRisco = grauMatch[1] as ProposalDraft["grauRisco"];
-    detectados.push(`grau de risco ${grauMatch[1]}`);
+  // Grau de risco (rótulo > heurística)
+  const grauLabel = detectGrauRiscoFromLabel(transcricao);
+  if (grauLabel) {
+    prefill.grauRisco = grauLabel;
+    detectados.push(`grau de risco ${grauLabel}`);
+  } else {
+    const grauMatch = norm(transcricao).match(/grau\s*(?:de\s*)?risco\s*([1-4])/i);
+    if (grauMatch) {
+      prefill.grauRisco = grauMatch[1] as ProposalDraft["grauRisco"];
+      detectados.push(`grau de risco ${grauMatch[1]}`);
+    }
   }
+
+  if (prefill.faturamentoAnual) prefill.faturamentoAnual = normalizaFaturamento(prefill.faturamentoAnual);
+
+  // Investimento ("10 x 2.600", "R$ 26.000 em 10 parcelas")
+  const inv = extractInvestimento(transcricao);
+  if (inv.total) { prefill.investimentoTotal = inv.total; detectados.push(`investimento R$ ${inv.total.toLocaleString("pt-BR")}`); }
+  if (inv.parcelas) { prefill.investimentoParcelas = inv.parcelas; detectados.push(`${inv.parcelas} parcela(s)`); }
+  if (inv.observacao) prefill.investimentoObservacao = inv.observacao;
+
+  // Validade
+  const validade = extractValidadeDias(transcricao);
+  if (validade) { prefill.validadeDias = validade; detectados.push(`validade ${validade} dias`); }
 
   const pains = extractPainPoints(transcricao);
   const urgency = extractUrgency(transcricao);
   if (pains.length) detectados.push(`${pains.length} ponto(s) crítico(s) da reunião`);
   if (urgency) detectados.push("urgência identificada");
 
-  const prazoMeses = inferPrazoMeses(colaboradores ?? undefined, estabelecimentos ?? undefined, prefill.maturidadePgr);
+  // Prazo (rótulo > inferência)
+  const prazoExplicito = extractPrazoMesesExplicito(transcricao);
+  const prazoMeses = prazoExplicito ?? inferPrazoMeses(colaboradores ?? undefined, estabelecimentos ?? undefined, prefill.maturidadePgr);
   prefill.prazoMeses = prazoMeses;
-  detectados.push(`prazo sugerido: ${prazoMeses} meses`);
+  detectados.push(`prazo ${prazoExplicito ? "informado" : "sugerido"}: ${prazoMeses} meses`);
 
   prefill.escopoResumo = buildResumo({
     colaboradores: colaboradores ?? undefined,
@@ -720,40 +749,37 @@ export function parseTranscricao(transcricao: string): ParsedProposalData {
     funcoes: funcoes ?? undefined,
     modelo: prefill.modeloTrabalho,
     maturidade: prefill.maturidadePgr,
-    pains,
-    urgency,
-    transcricao,
+    pains, urgency, transcricao,
   });
 
-  prefill.diferenciais = buildDiferenciais({
-    pains,
-    temEquipeSst: prefill.temEquipeSst,
-    temPrestadores: prefill.temPrestadores,
-    modelo: prefill.modeloTrabalho,
-    maturidade: prefill.maturidadePgr,
-  });
+  // ─── Listas literais do resumo (prioridade máxima) ───
+  const difLiterais = extractSection(transcricao, ["DIFERENCIAIS", "DIFERENCIAIS \\(AJUSTADO\\)"]);
+  const entLiterais = extractSection(transcricao, ["ENTREGÁVEIS", "ENTREGAVEIS"]);
+  const fasesLiterais = extractFasesEstruturadas(transcricao);
 
-  prefill.entregaveis = buildEntregaveis({
-    pains,
-    temEquipeSst: prefill.temEquipeSst,
-    temPrestadores: prefill.temPrestadores,
-  });
-
-  // Mantém defaults caso algum cenário gere poucos itens.
-  if (prefill.diferenciais.length < 4) {
-    prefill.diferenciais = [...prefill.diferenciais, ...DEFAULT_DIFERENCIAIS].slice(0, 6);
-  }
-  if (prefill.entregaveis.length < 5) {
-    prefill.entregaveis = [...prefill.entregaveis, ...DEFAULT_ENTREGAVEIS].slice(0, 8);
+  if (difLiterais.length >= 3) {
+    prefill.diferenciais = difLiterais.slice(0, 8);
+    detectados.push(`${difLiterais.length} diferenciais do resumo`);
+  } else {
+    prefill.diferenciais = buildDiferenciais({ pains, temEquipeSst: prefill.temEquipeSst, temPrestadores: prefill.temPrestadores, modelo: prefill.modeloTrabalho, maturidade: prefill.maturidadePgr });
   }
 
-  prefill.fases = buildFases({
-    prazoMeses,
-    modelo: prefill.modeloTrabalho,
-    maturidade: prefill.maturidadePgr,
-    colaboradores: colaboradores ?? undefined,
-    unidades: estabelecimentos ?? undefined,
-  });
+  if (entLiterais.length >= 3) {
+    prefill.entregaveis = entLiterais.slice(0, 12);
+    detectados.push(`${entLiterais.length} entregáveis do resumo`);
+  } else {
+    prefill.entregaveis = buildEntregaveis({ pains, temEquipeSst: prefill.temEquipeSst, temPrestadores: prefill.temPrestadores });
+  }
+
+  if (prefill.diferenciais.length < 4) prefill.diferenciais = [...prefill.diferenciais, ...DEFAULT_DIFERENCIAIS].slice(0, 6);
+  if (prefill.entregaveis.length < 5) prefill.entregaveis = [...prefill.entregaveis, ...DEFAULT_ENTREGAVEIS].slice(0, 8);
+
+  if (fasesLiterais.length >= 2) {
+    prefill.fases = fasesLiterais;
+    detectados.push(`${fasesLiterais.length} fases do resumo`);
+  } else {
+    prefill.fases = buildFases({ prazoMeses, modelo: prefill.modeloTrabalho, maturidade: prefill.maturidadePgr, colaboradores: colaboradores ?? undefined, unidades: estabelecimentos ?? undefined });
+  }
 
   const frasesOriginais = transcricao
     .split(/(?<=[.!?])\s+/)
