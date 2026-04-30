@@ -318,14 +318,23 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input value={draft.clienteWhatsapp} onChange={e => update("clienteWhatsapp", e.target.value)} placeholder="(11) 99999-9999" />
               </Field>
               <Field label="Faturamento anual">
-                <Select value={draft.faturamentoAnual || undefined} onValueChange={v => update("faturamentoAnual", v)}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="me_epp">ME / EPP (até R$ 4,8M)</SelectItem>
-                    <SelectItem value="medio">Médio (R$ 4,8M – R$ 300M)</SelectItem>
-                    <SelectItem value="grande">Grande (acima de R$ 300M)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  value={draft.faturamentoAnual}
+                  onChange={e => update("faturamentoAnual", e.target.value)}
+                  placeholder="Ex.: Médio (R$ 33 milhões)"
+                />
+                <div className="grid grid-cols-3 gap-1.5 mt-1.5">
+                  {["ME/EPP", "Médio", "Grande"].map(v => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => update("faturamentoAnual", v)}
+                      className="text-[10px] font-semibold py-1.5 rounded-md border border-border hover:border-secondary/50 text-muted-foreground hover:text-primary transition"
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
               </Field>
             </Grid>
           </Section>
