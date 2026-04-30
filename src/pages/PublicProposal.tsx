@@ -370,6 +370,7 @@ const PublicProposal = () => {
           </p>
         </footer>
       </main>
+      </div>
     </div>
   );
 };
