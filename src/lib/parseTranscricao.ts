@@ -271,7 +271,170 @@ const CARGOS_LIST = [
   "people business partner", "business partner", "BP de RH", "HRBP",
   "analista de RH", "analista de pessoas",
   "owner", "proprietária", "proprietário", "dona", "dono",
+  "sócia proprietária", "sócio proprietário", "sócia-proprietária", "sócio-proprietário",
+  "sócia administradora", "sócio administrador", "sócia-administradora", "sócio-administrador",
 ];
+
+// ─── Parsers de seções estruturadas ("🔹 DIFERENCIAIS", "FASES DO PROJETO", etc.) ───
+// Detecta blocos rotulados e devolve as linhas-bullet para reuso direto na proposta,
+// sem reescrever conteúdo que o usuário já curou.
+function extractSection(text: string, headers: string[]): string[] {
+  const lines = text.split(/\r?\n/);
+  const out: string[] = [];
+  const headerRe = new RegExp(
+    `^\\s*[🔹💰📌▪️•\\-\\*\\s]*(?:${headers.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
+    "i"
+  );
+  // qualquer outra "seção" começando com emoji/título maiúsculo encerra a anterior
+  const otherSectionRe = /^\s*[🔹💰📌▪️]\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/;
+  let inSection = false;
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      if (inSection && out.length) continue;
+      continue;
+    }
+    if (headerRe.test(line)) { inSection = true; continue; }
+    if (inSection && otherSectionRe.test(line)) break;
+    if (inSection) {
+      // pula sublinhas tipo "Fase X — título"; trata como bullet completo
+      const cleaned = line
+        .replace(/^[\s•\-\*\u2022\u25CF\u25E6\u00B7👉▪️]+/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (cleaned.length > 4) out.push(cleaned);
+    }
+  }
+  return out;
+}
+
+// Extrai fases no formato "Fase 1 — Diagnóstico ... 👉 Prazo: 2 semanas"
+function extractFasesEstruturadas(text: string): ProposalFase[] {
+  const re = /Fase\s*\d+\s*[—\-:]\s*([^\n]+)\n([\s\S]*?)(?=(?:\n\s*Fase\s*\d+\s*[—\-:])|(?:\n\s*[🔹💰📌])|$)/gi;
+  const out: ProposalFase[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    const titulo = `Fase ${out.length + 1} — ${m[1].trim()}`;
+    const body = m[2].trim();
+    // separa duração (👉 Prazo: ...) do restante
+    const prazoMatch = body.match(/(?:👉)?\s*prazo[:\s]+([^\n]+)/i);
+    const duracao = prazoMatch ? prazoMatch[1].trim().replace(/[.;]+$/, "") : "";
+    const descricao = body
+      .replace(/(?:👉)?\s*prazo[:\s]+[^\n]+/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (descricao || duracao) {
+      out.push({ titulo, descricao: descricao || titulo, duracao: duracao || "2 a 4 semanas" });
+    }
+  }
+  return out;
+}
+
+// "10 x 2.600", "10x R$ 2.600,00", "R$ 26.000 em 10 parcelas"
+function extractInvestimento(text: string): { total?: number; parcelas?: number; observacao?: string } {
+  // Padrão "Nx Y" ou "N x R$ Y"
+  const reA = /(\d{1,3})\s*[x×]\s*(?:r?\$?\s*)?([\d.,]+)/i;
+  const a = text.match(reA);
+  if (a) {
+    const parcelas = parseInt(a[1], 10);
+    const valorParcela = parseBrazilianNumber(a[2]);
+    if (parcelas > 0 && valorParcela > 0) {
+      return {
+        total: Math.round(parcelas * valorParcela),
+        parcelas,
+        observacao: `${parcelas}x de R$ ${valorParcela.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+      };
+    }
+  }
+  // "R$ 26.000 em 10 parcelas" / "valor total R$ 26.000"
+  const reB = /r\$\s*([\d.,]+)[^.\n]{0,40}?(\d{1,3})\s*parcela/i;
+  const b = text.match(reB);
+  if (b) {
+    const total = parseBrazilianNumber(b[1]);
+    const parcelas = parseInt(b[2], 10);
+    if (total > 0 && parcelas > 0) return { total, parcelas };
+  }
+  return {};
+}
+
+function parseBrazilianNumber(s: string): number {
+  // "2.600" → 2600 ; "2.600,00" → 2600 ; "26.000,50" → 26000.50
+  const cleaned = s.replace(/\s/g, "");
+  if (cleaned.includes(",")) {
+    return parseFloat(cleaned.replace(/\./g, "").replace(",", "."));
+  }
+  // sem vírgula: pontos são milhar
+  return parseFloat(cleaned.replace(/\./g, ""));
+}
+
+// "Validade: 3 dias úteis", "validade da proposta: 15 dias"
+function extractValidadeDias(text: string): number | null {
+  const m = text.match(/valid(?:ade|a)[^.\n]{0,30}?(\d{1,3})\s*dia/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// "Prazo: 4 meses", "prazo do projeto 3 meses"
+function extractPrazoMesesExplicito(text: string): number | null {
+  const m = text.match(/prazo[^.\n]{0,30}?(\d{1,2})\s*m(?:es|ês|eses)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// "Faturamento: Médio (R$ 33 milhões)" → "Médio (R$ 33 milhões)"
+// também aceita só "R$ 33 milhões"
+function normalizaFaturamento(raw: string): string {
+  return raw.replace(/\s{2,}/g, " ").trim();
+}
+
+// "Tem mas precisa validar" / "Tem PGR mas desatualizado" → parcial
+function detectMaturidadePgrFromLabel(text: string): ProposalDraft["maturidadePgr"] | null {
+  const m = text.match(/maturidade\s+do\s+pgr[^:\n]*:\s*([^\n]+)/i);
+  if (!m) return null;
+  const v = norm(m[1]);
+  if (/inexistente|n[aã]o (?:tem|possui)|do zero|nenhum/.test(v)) return "inexistente";
+  if (/completo|atualizado|em dia|pronto|ok/.test(v)) return "completo";
+  if (/parcial|desatualizado|mas|precisa|antigo|incompleto|valida/.test(v)) return "parcial";
+  return null;
+}
+
+// "Grau de risco (CNAE): Grau 2 — médio" → "2"
+function detectGrauRiscoFromLabel(text: string): ProposalDraft["grauRisco"] | null {
+  const m = text.match(/grau\s+de\s+risco[^:\n]*:\s*[^\d\n]*([1-4])/i);
+  return m ? (m[1] as ProposalDraft["grauRisco"]) : null;
+}
+
+// "Tem prestadores/PJ no local?: Não"
+function detectBoolFromLabel(text: string, label: RegExp): boolean | null {
+  const re = new RegExp(`${label.source}[^:\\n]*:\\s*([^\\n]+)`, "i");
+  const m = text.match(re);
+  if (!m) return null;
+  const v = norm(m[1]);
+  if (/^(n[aã]o|nao|none|nenhum|false|0)/.test(v)) return false;
+  if (/^(sim|s|yes|true|1|tem|possui)/.test(v)) return true;
+  return null;
+}
+
+// "Total de colaboradores: 17 (+1 afastado)" → 17
+// "Estabelecimentos / Unidades: 1" → 1
+// "Nº de gestores: 2" → 2
+function extractNumberFromLabel(text: string, labels: string[]): number | null {
+  for (const l of labels) {
+    const re = new RegExp(`${l}[^:\\n]*:\\s*(\\d{1,6})`, "i");
+    const m = text.match(re);
+    if (m) return parseInt(m[1], 10);
+  }
+  return null;
+}
+
+// "Modelo de trabalho: Presencial" / "Híbrido" / "Remoto"
+function extractModeloFromLabel(text: string): ProposalDraft["modeloTrabalho"] | null {
+  const m = text.match(/modelo\s+de\s+trabalho[^:\n]*:\s*([^\n]+)/i);
+  if (!m) return null;
+  const v = norm(m[1]);
+  if (/h[ií]brid/.test(v)) return "hibrido";
+  if (/remot|home/.test(v)) return "remoto";
+  if (/presenci/.test(v)) return "presencial";
+  return null;
+}
 
 const STOP_WORDS_NOME = new Set([
   "Cliente","Empresa","Reunião","Reuniao","Call","Diagnóstico","Diagnostico","Resumo",
