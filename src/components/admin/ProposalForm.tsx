@@ -93,11 +93,14 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
   const [saving, setSaving] = useState(false);
   const [valorHora, setValorHora] = useState<number>(350);
   const [horasManual, setHorasManual] = useState<number | null>(null);
+  const [totalManualEditado, setTotalManualEditado] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setDraft(proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) });
+      const nextDraft = proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) };
+      setDraft(nextDraft);
       setHorasManual(null);
+      setTotalManualEditado((nextDraft.investimentoTotal ?? 0) > 0);
     }
   }, [open, lead, proposal, prefill]);
 
@@ -122,18 +125,25 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
 
   const horasFinais = horasManual ?? horasEstimadas;
   const totalCalculado = horasFinais * valorHora;
+  const valorFinal = Number.isFinite(draft.investimentoTotal) ? draft.investimentoTotal : 0;
+  const valorParcelaFinal = valorFinal / Math.max(draft.investimentoParcelas, 1);
 
   const aplicarCalculo = () => {
     update("investimentoTotal", totalCalculado);
+    setTotalManualEditado(true);
   };
 
-  // Auto-aplica o cálculo quando o investimento ainda está zerado (proposta nova)
+  // Auto-aplica o cálculo só enquanto o total ainda não foi preenchido/editado.
   useEffect(() => {
-    if (draft.investimentoTotal === 0 && totalCalculado > 0) {
+    if (!totalManualEditado && draft.investimentoTotal === 0 && totalCalculado > 0) {
       update("investimentoTotal", totalCalculado);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalCalculado, draft.investimentoTotal]);
+  }, [totalCalculado, draft.investimentoTotal, totalManualEditado]);
+
+  const updateInvestimentoTotal = (value: number) => {
+    setTotalManualEditado(true);
+    update("investimentoTotal", Number.isFinite(value) ? Math.max(0, value) : 0);
+  };
 
   const update = <K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) => {
     setDraft(d => ({ ...d, [key]: value }));
@@ -307,14 +317,23 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input value={draft.clienteWhatsapp} onChange={e => update("clienteWhatsapp", e.target.value)} placeholder="(11) 99999-9999" />
               </Field>
               <Field label="Faturamento anual">
-                <Select value={draft.faturamentoAnual || undefined} onValueChange={v => update("faturamentoAnual", v)}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="me_epp">ME / EPP (até R$ 4,8M)</SelectItem>
-                    <SelectItem value="medio">Médio (R$ 4,8M – R$ 300M)</SelectItem>
-                    <SelectItem value="grande">Grande (acima de R$ 300M)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  value={draft.faturamentoAnual}
+                  onChange={e => update("faturamentoAnual", e.target.value)}
+                  placeholder="Ex.: Médio (R$ 33 milhões)"
+                />
+                <div className="grid grid-cols-3 gap-1.5 mt-1.5">
+                  {["ME/EPP", "Médio", "Grande"].map(v => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => update("faturamentoAnual", v)}
+                      className="text-[10px] font-semibold py-1.5 rounded-md border border-border hover:border-secondary/50 text-muted-foreground hover:text-primary transition"
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
               </Field>
             </Grid>
           </Section>
@@ -467,38 +486,54 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/60">
-                    Investimento total sugerido
+                    Investimento total final
                   </div>
                   <div className="text-3xl sm:text-4xl font-extrabold text-primary mt-1 tabular-nums">
-                    {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    {valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {horasFinais}h × R$ {valorHora} •{" "}
+                    Sugestão: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} ({horasFinais}h × R$ {valorHora}) •{" "}
                     {draft.investimentoParcelas}× de{" "}
                     <span className="font-semibold text-primary">
-                      {(totalCalculado / Math.max(draft.investimentoParcelas, 1)).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  {draft.investimentoTotal !== totalCalculado && (
+                  {valorFinal !== totalCalculado && (
                     <span className="text-[10px] text-muted-foreground">
-                      Salvo: {draft.investimentoTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      Valor manual aplicado
                     </span>
                   )}
                   <Button
                     type="button"
                     size="sm"
                     onClick={aplicarCalculo}
-                    disabled={draft.investimentoTotal === totalCalculado}
+                    disabled={valorFinal === totalCalculado}
                     className="hero-gradient border-0 text-primary-foreground gap-1.5"
                   >
                     <Wand2 className="h-3.5 w-3.5" />
-                    {draft.investimentoTotal === totalCalculado ? "Aplicado" : "Usar este valor"}
+                    {valorFinal === totalCalculado ? "Sugestão aplicada" : "Usar sugestão"}
                   </Button>
                 </div>
               </div>
             </div>
+
+            <Grid>
+              <Field label="Investimento total final (R$)">
+                <Input
+                  type="number"
+                  min={0}
+                  step={100}
+                  value={valorFinal}
+                  onChange={e => updateInvestimentoTotal(e.target.valueAsNumber)}
+                  placeholder="Ex.: 26000"
+                />
+              </Field>
+              <Field label="Valor por parcela">
+                <Input value={valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} readOnly />
+              </Field>
+            </Grid>
 
             {/* Controles de cálculo */}
             <div className="rounded-lg border bg-card p-4 space-y-4">
@@ -605,18 +640,6 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input type="number" min={1} value={draft.validadeDias} onChange={e => update("validadeDias", +e.target.value || 15)} />
               </Field>
             </Grid>
-
-            {/* Avançado: ajuste manual do total */}
-            <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground hover:text-primary select-none">
-                Ajustar valor manualmente (opcional)
-              </summary>
-              <div className="mt-2">
-                <Field label="Investimento total (R$) — sobrescreve o cálculo">
-                  <Input type="number" min={0} value={draft.investimentoTotal} onChange={e => update("investimentoTotal", +e.target.value || 0)} />
-                </Field>
-              </div>
-            </details>
 
             <Field label="Observação sobre pagamento">
               <Textarea

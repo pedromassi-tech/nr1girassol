@@ -90,7 +90,9 @@ function generateSlug(): string {
   return `${part1}${part2}`;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function rowToProposal(row: any): Proposal {
+  const internas = splitLogo(row.observacoes_internas ?? "");
   return {
     id: row.id,
     slug: row.slug,
@@ -121,41 +123,54 @@ function rowToProposal(row: any): Proposal {
     investimentoObservacao: row.investimento_observacao ?? "",
     validadeDias: row.validade_dias ?? 15,
     status: (row.status as ProposalStatus) ?? "rascunho",
-    observacoesInternas: splitLogo(row.observacoes_internas ?? "").rest,
-    clienteLogoUrl: splitLogo(row.observacoes_internas ?? "").logo,
+    observacoesInternas: internas.rest,
+    clienteLogoUrl: internas.logo,
     createdAt: row.created_at ?? new Date().toISOString(),
     updatedAt: row.updated_at ?? new Date().toISOString(),
   };
 }
 
 function draftToRow(draft: ProposalDraft) {
+  const text = (value: unknown) => typeof value === "string" ? value : value == null ? "" : String(value);
+  const num = (value: unknown, fallback = 0, min = 0) => {
+    const n = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(n) ? Math.max(min, n) : fallback;
+  };
+  const int = (value: unknown, fallback = 0, min = 0) => Math.round(num(value, fallback, min));
+  const stringList = (value: unknown) => Array.isArray(value) ? value.map(text).filter(Boolean) : [];
+  const fases = Array.isArray(draft.fases) ? draft.fases.map((fase) => ({
+    titulo: text(fase?.titulo),
+    descricao: text(fase?.descricao),
+    duracao: text(fase?.duracao),
+  })).filter(fase => fase.titulo || fase.descricao || fase.duracao) : [];
+
   return {
-    lead_id: draft.leadId,
-    cliente_nome: draft.clienteNome,
-    cliente_empresa: draft.clienteEmpresa,
-    cliente_email: draft.clienteEmail,
-    cliente_whatsapp: draft.clienteWhatsapp,
-    cliente_cargo: draft.clienteCargo,
-    num_estabelecimentos: draft.numEstabelecimentos,
-    num_funcoes: draft.numFuncoes,
-    num_colaboradores: draft.numColaboradores,
-    modelo_trabalho: draft.modeloTrabalho,
-    faturamento_anual: draft.faturamentoAnual,
-    maturidade_pgr: draft.maturidadePgr,
-    grau_risco: draft.grauRisco,
-    cnae: draft.cnae,
-    tem_prestadores: draft.temPrestadores,
-    num_lideres: draft.numLideres,
-    tem_equipe_sst: draft.temEquipeSst,
-    escopo_resumo: draft.escopoResumo,
-    diferenciais: draft.diferenciais,
-    fases: draft.fases,
-    entregaveis: draft.entregaveis,
-    prazo_meses: draft.prazoMeses,
-    investimento_total: draft.investimentoTotal,
-    investimento_parcelas: draft.investimentoParcelas,
-    investimento_observacao: draft.investimentoObservacao,
-    validade_dias: draft.validadeDias,
+    lead_id: draft.leadId || null,
+    cliente_nome: text(draft.clienteNome),
+    cliente_empresa: text(draft.clienteEmpresa),
+    cliente_email: text(draft.clienteEmail),
+    cliente_whatsapp: text(draft.clienteWhatsapp),
+    cliente_cargo: text(draft.clienteCargo),
+    num_estabelecimentos: int(draft.numEstabelecimentos, 1, 1),
+    num_funcoes: int(draft.numFuncoes, 1, 1),
+    num_colaboradores: int(draft.numColaboradores, 0, 0),
+    modelo_trabalho: ["presencial", "hibrido", "remoto"].includes(text(draft.modeloTrabalho)) ? draft.modeloTrabalho : "presencial",
+    faturamento_anual: text(draft.faturamentoAnual),
+    maturidade_pgr: ["inexistente", "parcial", "completo"].includes(text(draft.maturidadePgr)) ? draft.maturidadePgr : "inexistente",
+    grau_risco: ["1", "2", "3", "4"].includes(text(draft.grauRisco)) ? draft.grauRisco : "2",
+    cnae: text(draft.cnae),
+    tem_prestadores: Boolean(draft.temPrestadores),
+    num_lideres: int(draft.numLideres, 0, 0),
+    tem_equipe_sst: Boolean(draft.temEquipeSst),
+    escopo_resumo: text(draft.escopoResumo),
+    diferenciais: stringList(draft.diferenciais),
+    fases,
+    entregaveis: stringList(draft.entregaveis),
+    prazo_meses: int(draft.prazoMeses, 3, 1),
+    investimento_total: num(draft.investimentoTotal, 0, 0),
+    investimento_parcelas: int(draft.investimentoParcelas, 1, 1),
+    investimento_observacao: text(draft.investimentoObservacao),
+    validade_dias: int(draft.validadeDias, 15, 1),
     status: draft.status ?? "rascunho",
     observacoes_internas: joinLogo(draft.clienteLogoUrl ?? "", draft.observacoesInternas ?? ""),
   };
