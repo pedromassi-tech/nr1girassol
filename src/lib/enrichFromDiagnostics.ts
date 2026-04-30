@@ -267,8 +267,8 @@ export function mergePrefill(
     [...(la ?? []), ...(lb ?? [])].forEach(x => x && set.add(x.trim()));
     return [...set];
   };
-  if (a.diferenciais || b.diferenciais) out.diferenciais = mergeList(a.diferenciais, b.diferenciais).slice(0, 6);
-  if (a.entregaveis || b.entregaveis) out.entregaveis = mergeList(a.entregaveis, b.entregaveis).slice(0, 8);
+  if (a.diferenciais || b.diferenciais) out.diferenciais = mergeList(a.diferenciais, b.diferenciais).slice(0, 8);
+  if (a.entregaveis || b.entregaveis) out.entregaveis = mergeList(a.entregaveis, b.entregaveis).slice(0, 12);
 
   // Escopo: concatena se ambos existem
   if (a.escopoResumo && b.escopoResumo && a.escopoResumo !== b.escopoResumo) {
