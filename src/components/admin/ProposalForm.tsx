@@ -93,11 +93,14 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
   const [saving, setSaving] = useState(false);
   const [valorHora, setValorHora] = useState<number>(350);
   const [horasManual, setHorasManual] = useState<number | null>(null);
+  const [totalManualEditado, setTotalManualEditado] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setDraft(proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) });
+      const nextDraft = proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) };
+      setDraft(nextDraft);
       setHorasManual(null);
+      setTotalManualEditado((nextDraft.investimentoTotal ?? 0) > 0);
     }
   }, [open, lead, proposal, prefill]);
 
@@ -122,18 +125,26 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
 
   const horasFinais = horasManual ?? horasEstimadas;
   const totalCalculado = horasFinais * valorHora;
+  const valorFinal = Number.isFinite(draft.investimentoTotal) ? draft.investimentoTotal : 0;
+  const valorParcelaFinal = valorFinal / Math.max(draft.investimentoParcelas, 1);
 
   const aplicarCalculo = () => {
     update("investimentoTotal", totalCalculado);
+    setTotalManualEditado(true);
   };
 
-  // Auto-aplica o cálculo quando o investimento ainda está zerado (proposta nova)
+  // Auto-aplica o cálculo só enquanto o total ainda não foi preenchido/editado.
   useEffect(() => {
-    if (draft.investimentoTotal === 0 && totalCalculado > 0) {
+    if (!totalManualEditado && draft.investimentoTotal === 0 && totalCalculado > 0) {
       update("investimentoTotal", totalCalculado);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalCalculado, draft.investimentoTotal]);
+  }, [totalCalculado, draft.investimentoTotal, totalManualEditado]);
+
+  const updateInvestimentoTotal = (value: number) => {
+    setTotalManualEditado(true);
+    update("investimentoTotal", Number.isFinite(value) ? Math.max(0, value) : 0);
+  };
 
   const update = <K extends keyof ProposalDraft>(key: K, value: ProposalDraft[K]) => {
     setDraft(d => ({ ...d, [key]: value }));
