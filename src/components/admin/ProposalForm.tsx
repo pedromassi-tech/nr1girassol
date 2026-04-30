@@ -138,7 +138,6 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     if (!totalManualEditado && draft.investimentoTotal === 0 && totalCalculado > 0) {
       update("investimentoTotal", totalCalculado);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalCalculado, draft.investimentoTotal, totalManualEditado]);
 
   const updateInvestimentoTotal = (value: number) => {
