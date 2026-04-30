@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getProposalBySlug, type Proposal } from "@/lib/proposalsStore";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle2, Sparkles, Calendar, Building2, Users, Briefcase,
   ShieldCheck, Target, Award, MessageCircle, Mail, Clock,
-  TrendingUp, Layers, ArrowRight, AlertCircle,
+  TrendingUp, Layers, ArrowRight, AlertCircle, Download, Loader2,
 } from "lucide-react";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import logoLight from "@/assets/logo-girassol-light.png";
