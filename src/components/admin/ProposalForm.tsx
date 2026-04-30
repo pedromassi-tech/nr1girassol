@@ -478,38 +478,54 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/60">
-                    Investimento total sugerido
+                    Investimento total final
                   </div>
                   <div className="text-3xl sm:text-4xl font-extrabold text-primary mt-1 tabular-nums">
-                    {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    {valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {horasFinais}h × R$ {valorHora} •{" "}
+                    Sugestão: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} ({horasFinais}h × R$ {valorHora}) •{" "}
                     {draft.investimentoParcelas}× de{" "}
                     <span className="font-semibold text-primary">
-                      {(totalCalculado / Math.max(draft.investimentoParcelas, 1)).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  {draft.investimentoTotal !== totalCalculado && (
+                  {valorFinal !== totalCalculado && (
                     <span className="text-[10px] text-muted-foreground">
-                      Salvo: {draft.investimentoTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      Valor manual aplicado
                     </span>
                   )}
                   <Button
                     type="button"
                     size="sm"
                     onClick={aplicarCalculo}
-                    disabled={draft.investimentoTotal === totalCalculado}
+                    disabled={valorFinal === totalCalculado}
                     className="hero-gradient border-0 text-primary-foreground gap-1.5"
                   >
                     <Wand2 className="h-3.5 w-3.5" />
-                    {draft.investimentoTotal === totalCalculado ? "Aplicado" : "Usar este valor"}
+                    {valorFinal === totalCalculado ? "Sugestão aplicada" : "Usar sugestão"}
                   </Button>
                 </div>
               </div>
             </div>
+
+            <Grid>
+              <Field label="Investimento total final (R$)">
+                <Input
+                  type="number"
+                  min={0}
+                  step={100}
+                  value={valorFinal}
+                  onChange={e => updateInvestimentoTotal(e.target.valueAsNumber)}
+                  placeholder="Ex.: 26000"
+                />
+              </Field>
+              <Field label="Valor por parcela">
+                <Input value={valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} readOnly />
+              </Field>
+            </Grid>
 
             {/* Controles de cálculo */}
             <div className="rounded-lg border bg-card p-4 space-y-4">
@@ -616,18 +632,6 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input type="number" min={1} value={draft.validadeDias} onChange={e => update("validadeDias", +e.target.value || 15)} />
               </Field>
             </Grid>
-
-            {/* Avançado: ajuste manual do total */}
-            <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground hover:text-primary select-none">
-                Ajustar valor manualmente (opcional)
-              </summary>
-              <div className="mt-2">
-                <Field label="Investimento total (R$) — sobrescreve o cálculo">
-                  <Input type="number" min={0} value={draft.investimentoTotal} onChange={e => update("investimentoTotal", +e.target.value || 0)} />
-                </Field>
-              </div>
-            </details>
 
             <Field label="Observação sobre pagamento">
               <Textarea
