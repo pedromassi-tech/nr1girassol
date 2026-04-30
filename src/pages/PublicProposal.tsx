@@ -103,8 +103,24 @@ const PublicProposal = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Botão flutuante de download (não entra no PDF) */}
+      <div className="fixed top-4 right-4 z-50 print:hidden">
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={downloading}
+          className="hero-gradient border-0 text-primary-foreground gap-2 shadow-lg"
+        >
+          {downloading ? (
+            <><Loader2 className="h-4 w-4 animate-spin" /> Gerando PDF...</>
+          ) : (
+            <><Download className="h-4 w-4" /> Baixar PDF</>
+          )}
+        </Button>
+      </div>
+
+      <div ref={printRef} className="bg-background pdf-root">
       {/* HERO */}
-      <header className="hero-gradient text-primary-foreground relative overflow-hidden">
+      <header className="hero-gradient text-primary-foreground relative overflow-hidden pdf-avoid-break">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,_white_0,_transparent_50%)]" />
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-16 relative">
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
