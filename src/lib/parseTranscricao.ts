@@ -282,11 +282,11 @@ function extractSection(text: string, headers: string[]): string[] {
   const lines = text.split(/\r?\n/);
   const out: string[] = [];
   const headerRe = new RegExp(
-    `^\\s*[🔹💰📌▪️•\\-\\*\\s]*(?:${headers.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
-    "i"
+    `^\\s*(?:(?:🔹|💰|📌|▪️|•|-|\\*|\\s)+)?(?:${headers.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
+    "iu"
   );
   // qualquer outra "seção" começando com emoji/título maiúsculo encerra a anterior
-  const otherSectionRe = /^\s*[🔹💰📌▪️]\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/;
+  const otherSectionRe = /^\s*(?:🔹|💰|📌|▪️)\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/u;
   let inSection = false;
   for (const raw of lines) {
     const line = raw.trim();
@@ -299,7 +299,7 @@ function extractSection(text: string, headers: string[]): string[] {
     if (inSection) {
       // pula sublinhas tipo "Fase X — título"; trata como bullet completo
       const cleaned = line
-        .replace(/^[\s•\-\*\u2022\u25CF\u25E6\u00B7👉▪️]+/, "")
+        .replace(/^(?:\s|•|-|\*|\u2022|\u25CF|\u25E6|\u00B7|👉|▪️)+/u, "")
         .replace(/\s+/g, " ")
         .trim();
       if (cleaned.length > 4) out.push(cleaned);
@@ -310,7 +310,7 @@ function extractSection(text: string, headers: string[]): string[] {
 
 // Extrai fases no formato "Fase 1 — Diagnóstico ... 👉 Prazo: 2 semanas"
 function extractFasesEstruturadas(text: string): ProposalFase[] {
-  const re = /Fase\s*\d+\s*[—\-:]\s*([^\n]+)\n([\s\S]*?)(?=(?:\n\s*Fase\s*\d+\s*[—\-:])|(?:\n\s*[🔹💰📌])|$)/gi;
+  const re = /Fase\s*\d+\s*[—\-:]\s*([^\n]+)\n([\s\S]*?)(?=(?:\n\s*Fase\s*\d+\s*[—\-:])|(?:\n\s*(?:🔹|💰|📌))|$)/giu;
   const out: ProposalFase[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
