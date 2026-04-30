@@ -307,7 +307,7 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input value={draft.clienteWhatsapp} onChange={e => update("clienteWhatsapp", e.target.value)} placeholder="(11) 99999-9999" />
               </Field>
               <Field label="Faturamento anual">
-                <Select value={draft.faturamentoAnual} onValueChange={v => update("faturamentoAnual", v)}>
+                <Select value={draft.faturamentoAnual || undefined} onValueChange={v => update("faturamentoAnual", v)}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="me_epp">ME / EPP (até R$ 4,8M)</SelectItem>
@@ -358,7 +358,7 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 </Select>
               </Field>
               <Field label="Grau de risco (CNAE)">
-                <Select value={draft.grauRisco} onValueChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
+                <Select value={draft.grauRisco || undefined} onValueChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1">Grau 1 — Baixo</SelectItem>
