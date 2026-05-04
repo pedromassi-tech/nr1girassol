@@ -611,6 +611,97 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 />
               </div>
 
+              {/* Complexidade regulatória */}
+              <div>
+                <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-1.5 block">
+                  Complexidade regulatória
+                </Label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {([["baixa", "Baixa"], ["media", "Média"], ["alta", "Alta"]] as const).map(([v, l]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setComplexidadeReg(v)}
+                      className={`text-xs font-semibold py-2 rounded-md border transition ${
+                        complexidadeReg === v
+                          ? "border-secondary bg-secondary/15 text-primary"
+                          : "border-border hover:border-secondary/50 text-muted-foreground"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fator de adequação */}
+              <div>
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70">
+                    Fator de adequação
+                  </Label>
+                  <span className="text-sm font-bold text-primary tabular-nums">{fatorAdequacao.toFixed(2)}×</span>
+                </div>
+                <input
+                  type="range"
+                  min={0.4}
+                  max={1.0}
+                  step={0.05}
+                  value={fatorAdequacao}
+                  onChange={e => setFatorAdequacao(+e.target.value)}
+                  className="w-full accent-secondary"
+                />
+              </div>
+
+              {/* Fator estratégico */}
+              <div>
+                <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-1.5 block">
+                  Fator estratégico
+                </Label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {([[0.9, "Sensível"], [1.0, "Normal"], [1.1, "Alto"], [1.2, "Urgência"], [1.3, "Estratég."]] as const).map(([v, l]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setFatorEstrategico(v)}
+                      className={`text-[11px] font-semibold py-2 rounded-md border transition ${
+                        fatorEstrategico === v
+                          ? "border-secondary bg-secondary/15 text-primary"
+                          : "border-border hover:border-secondary/50 text-muted-foreground"
+                      }`}
+                    >
+                      {v.toFixed(1)}×<span className="block text-[9px] font-normal opacity-70">{l}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Memória de cálculo */}
+              <details className="rounded-md border bg-muted/20 p-3 text-xs">
+                <summary className="cursor-pointer font-semibold text-primary">📋 Memória de cálculo</summary>
+                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 tabular-nums">
+                  <span className="text-muted-foreground">Base (gestão)</span><span className="text-right">40h</span>
+                  <span className="text-muted-foreground">Colaboradores ({draft.numColaboradores})</span><span className="text-right">+{breakdown.colab}h</span>
+                  <span className="text-muted-foreground">Funções ({draft.numFuncoes})</span><span className="text-right">+{breakdown.func}h</span>
+                  <span className="text-muted-foreground">Unidades ({draft.numEstabelecimentos})</span><span className="text-right">+{breakdown.unid}h</span>
+                  <span className="text-muted-foreground">Modelo ({draft.modeloTrabalho})</span><span className="text-right">+{breakdown.modelo}h</span>
+                  <span className="text-muted-foreground">PGR ({draft.maturidadePgr})</span><span className="text-right">+{breakdown.pgr}h</span>
+                  <span className="text-muted-foreground">RH/SST interno</span><span className="text-right">+{breakdown.sst}h</span>
+                  <span className="text-muted-foreground">Lideranças ({draft.numLideres})</span><span className="text-right">+{breakdown.lider}h</span>
+                  <span className="text-muted-foreground">Complexidade ({complexidadeReg})</span><span className="text-right">+{breakdown.compl}h</span>
+                  <span className="text-muted-foreground">Prestadores</span><span className="text-right">+{breakdown.prest}h</span>
+                  <span className="text-muted-foreground">Grau risco ({draft.grauRisco})</span><span className="text-right">+{breakdown.risco}h</span>
+                  <span className="font-bold text-primary border-t pt-1 mt-1">Total horas</span>
+                  <span className="font-bold text-primary border-t pt-1 mt-1 text-right">{horasEstimadas}h</span>
+                  <span className="text-muted-foreground pt-2">Valor bruto</span>
+                  <span className="text-right pt-2">{(horasFinais * valorHora).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                  <span className="text-muted-foreground">× Adequação ({fatorAdequacao}×)</span>
+                  <span className="text-right">{(horasFinais * valorHora * fatorAdequacao).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                  <span className="text-muted-foreground">× Estratégico ({fatorEstrategico}×)</span>
+                  <span className="text-right font-bold text-primary">{totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                </div>
+              </details>
+
               {/* Parcelas — chips */}
               <div>
                 <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-1.5 block">
