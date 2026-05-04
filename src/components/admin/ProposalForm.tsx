@@ -495,7 +495,8 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                     {valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Sugestão: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} ({horasFinais}h × R$ {valorHora}) •{" "}
+                    Sugestão: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} •{" "}
+                    {horasFinais}h × R$ {valorHora} × {fatorAdequacao} × {fatorEstrategico} •{" "}
                     {draft.investimentoParcelas}× de{" "}
                     <span className="font-semibold text-primary">
                       {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
