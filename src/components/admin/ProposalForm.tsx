@@ -91,9 +91,13 @@ const proposalToDraft = (p: Proposal): ProposalDraft => ({
 const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: ProposalFormProps) => {
   const [draft, setDraft] = useState<ProposalDraft>(() => proposal ? proposalToDraft(proposal) : { ...emptyDraft(lead), ...(prefill ?? {}) });
   const [saving, setSaving] = useState(false);
-  const [valorHora, setValorHora] = useState<number>(350);
+  const [valorHora, setValorHora] = useState<number>(503);
   const [horasManual, setHorasManual] = useState<number | null>(null);
   const [totalManualEditado, setTotalManualEditado] = useState(false);
+  // Novos parâmetros da planilha de precificação
+  const [complexidadeReg, setComplexidadeReg] = useState<"baixa" | "media" | "alta">("media");
+  const [fatorEstrategico, setFatorEstrategico] = useState<number>(1.0);
+  const [fatorAdequacao, setFatorAdequacao] = useState<number>(0.65);
 
   useEffect(() => {
     if (open) {
@@ -104,27 +108,26 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     }
   }, [open, lead, proposal, prefill]);
 
-  // ── Calculadora de horas baseada no escopo ──
-  const horasEstimadas = (() => {
-    let h = 40; // base de gestão/coordenação
-    h += draft.numEstabelecimentos * 16;        // visitas/análise por unidade
-    h += draft.numFuncoes * 4;                   // análise por função
-    h += Math.ceil(draft.numColaboradores / 20) * 6; // escuta proporcional
-    h += draft.numLideres * 2;                   // mentoria de liderança
-    if (draft.maturidadePgr === "inexistente") h += 40;
-    else if (draft.maturidadePgr === "parcial") h += 24;
-    else h += 12;
-    if (draft.modeloTrabalho === "hibrido") h += 16;
-    if (draft.modeloTrabalho === "remoto") h += 24;
-    if (draft.temPrestadores) h += 20;
-    if (!draft.temEquipeSst) h += 30;            // mais documentação se não há SST interna
-    if (draft.grauRisco === "3") h += 16;
-    if (draft.grauRisco === "4") h += 32;
-    return Math.round(h);
+  // ── Memória de cálculo (replica a planilha NR-1) ──
+  const breakdown = (() => {
+    const colab = draft.numColaboradores <= 20 ? 0 : draft.numColaboradores <= 50 ? 5 : draft.numColaboradores <= 100 ? 10 : 15;
+    const func = draft.numFuncoes <= 5 ? 0 : draft.numFuncoes <= 10 ? 5 : draft.numFuncoes <= 20 ? 10 : 15;
+    const unid = draft.numEstabelecimentos === 1 ? 0 : draft.numEstabelecimentos <= 3 ? 5 : 10;
+    const modelo = draft.modeloTrabalho === "presencial" ? 0 : draft.modeloTrabalho === "hibrido" ? 3 : 5;
+    const pgr = draft.maturidadePgr === "inexistente" ? 10 : draft.maturidadePgr === "parcial" ? 5 : 2;
+    const sst = draft.temEquipeSst ? 0 : 5;
+    const lider = draft.numLideres <= 3 ? 2 : draft.numLideres <= 8 ? 5 : 8;
+    const compl = complexidadeReg === "baixa" ? 0 : complexidadeReg === "media" ? 3 : 5;
+    const prest = draft.temPrestadores ? 3 : 0;
+    const risco = draft.grauRisco === "3" ? 3 : draft.grauRisco === "4" ? 5 : 0;
+    return { colab, func, unid, modelo, pgr, sst, lider, compl, prest, risco };
   })();
 
+  const horasEstimadas = 40 + Object.values(breakdown).reduce((a, b) => a + b, 0);
   const horasFinais = horasManual ?? horasEstimadas;
-  const totalCalculado = horasFinais * valorHora;
+  const valorBruto = horasFinais * valorHora;
+  const valorAjustado = valorBruto * fatorAdequacao;
+  const totalCalculado = Math.round(valorAjustado * fatorEstrategico);
   const valorFinal = Number.isFinite(draft.investimentoTotal) ? draft.investimentoTotal : 0;
   const valorParcelaFinal = valorFinal / Math.max(draft.investimentoParcelas, 1);
 
