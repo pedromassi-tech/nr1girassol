@@ -24,12 +24,26 @@ const PublicProposal = () => {
   const handleDownloadPDF = async () => {
     if (!printRef.current || !proposal) return;
     setDownloading(true);
-    const node = printRef.current;
-    // Ativa modo de captura: largura fixa + desliga animações/transforms
-    node.classList.add("pdf-rendering");
-    // Pequeno delay p/ garantir reflow + carregamento de fontes
+
+    // Clona o nó para fora da árvore visível, evitando que html2pdf
+    // mexa no DOM original (que estava deixando a tela em branco).
+    const original = printRef.current;
+    const clone = original.cloneNode(true) as HTMLElement;
+    clone.classList.add("pdf-rendering");
+
+    const sandbox = document.createElement("div");
+    sandbox.style.position = "fixed";
+    sandbox.style.left = "-10000px";
+    sandbox.style.top = "0";
+    sandbox.style.width = "1100px";
+    sandbox.style.background = "#ffffff";
+    sandbox.style.zIndex = "-1";
+    sandbox.appendChild(clone);
+    document.body.appendChild(sandbox);
+
     await (document as any).fonts?.ready?.catch?.(() => {});
     await new Promise((r) => setTimeout(r, 250));
+
     try {
       const html2pdf = (await import("html2pdf.js")).default;
       const filename = `Proposta-${proposal.clienteEmpresa.replace(/[^a-z0-9]+/gi, "-")}-${proposal.slug}.pdf`;
@@ -61,13 +75,13 @@ const PublicProposal = () => {
             avoid: [".pdf-avoid-break", "section", "header", "footer", "img"],
           },
         } as any)
-        .from(node)
+        .from(clone)
         .save();
     } catch (e) {
       console.error("Erro ao gerar PDF:", e);
       alert("Não foi possível gerar o PDF. Tente novamente.");
     } finally {
-      node.classList.remove("pdf-rendering");
+      if (sandbox.parentNode) sandbox.parentNode.removeChild(sandbox);
       setDownloading(false);
     }
   };
