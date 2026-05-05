@@ -108,6 +108,21 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
     }
   }, [open, lead, proposal, prefill]);
 
+  // Fix Radix Select dentro do Dialog: garante que o body fique clicável
+  // mesmo se um popover deixar pointer-events:none preso após fechar.
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setInterval(() => {
+      if (document.body.style.pointerEvents === "none") {
+        document.body.style.pointerEvents = "";
+      }
+    }, 200);
+    return () => {
+      window.clearInterval(id);
+      document.body.style.pointerEvents = "";
+    };
+  }, [open]);
+
   // ── Memória de cálculo (replica a planilha NR-1) ──
   const breakdown = (() => {
     const colab = draft.numColaboradores <= 20 ? 0 : draft.numColaboradores <= 50 ? 5 : draft.numColaboradores <= 100 ? 10 : 15;
