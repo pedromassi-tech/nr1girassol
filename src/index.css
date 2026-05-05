@@ -105,7 +105,8 @@
   }
 }
 
-/* PDF rendering — evita cortar seções, cards e títulos no meio */
+/* ─── PDF rendering ─── */
+/* Evita cortar seções, cards e títulos no meio das páginas */
 .pdf-root section,
 .pdf-root header,
 .pdf-root footer,
@@ -121,3 +122,25 @@
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+/* Modo de captura: força tudo visível, desliga animações/transforms do framer-motion
+   (sem isso, seções com whileInView ficam invisíveis ou recortadas no PDF). */
+.pdf-rendering,
+.pdf-rendering * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.pdf-rendering {
+  width: 1100px !important;
+  max-width: 1100px !important;
+}
+/* Garante que gradientes e backdrop-blur renderizem como cor sólida no canvas */
+.pdf-rendering .backdrop-blur,
+.pdf-rendering [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
