@@ -4,16 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   createProposal, updateProposal,
   DEFAULT_DIFERENCIAIS, DEFAULT_FASES, DEFAULT_ENTREGAVEIS,
   type Proposal, type ProposalDraft, type ProposalFase,
 } from "@/lib/proposalsStore";
-import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Sparkles, Building2, Users, Briefcase, DollarSign, Save, X, Calculator, Wand2, Upload, Image as ImageIcon, ChevronDown } from "lucide-react";
 import type { Lead } from "@/lib/adminStore";
 
 interface ProposalFormProps {
@@ -369,14 +366,11 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 <Input type="number" min={0} value={draft.numColaboradores} onChange={e => update("numColaboradores", +e.target.value || 0)} />
               </Field>
               <Field label="Modelo de trabalho">
-                <Select value={draft.modeloTrabalho} onValueChange={v => update("modeloTrabalho", v as ProposalDraft["modeloTrabalho"])}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="presencial">Presencial</SelectItem>
-                    <SelectItem value="hibrido">Híbrido</SelectItem>
-                    <SelectItem value="remoto">Remoto</SelectItem>
-                  </SelectContent>
-                </Select>
+                <ChoiceSelect value={draft.modeloTrabalho} onChange={v => update("modeloTrabalho", v as ProposalDraft["modeloTrabalho"])}>
+                  <option value="presencial">Presencial</option>
+                  <option value="hibrido">Híbrido</option>
+                  <option value="remoto">Remoto</option>
+                </ChoiceSelect>
               </Field>
             </Grid>
           </Section>
@@ -385,25 +379,19 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
           <Section icon={Briefcase} title="Complexidade técnica (Fase 3)">
             <Grid>
               <Field label="Maturidade do PGR/GRO atual">
-                <Select value={draft.maturidadePgr} onValueChange={v => update("maturidadePgr", v as ProposalDraft["maturidadePgr"])}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="inexistente">Inexistente — criar do zero</SelectItem>
-                    <SelectItem value="parcial">Parcial — revisar e completar</SelectItem>
-                    <SelectItem value="completo">Completo — adequar à NR-1</SelectItem>
-                  </SelectContent>
-                </Select>
+                <ChoiceSelect value={draft.maturidadePgr} onChange={v => update("maturidadePgr", v as ProposalDraft["maturidadePgr"])}>
+                  <option value="inexistente">Inexistente — criar do zero</option>
+                  <option value="parcial">Parcial — revisar e completar</option>
+                  <option value="completo">Completo — adequar à NR-1</option>
+                </ChoiceSelect>
               </Field>
               <Field label="Grau de risco (CNAE)">
-                <Select value={draft.grauRisco || "2"} onValueChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Grau 1 — Baixo</SelectItem>
-                    <SelectItem value="2">Grau 2 — Médio</SelectItem>
-                    <SelectItem value="3">Grau 3 — Alto</SelectItem>
-                    <SelectItem value="4">Grau 4 — Muito alto</SelectItem>
-                  </SelectContent>
-                </Select>
+                <ChoiceSelect value={draft.grauRisco || "2"} onChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
+                  <option value="1">Grau 1 — Baixo</option>
+                  <option value="2">Grau 2 — Médio</option>
+                  <option value="3">Grau 3 — Alto</option>
+                  <option value="4">Grau 4 — Muito alto</option>
+                </ChoiceSelect>
               </Field>
               <Field label="CNAE principal">
                 <Input value={draft.cnae} onChange={e => update("cnae", e.target.value)} placeholder="00.00-0/00" />
