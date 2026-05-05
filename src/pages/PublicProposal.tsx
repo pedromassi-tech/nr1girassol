@@ -24,29 +24,50 @@ const PublicProposal = () => {
   const handleDownloadPDF = async () => {
     if (!printRef.current || !proposal) return;
     setDownloading(true);
+    const node = printRef.current;
+    // Ativa modo de captura: largura fixa + desliga animações/transforms
+    node.classList.add("pdf-rendering");
+    // Pequeno delay p/ garantir reflow + carregamento de fontes
+    await (document as any).fonts?.ready?.catch?.(() => {});
+    await new Promise((r) => setTimeout(r, 250));
     try {
       const html2pdf = (await import("html2pdf.js")).default;
       const filename = `Proposta-${proposal.clienteEmpresa.replace(/[^a-z0-9]+/gi, "-")}-${proposal.slug}.pdf`;
       await html2pdf()
         .set({
-          margin: 0,
+          margin: [8, 0, 8, 0],
           filename,
-          image: { type: "jpeg", quality: 0.98 },
+          image: { type: "jpeg", quality: 1 },
           html2canvas: {
-            scale: 2,
+            scale: 3,
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#ffffff",
             windowWidth: 1100,
+            scrollX: 0,
+            scrollY: 0,
+            letterRendering: true,
+            imageTimeout: 15000,
           },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"], avoid: [".pdf-avoid-break"] },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+            compress: true,
+            putOnlyUsedFonts: true,
+          },
+          pagebreak: {
+            mode: ["css", "legacy", "avoid-all"],
+            avoid: [".pdf-avoid-break", "section", "header", "footer", "img"],
+          },
         } as any)
-        .from(printRef.current)
+        .from(node)
         .save();
     } catch (e) {
       console.error("Erro ao gerar PDF:", e);
+      alert("Não foi possível gerar o PDF. Tente novamente.");
     } finally {
+      node.classList.remove("pdf-rendering");
       setDownloading(false);
     }
   };
