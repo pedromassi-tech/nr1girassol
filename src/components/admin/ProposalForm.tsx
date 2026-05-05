@@ -702,18 +702,34 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 </div>
               </details>
 
-              {/* Parcelas — chips */}
+              {/* Parcelas — input livre + atalhos */}
               <div>
                 <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-1.5 block">
-                  Parcelamento
+                  Parcelamento (nº de parcelas)
                 </Label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {[1, 3, 4, 6, 12].map(n => (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={60}
+                    value={draft.investimentoParcelas}
+                    onChange={e => {
+                      const n = parseInt(e.target.value, 10);
+                      update("investimentoParcelas", Number.isFinite(n) && n > 0 ? n : 1);
+                    }}
+                    className="w-24 text-center font-semibold"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    × de {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </span>
+                </div>
+                <div className="grid grid-cols-6 gap-1.5 mt-2">
+                  {[1, 3, 4, 6, 10, 12].map(n => (
                     <button
                       key={n}
                       type="button"
                       onClick={() => update("investimentoParcelas", n)}
-                      className={`text-xs font-semibold py-2 rounded-md border transition ${
+                      className={`text-xs font-semibold py-1.5 rounded-md border transition ${
                         draft.investimentoParcelas === n
                           ? "border-secondary bg-secondary/15 text-primary"
                           : "border-border hover:border-secondary/50 text-muted-foreground"
