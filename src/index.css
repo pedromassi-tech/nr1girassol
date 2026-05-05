@@ -144,3 +144,24 @@
   -webkit-backdrop-filter: none !important;
 }
 
+/* No PDF: banner em azul absoluto, sem gradiente nem efeito de luz radial */
+.pdf-rendering .hero-gradient {
+  background: #06162f !important;
+  background-image: none !important;
+}
+.pdf-rendering header > .absolute,
+.pdf-rendering [class*="bg-[radial-gradient"] {
+  background: transparent !important;
+  background-image: none !important;
+  opacity: 0 !important;
+}
+
+/* Evita quebras feias dentro de cards/sections no PDF */
+.pdf-rendering section,
+.pdf-rendering .rounded-2xl,
+.pdf-rendering .rounded-3xl,
+.pdf-rendering .rounded-xl {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
