@@ -243,20 +243,24 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
   const removeLogo = () => update("clienteLogoUrl", "");
 
   const handleSave = async () => {
-    if (!draft.clienteNome || !draft.clienteEmpresa) {
+    if (saving) return;
+    if (!draft.clienteNome.trim() || !draft.clienteEmpresa.trim()) {
       alert("Preencha ao menos nome do cliente e empresa.");
       return;
     }
     setSaving(true);
-    const result = proposal
-      ? await updateProposal(proposal.id, draft)
-      : await createProposal(draft);
-    setSaving(false);
-    if (result) {
+    try {
+      const result = proposal
+        ? await updateProposal(proposal.id, draft)
+        : await createProposal(draft);
       onSaved(result);
       onOpenChange(false);
-    } else {
-      alert("Erro ao salvar a proposta.");
+    } catch (err) {
+      console.error("[ProposalForm] save failed:", err);
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      alert(`Erro ao salvar a proposta:\n${msg}`);
+    } finally {
+      setSaving(false);
     }
   };
 
