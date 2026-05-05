@@ -25,19 +25,17 @@ const PublicProposal = () => {
     if (!printRef.current || !proposal) return;
     setDownloading(true);
 
-    // Clona o nó para fora da árvore visível, evitando que html2pdf
-    // mexa no DOM original (que estava deixando a tela em branco).
     const original = printRef.current;
     const clone = original.cloneNode(true) as HTMLElement;
     clone.classList.add("pdf-rendering");
 
     const sandbox = document.createElement("div");
-    sandbox.style.position = "fixed";
-    sandbox.style.left = "-10000px";
+    sandbox.style.position = "absolute";
+    sandbox.style.left = "-99999px";
     sandbox.style.top = "0";
     sandbox.style.width = "1100px";
-    sandbox.style.background = "#ffffff";
-    sandbox.style.zIndex = "-1";
+    sandbox.style.background = "hsl(220 20% 97%)";
+    sandbox.style.pointerEvents = "none";
     sandbox.appendChild(clone);
     document.body.appendChild(sandbox);
 
@@ -45,38 +43,92 @@ const PublicProposal = () => {
     await new Promise((r) => setTimeout(r, 250));
 
     try {
-      const html2pdf = (await import("html2pdf.js")).default;
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
       const filename = `Proposta-${proposal.clienteEmpresa.replace(/[^a-z0-9]+/gi, "-")}-${proposal.slug}.pdf`;
-      await html2pdf()
-        .set({
-          margin: [8, 0, 8, 0],
-          filename,
-          image: { type: "jpeg", quality: 1 },
-          html2canvas: {
-            scale: 3,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-            windowWidth: 1100,
-            scrollX: 0,
-            scrollY: 0,
-            letterRendering: true,
-            imageTimeout: 15000,
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-            compress: true,
-            putOnlyUsedFonts: true,
-          },
-          pagebreak: {
-            mode: ["css", "legacy", "avoid-all"],
-            avoid: [".pdf-avoid-break", "section", "header", "footer", "img"],
-          },
-        } as any)
-        .from(clone)
-        .save();
+
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 10;
+      const bottomMargin = 10;
+      const contentWidth = pageWidth - margin * 2;
+      const gap = 8;
+      let currentY = 0;
+
+      const paintPageBackground = () => {
+        pdf.setFillColor(248, 249, 251);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      };
+
+      const addPage = () => {
+        pdf.addPage();
+        paintPageBackground();
+        currentY = margin;
+      };
+
+      const renderSection = async (section: HTMLElement, fullBleed = false) => {
+        const canvas = await html2canvas(section, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: fullBleed ? "#06162f" : null,
+          windowWidth: 1100,
+          scrollX: 0,
+          scrollY: 0,
+          imageTimeout: 15000,
+          logging: false,
+        });
+
+        const targetWidth = fullBleed ? pageWidth : contentWidth;
+        const x = fullBleed ? 0 : margin;
+        const mmPerPixel = targetWidth / canvas.width;
+        const targetHeight = canvas.height * mmPerPixel;
+        const maxContentHeight = pageHeight - margin - bottomMargin;
+
+        if (targetHeight <= maxContentHeight) {
+          if (!fullBleed && currentY + targetHeight > pageHeight - bottomMargin && currentY > margin) {
+            addPage();
+          }
+          pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, currentY, targetWidth, targetHeight, undefined, "FAST");
+          currentY += targetHeight + (fullBleed ? 12 : gap);
+          return;
+        }
+
+        if (currentY > margin) addPage();
+        let sourceY = 0;
+        while (sourceY < canvas.height) {
+          const availableMm = pageHeight - bottomMargin - currentY;
+          const sliceHeightPx = Math.max(1, Math.min(canvas.height - sourceY, Math.floor(availableMm / mmPerPixel)));
+          const slice = document.createElement("canvas");
+          slice.width = canvas.width;
+          slice.height = sliceHeightPx;
+          const ctx = slice.getContext("2d");
+          if (!ctx) throw new Error("Não foi possível preparar o PDF.");
+          ctx.drawImage(canvas, 0, sourceY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+          const sliceHeightMm = sliceHeightPx * mmPerPixel;
+
+          pdf.addImage(slice.toDataURL("image/png"), "PNG", x, currentY, targetWidth, sliceHeightMm, undefined, "FAST");
+          sourceY += sliceHeightPx;
+          currentY += sliceHeightMm;
+
+          if (sourceY < canvas.height) addPage();
+        }
+        currentY += gap;
+      };
+
+      paintPageBackground();
+      const header = clone.querySelector("header") as HTMLElement | null;
+      const mainBlocks = Array.from(clone.querySelector("main")?.children ?? []) as HTMLElement[];
+
+      if (header) await renderSection(header, true);
+      for (const block of mainBlocks) {
+        await renderSection(block);
+      }
+
+      pdf.save(filename);
     } catch (e) {
       console.error("Erro ao gerar PDF:", e);
       alert("Não foi possível gerar o PDF. Tente novamente.");
