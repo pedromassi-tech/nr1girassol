@@ -395,8 +395,8 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
                 </Select>
               </Field>
               <Field label="Grau de risco (CNAE)">
-                <Select value={draft.grauRisco || undefined} onValueChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select value={draft.grauRisco || "2"} onValueChange={v => update("grauRisco", v as ProposalDraft["grauRisco"])}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1">Grau 1 — Baixo</SelectItem>
                     <SelectItem value="2">Grau 2 — Médio</SelectItem>
