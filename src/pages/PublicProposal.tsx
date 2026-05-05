@@ -39,7 +39,7 @@ const PublicProposal = () => {
     sandbox.appendChild(clone);
     document.body.appendChild(sandbox);
 
-    await (document as any).fonts?.ready?.catch?.(() => {});
+    await document.fonts?.ready.catch(() => undefined);
     await new Promise((r) => setTimeout(r, 250));
 
     try {
