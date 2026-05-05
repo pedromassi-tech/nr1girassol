@@ -215,23 +215,23 @@ export async function getProposalBySlug(slug: string): Promise<Proposal | null> 
   return data ? rowToProposal(data) : null;
 }
 
-export async function createProposal(draft: ProposalDraft): Promise<Proposal | null> {
+export async function createProposal(draft: ProposalDraft): Promise<Proposal> {
   const slug = generateSlug();
   const row = { ...draftToRow(draft), slug };
   const { data, error } = await db.from("proposals").insert(row).select().single();
   if (error) {
-    console.error("Error creating proposal:", error);
-    return null;
+    console.error("Error creating proposal:", error, "row:", row);
+    throw new Error(error.message || "Falha ao criar proposta");
   }
   return rowToProposal(data);
 }
 
-export async function updateProposal(id: string, draft: ProposalDraft): Promise<Proposal | null> {
+export async function updateProposal(id: string, draft: ProposalDraft): Promise<Proposal> {
   const row = { ...draftToRow(draft), updated_at: new Date().toISOString() };
   const { data, error } = await db.from("proposals").update(row).eq("id", id).select().single();
   if (error) {
-    console.error("Error updating proposal:", error);
-    return null;
+    console.error("Error updating proposal:", error, "row:", row);
+    throw new Error(error.message || "Falha ao atualizar proposta");
   }
   return rowToProposal(data);
 }
