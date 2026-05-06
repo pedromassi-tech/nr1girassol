@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
 import RiskCalculator from "@/components/RiskCalculator";
 import ContactForm from "@/components/ContactForm";
+import Navbar from "@/components/Navbar";
 import logoLight from "@/assets/logo-girassol-light.png";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import mariaResende from "@/assets/maria-resende.png";
@@ -52,16 +53,11 @@ const calculatorOutputs = [
 ] as const;
 
 const Index = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     trackPageView();
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
   }, []);
 
   useEffect(() => {
@@ -80,100 +76,16 @@ const Index = () => {
   }, [location]);
 
   const scrollTo = (id: string) => {
-    setMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const navLinks = [
-    { label: "Soluções", id: "sobre-teste", path: "/servicos" },
-    { label: "Mentoria", id: "mentoria", path: "/mentoria" },
-    { label: "Especialista", id: "especialista", path: "/sobre" },
-    { label: "Blog", id: "blog", path: "/blog" },
-  ];
-
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* ─── HEADER ─── */}
-      <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-background/95 backdrop-blur-lg shadow-sm" : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 md:h-20 flex items-center justify-between">
-          <div 
-            className="flex items-center gap-3 cursor-pointer"
-            onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          >
-            <img
-              src={scrolled ? logoLight : logoDark}
-              alt="Instituto Girassol"
-              className="h-9 md:h-11 object-contain"
-            />
-            <span className={`text-lg font-bold tracking-tight hidden sm:block ${scrolled ? 'text-primary' : 'text-primary-foreground'}`}>
-              Maria Resende
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => {
-                  if (l.id === "blog") { navigate("/blog"); }
-                  else { navigate(l.path); }
-                }}
-                className={`text-sm font-medium transition-colors ${
-                  scrolled ? "text-muted-foreground hover:text-primary" : "text-primary-foreground/70 hover:text-primary-foreground"
-                }`}
-              >
-                {l.label}
-              </button>
-            ))}
-            <Button
-              onClick={() => navigate("/quiz")}
-              size="sm"
-              className="gold-gradient border-0 text-primary font-semibold shadow-md hover:shadow-lg transition-shadow"
-            >
-              Fazer o teste
-            </Button>
-          </nav>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className={`md:hidden p-2 rounded-lg ${scrolled ? "text-primary" : "text-primary-foreground"}`}
-            aria-label="Menu"
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-background border-b shadow-lg"
-          >
-            <nav className="flex flex-col p-5 gap-4">
-              {navLinks.map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => {
-                    if (l.id === "blog") { navigate("/blog"); }
-                    else { navigate(l.path); }
-                    setMenuOpen(false);
-                  }}
-                  className="text-left text-sm font-medium text-foreground/80 hover:text-primary py-2"
-                >
-                  {l.label}
-                </button>
-              ))}
-              <Button onClick={() => { navigate("/quiz"); setMenuOpen(false); }} className="gold-gradient border-0 text-primary font-semibold mt-2">
-                Fazer o teste
-              </Button>
-            </nav>
-          </motion.div>
-        )}
-      </header>
+      <Navbar />
+
 
       {/* ─── HERO ─── */}
       <section className="hero-gradient relative pt-24 pb-14 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-4 sm:px-8 overflow-hidden">
