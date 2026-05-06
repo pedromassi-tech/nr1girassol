@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, ArrowLeft, Share2, Clock } from "lucide-react";
+import { Calendar, ArrowLeft, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoLight from "@/assets/logo-girassol-light.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +29,7 @@ const BlogPost = () => {
 
   const fetchPost = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("blog_posts")
         .select("*")
         .eq("slug", slug)
@@ -53,7 +53,7 @@ const BlogPost = () => {
       <header className="bg-background border-b h-16 md:h-20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-5 h-full flex items-center justify-between">
           <img src={logoLight} alt="Logo" className="h-9 cursor-pointer" onClick={() => navigate("/")} />
-          <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="gap-2 text-primary">
             <ArrowLeft className="h-4 w-4" /> Todos os posts
           </Button>
         </div>
@@ -75,9 +75,11 @@ const BlogPost = () => {
             {post.title}
           </h1>
 
-          <div className="aspect-[21/9] rounded-3xl overflow-hidden mb-12 shadow-xl">
-            <img src={post.cover_image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover" />
-          </div>
+          {post.cover_image && (
+            <div className="aspect-[21/9] rounded-3xl overflow-hidden mb-12 shadow-xl">
+              <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover" />
+            </div>
+          )}
 
           <div 
             className="prose prose-lg max-w-none text-foreground/80 prose-headings:text-primary prose-a:text-secondary prose-strong:text-primary"
@@ -85,14 +87,19 @@ const BlogPost = () => {
           />
 
           <div className="mt-16 pt-8 border-t flex items-center justify-between">
-            <Button variant="ghost" onClick={() => navigate("/blog")} className="gap-2">
+            <Button variant="ghost" onClick={() => navigate("/blog")} className="gap-2 text-primary">
               <ArrowLeft className="h-4 w-4" /> Voltar ao Blog
             </Button>
             <Button variant="outline" size="sm" className="gap-2" onClick={() => {
-              navigator.share({ title: post.title, url: window.location.href }).catch(() => {
+              if (navigator.share) {
+                navigator.share({ title: post.title, url: window.location.href }).catch(() => {
+                   navigator.clipboard.writeText(window.location.href);
+                   alert("Link copiado!");
+                });
+              } else {
                  navigator.clipboard.writeText(window.location.href);
                  alert("Link copiado!");
-              });
+              }
             }}>
               <Share2 className="h-4 w-4" /> Compartilhar
             </Button>
