@@ -20,6 +20,7 @@ import ProposalForm from "@/components/admin/ProposalForm";
 import ProposalCreatorChoice from "@/components/admin/ProposalCreatorChoice";
 import type { ProposalDraft } from "@/lib/proposalsStore";
 import { toast } from "@/hooks/use-toast";
+import BlogManager from "@/components/admin/BlogManager";
 
 const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; icon: typeof CheckCircle }> = {
   novo: { label: "Novo", color: "bg-blue-100 text-blue-700 border-blue-200", icon: AlertTriangle },
