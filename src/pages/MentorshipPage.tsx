@@ -1,10 +1,14 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Star, Target, Users, Zap, Award, Calendar, MessageSquare, ArrowRight } from "lucide-react";
+import { CheckCircle2, Star, Target, Users, Zap, Award, Calendar, MessageSquare, ArrowRight, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import logoDark from "@/assets/logo-girassol-dark.png";
+import mariaResende from "@/assets/maria-resende.png";
 
 const MentorshipPage = () => {
+  const navigate = useNavigate();
+
   const benefits = [
     {
       icon: <Target className="h-6 w-6 text-primary" />,
@@ -38,13 +42,13 @@ const MentorshipPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 -z-10" />
-        <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-slate-50">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -53,21 +57,32 @@ const MentorshipPage = () => {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
                 <Star className="h-4 w-4 fill-primary" />
-                <span>Mentoria Exclusiva com Maria Resende</span>
+                <span>Mentoria Exclusiva</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black text-primary leading-tight mb-6">
                 Desenvolva seu <span className="text-secondary">potencial máximo</span> sem abrir mão da sua saúde.
               </h1>
               <p className="text-lg text-muted-foreground mb-8 max-w-xl">
-                A mentoria estratégica de Maria Resende é desenhada para líderes e profissionais que buscam excelência, produtividade sustentável e uma vida equilibrada em 2026.
+                A mentoria estratégica de Maria Resende é desenhada para líderes e profissionais que buscam excelência, produtividade sustentável e uma vida equilibrada.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="gold-gradient text-primary font-bold h-14 px-8 shadow-xl">
+                <Button 
+                  onClick={() => navigate("/contato")}
+                  size="lg" 
+                  className="gold-gradient text-primary font-bold h-14 px-8 shadow-xl"
+                >
                   Quero saber mais
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" className="h-14 px-8 border-primary text-primary font-bold">
-                  Ver depoimentos
+                <Button 
+                  variant="outline" 
+                  className="h-14 px-8 border-primary text-primary font-bold"
+                  onClick={() => {
+                    const el = document.getElementById('benefits');
+                    el?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Ver benefícios
                 </Button>
               </div>
             </motion.div>
@@ -80,7 +95,7 @@ const MentorshipPage = () => {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl relative z-10 border-4 border-white">
                 <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" 
+                  src={mariaResende} 
                   alt="Maria Resende" 
                   className="w-full h-full object-cover"
                 />
@@ -110,7 +125,7 @@ const MentorshipPage = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-white">
+      <section id="benefits" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-primary mb-4">Por que escolher esta mentoria?</h2>
@@ -177,14 +192,14 @@ const MentorshipPage = () => {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden">
                        <img 
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100" 
+                        src={mariaResende} 
                         alt="Maria Resende" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div>
-                      <p className="font-bold">Maria Resende</p>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest">Especialista em Gestão do Tempo</p>
+                      <p className="font-bold text-primary">Maria Resende</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Especialista em Gestão do Tempo</p>
                     </div>
                   </div>
                 </div>
@@ -202,11 +217,20 @@ const MentorshipPage = () => {
             As vagas para mentoria individual são limitadas para garantir a máxima qualidade no acompanhamento. Reserve seu horário para uma conversa inicial gratuita.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="xl" className="gold-gradient text-primary font-bold h-16 px-10 rounded-full shadow-2xl hover:scale-105 transition-transform">
+            <Button 
+              onClick={() => navigate("/contato")}
+              size="lg" 
+              className="gold-gradient text-primary font-bold h-16 px-10 rounded-full shadow-2xl hover:scale-105 transition-transform"
+            >
               Agendar Conversa Gratuita
             </Button>
-            <Button size="xl" variant="ghost" className="h-16 px-10 rounded-full text-primary font-bold">
-              Falar no WhatsApp
+            <Button 
+              onClick={() => navigate("/contato")}
+              size="lg" 
+              variant="ghost" 
+              className="h-16 px-10 rounded-full text-primary font-bold"
+            >
+              Falar com a equipe
             </Button>
           </div>
           <p className="mt-8 text-sm text-muted-foreground flex items-center justify-center gap-2">
@@ -216,7 +240,21 @@ const MentorshipPage = () => {
         </div>
       </section>
 
-      <Footer />
+      {/* Footer Copy */}
+      <footer className="hero-gradient py-10 md:py-16 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <img src={logoDark} alt="Instituto Girassol" className="h-10" />
+            <p className="text-primary-foreground/40 text-xs text-center md:text-left max-w-sm leading-relaxed">
+              Instituto Girassol – Desenvolvimento humano estratégico para líderes e organizações.
+            </p>
+          </div>
+          <div className="flex gap-6 text-primary-foreground/30 text-xs">
+            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Termos</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
