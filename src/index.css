@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,73 +6,35 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 218 50% 12%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 218 50% 12%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 218 50% 12%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 218 75% 11%;
-    --primary-foreground: 42 30% 95%;
+    --primary: 215 78% 11%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 42 62% 54%;
-    --secondary-foreground: 218 75% 11%;
+    --secondary: 43 100% 50%;
+    --secondary-foreground: 215 78% 11%;
 
-    --muted: 220 18% 93%;
-    --muted-foreground: 218 12% 48%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 42 62% 54%;
-    --accent-foreground: 218 75% 11%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 220 18% 90%;
-    --input: 220 18% 88%;
-    --ring: 42 62% 54%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 47% 11%;
 
-    --radius: 0.75rem;
-
-    --gold: 42 62% 54%;
-    --gold-light: 42 50% 72%;
-    --navy: 218 75% 11%;
-    --navy-light: 215 55% 28%;
-    --hero-gradient-start: 218 75% 11%;
-    --hero-gradient-end: 215 55% 28%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 220 50% 5%;
-    --foreground: 42 10% 95%;
-    --card: 220 50% 8%;
-    --card-foreground: 42 10% 95%;
-    --popover: 220 50% 8%;
-    --popover-foreground: 42 10% 95%;
-    --primary: 42 62% 54%;
-    --primary-foreground: 218 75% 11%;
-    --secondary: 220 40% 20%;
-    --secondary-foreground: 42 10% 95%;
-    --muted: 220 30% 15%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 42 62% 54%;
-    --accent-foreground: 218 75% 11%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 30% 18%;
-    --input: 220 30% 18%;
-    --ring: 42 62% 54%;
+    --radius: 1rem;
   }
 }
 
@@ -80,88 +42,31 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Montserrat', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-secondary/30;
   }
 }
 
-@layer utilities {
+.hero-gradient {
+  background: linear-gradient(135deg, #06162f 0%, #0a2347 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #FFB800 0%, #FFD700 100%);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media print {
   .hero-gradient {
-    background: linear-gradient(135deg, hsl(218 75% 11%) 0%, hsl(215 55% 28%) 60%, hsl(215 50% 35%) 100%);
+    background: #06162f !important;
   }
-  .gold-gradient {
-    background: linear-gradient(135deg, hsl(42 62% 54%) 0%, hsl(42 50% 65%) 100%);
+  .bg-\[radial-gradient\(circle\,rgba\(255\,255\,255\,0\.8\)_1px\,transparent_1px\)\] {
+    background-image: none !important;
   }
-  .text-balance {
-    text-wrap: balance;
+  .absolute.inset-0.opacity-\[0\.03\] {
+    display: none !important;
   }
 }
-
-/* ─── PDF rendering ─── */
-/* Evita cortar seções, cards e títulos no meio das páginas */
-.pdf-root section,
-.pdf-root header,
-.pdf-root footer,
-.pdf-avoid-break {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-.pdf-root h1, .pdf-root h2, .pdf-root h3 {
-  break-after: avoid;
-  page-break-after: avoid;
-}
-.pdf-root img {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-/* Modo de captura: força tudo visível, desliga animações/transforms do framer-motion
-   (sem isso, seções com whileInView ficam invisíveis ou recortadas no PDF). */
-.pdf-rendering,
-.pdf-rendering * {
-  animation: none !important;
-  transition: none !important;
-  transform: none !important;
-  opacity: 1 !important;
-  filter: none !important;
-}
-.pdf-rendering {
-  width: 1100px !important;
-  max-width: 1100px !important;
-}
-/* Garante que gradientes e backdrop-blur renderizem como cor sólida no canvas */
-.pdf-rendering .backdrop-blur,
-.pdf-rendering [class*="backdrop-blur"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* No PDF: banner em azul absoluto, sem gradiente nem efeito de luz radial */
-.pdf-rendering .hero-gradient {
-  background: #06162f !important;
-  background-image: none !important;
-}
-.pdf-rendering header > .absolute,
-.pdf-rendering [class*="bg-[radial-gradient"] {
-  background: transparent !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-/* Evita quebras feias dentro de cards/sections no PDF */
-.pdf-rendering section,
-.pdf-rendering .rounded-2xl,
-.pdf-rendering .rounded-3xl,
-.pdf-rendering .rounded-xl {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
