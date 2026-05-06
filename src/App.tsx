@@ -9,6 +9,8 @@ import AdminDashboard from "./pages/AdminDashboard.tsx";
 import PublicProposal from "./pages/PublicProposal.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
+import QuizPage from "./pages/QuizPage.tsx";
+import CalculatorPage from "./pages/CalculatorPage.tsx";
 
 
 const queryClient = new QueryClient();
@@ -23,8 +25,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/sobre" element={<Index />} />
           <Route path="/servicos" element={<Index />} />
-          <Route path="/quiz" element={<Index />} />
-          <Route path="/calculadora" element={<Index />} />
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/calculadora" element={<CalculatorPage />} />
           <Route path="/contato" element={<Index />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />

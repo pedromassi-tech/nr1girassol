@@ -8,8 +8,6 @@ import {
   ArrowRight, CheckCircle, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Quiz from "@/components/Quiz";
-import RiskCalculator from "@/components/RiskCalculator";
 import ContactForm from "@/components/ContactForm";
 import Navbar from "@/components/Navbar";
 import logoLight from "@/assets/logo-girassol-light.png";
@@ -286,38 +284,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── QUIZ ─── */}
-      <section id="quiz" className="py-14 md:py-28 px-4 sm:px-8 bg-muted/30">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
-            <motion.div variants={fadeUp} className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-1.5 mb-4">
-                <ClipboardCheck className="h-3.5 w-3.5 text-secondary" />
-                <span className="text-secondary text-xs font-bold tracking-wide uppercase">Diagnóstico NR-1</span>
-              </div>
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
-                Responda o diagnóstico
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base mt-2">
-                Descubra se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
-              </p>
-            </motion.div>
-            <motion.div variants={fadeUp}>
-              <div className="bg-card rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-lg shadow-primary/5">
-                <Quiz />
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── CALCULADORA DE RISCO ─── */}
+      {/* ─── CTA MENTORIA ─── */}
       <section id="mentoria" className="relative overflow-hidden bg-muted/20 py-14 md:py-28 px-4 sm:px-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-secondary/10 to-transparent" />
         <div className="relative max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger} className="space-y-6 md:space-y-8">
             <motion.div variants={fadeUp} className="text-center mb-8">
-               <h2 id="mentoria" className="text-2xl md:text-4xl font-bold text-primary">Mentoria Executiva | Gestão 360</h2>
+               <h2 className="text-2xl md:text-4xl font-bold text-primary">Mentoria Executiva | Gestão 360</h2>
                <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">Acompanhamento estratégico para líderes e empresários que precisam organizar rotina, fortalecer a liderança e sustentar resultados.</p>
             </motion.div>
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-8">
