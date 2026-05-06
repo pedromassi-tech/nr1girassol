@@ -35,7 +35,7 @@ const AdminBlog = () => {
   }, []);
 
   const fetchPosts = async () => {
-    const { data, error } = await supabase.from("blog_posts").select("*").order("published_at", { ascending: false });
+    const { data, error } = await (supabase as any).from("blog_posts").select("*").order("published_at", { ascending: false });
     if (error) {
       toast({ title: "Erro ao carregar posts", variant: "destructive" });
     } else {
@@ -52,16 +52,21 @@ const AdminBlog = () => {
     }
 
     const postData = {
-      ...editingPost,
+      title: editingPost.title,
+      slug: editingPost.slug,
+      summary: editingPost.summary || "",
+      content: editingPost.content || "",
+      cover_image: editingPost.cover_image || "",
+      category: editingPost.category || "",
       published_at: editingPost.published_at || new Date().toISOString(),
     };
 
     let error;
     if (editingPost.id) {
-      const { error: err } = await supabase.from("blog_posts").update(postData).eq("id", editingPost.id);
+      const { error: err } = await (supabase as any).from("blog_posts").update(postData).eq("id", editingPost.id);
       error = err;
     } else {
-      const { error: err } = await supabase.from("blog_posts").insert([postData]);
+      const { error: err } = await (supabase as any).from("blog_posts").insert([postData]);
       error = err;
     }
 
@@ -76,7 +81,7 @@ const AdminBlog = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este post permanentemente?")) return;
-    const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+    const { error } = await (supabase as any).from("blog_posts").delete().eq("id", id);
     if (error) {
       toast({ title: "Erro ao excluir", variant: "destructive" });
     } else {
@@ -85,13 +90,13 @@ const AdminBlog = () => {
     }
   };
 
-  const filteredPosts = posts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredPosts = posts.filter(p => p.title?.toLowerCase().includes(searchTerm.toLowerCase()));
 
   if (editingPost) {
     return (
       <div className="min-h-screen bg-muted/20 p-5 md:p-10">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" onClick={() => setEditingPost(null)} className="mb-6 gap-2">
+          <Button variant="ghost" onClick={() => setEditingPost(null)} className="mb-6 gap-2 text-primary">
             <ArrowLeft className="h-4 w-4" /> Cancelar
           </Button>
           
