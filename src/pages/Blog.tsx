@@ -5,7 +5,6 @@ import { Search, Calendar, ChevronRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import logoLight from "@/assets/logo-girassol-light.png";
-import logoDark from "@/assets/logo-girassol-dark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Post {
@@ -31,7 +30,7 @@ const Blog = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("blog_posts")
         .select("*")
         .order("published_at", { ascending: false });
@@ -46,8 +45,8 @@ const Blog = () => {
   };
 
   const filteredPosts = posts.filter(p => 
-    p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.category.toLowerCase().includes(searchTerm.toLowerCase())
+    p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -55,7 +54,7 @@ const Blog = () => {
       <header className="bg-background border-b h-16 md:h-20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-5 h-full flex items-center justify-between">
           <img src={logoLight} alt="Logo" className="h-9 cursor-pointer" onClick={() => navigate("/")} />
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-2 text-primary">
             <ArrowLeft className="h-4 w-4" /> Voltar ao site
           </Button>
         </div>
@@ -93,8 +92,14 @@ const Blog = () => {
                 className="bg-card rounded-2xl border overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
                 onClick={() => navigate(`/blog/${post.slug}`)}
               >
-                <div className="aspect-video overflow-hidden">
-                  <img src={post.cover_image || "/placeholder.svg"} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="aspect-video overflow-hidden bg-muted">
+                  {post.cover_image ? (
+                    <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                       Sem imagem
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
