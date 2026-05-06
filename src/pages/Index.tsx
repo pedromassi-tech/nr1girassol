@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { trackPageView } from "@/lib/adminStore";
 import { motion } from "framer-motion";
-import { ArrowDown, Users, BarChart3, MessageCircle, Menu, X, ClipboardCheck, Timer, Award, Calculator, ShieldAlert } from "lucide-react";
+import { 
+  ArrowDown, Users, BarChart3, MessageCircle, Menu, X, 
+  ClipboardCheck, Timer, Award, Calculator, ShieldAlert, 
+  ArrowRight, CheckCircle, Star
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
 import RiskCalculator from "@/components/RiskCalculator";
@@ -49,6 +54,8 @@ const calculatorOutputs = [
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     trackPageView();
@@ -57,16 +64,34 @@ const Index = () => {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === "/quiz") {
+      scrollTo("quiz");
+    } else if (path === "/calculadora") {
+      scrollTo("calculadora");
+    } else if (path === "/sobre") {
+      scrollTo("especialista");
+    } else if (path === "/contato") {
+      scrollTo("contato");
+    } else if (path === "/servicos") {
+      scrollTo("sobre-teste");
+    }
+  }, [location]);
+
   const scrollTo = (id: string) => {
     setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const navLinks = [
-    { label: "Sobre o teste", id: "sobre-teste" },
-    { label: "Calculadora", id: "calculadora" },
-    { label: "Para quem é", id: "para-quem" },
-    { label: "Especialista", id: "especialista" },
+    { label: "Serviços", id: "sobre-teste", path: "/servicos" },
+    { label: "Calculadora", id: "calculadora", path: "/calculadora" },
+    { label: "Especialista", id: "especialista", path: "/sobre" },
+    { label: "Blog", id: "blog", path: "/blog" },
   ];
 
   return (
@@ -81,13 +106,17 @@ const Index = () => {
           <img
             src={scrolled ? logoLight : logoDark}
             alt="Instituto Girassol"
-            className="h-9 md:h-11 object-contain"
+            className="h-9 md:h-11 object-contain cursor-pointer"
+            onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           />
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((l) => (
               <button
                 key={l.id}
-                onClick={() => scrollTo(l.id)}
+                onClick={() => {
+                  if (l.id === "blog") { navigate("/blog"); }
+                  else { navigate(l.path); }
+                }}
                 className={`text-sm font-medium transition-colors ${
                   scrolled ? "text-muted-foreground hover:text-primary" : "text-primary-foreground/70 hover:text-primary-foreground"
                 }`}
@@ -96,7 +125,7 @@ const Index = () => {
               </button>
             ))}
             <Button
-              onClick={() => scrollTo("quiz")}
+              onClick={() => navigate("/quiz")}
               size="sm"
               className="gold-gradient border-0 text-primary font-semibold shadow-md hover:shadow-lg transition-shadow"
             >
@@ -121,13 +150,17 @@ const Index = () => {
               {navLinks.map((l) => (
                 <button
                   key={l.id}
-                  onClick={() => scrollTo(l.id)}
+                  onClick={() => {
+                    if (l.id === "blog") { navigate("/blog"); }
+                    else { navigate(l.path); }
+                    setMenuOpen(false);
+                  }}
                   className="text-left text-sm font-medium text-foreground/80 hover:text-primary py-2"
                 >
                   {l.label}
                 </button>
               ))}
-              <Button onClick={() => scrollTo("quiz")} className="gold-gradient border-0 text-primary font-semibold mt-2">
+              <Button onClick={() => { navigate("/quiz"); setMenuOpen(false); }} className="gold-gradient border-0 text-primary font-semibold mt-2">
                 Fazer o teste
               </Button>
             </nav>
@@ -137,43 +170,39 @@ const Index = () => {
 
       {/* ─── HERO ─── */}
       <section className="hero-gradient relative pt-24 pb-14 md:pt-36 md:pb-28 lg:pt-40 lg:pb-32 px-4 sm:px-8 overflow-hidden">
-        {/* Decorative elements */}
         <div className="absolute top-10 right-[-15%] w-[600px] h-[600px] rounded-full bg-secondary/8 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-30%] left-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
-        {/* Subtle grid pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Text */}
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-primary-foreground/10 border border-primary-foreground/15 rounded-full px-4 py-1.5 mb-6">
                 <ClipboardCheck className="h-3.5 w-3.5 text-secondary" />
-                <span className="text-primary-foreground/80 text-xs font-semibold tracking-wide uppercase">Diagnóstico gratuito</span>
+                <span className="text-primary-foreground/80 text-xs font-semibold tracking-wide uppercase">Diagnóstico Estratégico NR-1</span>
               </motion.div>
               <motion.h1
                 variants={fadeUp}
                 className="text-2xl sm:text-3xl md:text-5xl lg:text-[3.25rem] font-extrabold text-primary-foreground leading-[1.15] tracking-tight text-balance"
               >
-                Sua empresa está realmente preparada para a{" "}
-                <span className="text-secondary">NR-1</span> na prática?
+                Sua NR-1 está no papel ou já virou <span className="text-secondary">proteção financeira</span> de verdade?
               </motion.h1>
               <motion.p
                 variants={fadeUp}
                 className="mt-4 md:mt-7 text-primary-foreground/65 text-sm md:text-lg leading-relaxed max-w-lg"
               >
-                Responda 10 perguntas simples e descubra, em poucos minutos, se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
+                Diagnóstico, calculadora de risco e consultoria para transformar riscos psicossociais em governança, resultado e segurança jurídica.
               </motion.p>
               <motion.div variants={fadeUp} className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-3">
                 <Button
-                  onClick={() => scrollTo("quiz")}
+                  onClick={() => navigate("/quiz")}
                   className="gold-gradient border-0 text-primary px-6 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
                 >
                   Começar meu diagnóstico
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button
-                  onClick={() => scrollTo("calculadora")}
+                  onClick={() => navigate("/calculadora")}
                   variant="outline"
                   className="border-secondary bg-secondary/15 text-primary-foreground hover:bg-secondary/25 py-5 gap-2 font-bold"
                 >
@@ -183,7 +212,6 @@ const Index = () => {
               </motion.div>
             </motion.div>
 
-            {/* Right: Visual stats card */}
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -191,42 +219,34 @@ const Index = () => {
               className="hidden lg:block"
             >
               <div className="relative">
-                {/* Glow behind */}
                 <div className="absolute -inset-4 gold-gradient rounded-3xl opacity-10 blur-2xl" />
                 <div className="relative bg-primary-foreground/[0.07] backdrop-blur-sm border border-primary-foreground/10 rounded-3xl p-8 space-y-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-3 w-3 rounded-full bg-secondary animate-pulse" />
-                    <span className="text-primary-foreground/50 text-sm font-medium">Diagnóstico NR-1</span>
+                    <span className="text-primary-foreground/50 text-sm font-medium">Foco em Governança</span>
                   </div>
-                  {/* Mini stat cards */}
                   {[
-                    { icon: ClipboardCheck, label: "Perguntas", value: "10", desc: "Objetivas e diretas" },
-                    { icon: Timer, label: "Tempo médio", value: "4 min", desc: "Rápido e prático" },
-                    { icon: Award, label: "Score", value: "0–100", desc: "Com diagnóstico personalizado" },
+                    { icon: ClipboardCheck, label: "Quiz NR-1", value: "Diagnóstico", desc: "Acesse agora", path: "/quiz" },
+                    { icon: Calculator, label: "Calculadora", value: "Risco Real", desc: "Simule o impacto", path: "/calculadora" },
+                    { icon: Award, label: "Consultoria", value: "360°", desc: "Gestão estratégica", path: "/contato" },
                   ].map((stat, i) => (
-                    <div key={i} className="flex items-center gap-4 bg-primary-foreground/5 rounded-2xl p-4">
+                    <div 
+                      key={i} 
+                      className="flex items-center gap-4 bg-primary-foreground/5 rounded-2xl p-4 cursor-pointer hover:bg-primary-foreground/10 transition-colors"
+                      onClick={() => navigate(stat.path)}
+                    >
                       <div className="h-11 w-11 rounded-xl gold-gradient flex items-center justify-center flex-shrink-0 shadow-sm">
                         <stat.icon className="h-5 w-5 text-primary" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-baseline gap-2 flex-wrap">
-                          <span className="text-2xl font-bold text-primary-foreground">{stat.value}</span>
+                          <span className="text-xl font-bold text-primary-foreground">{stat.value}</span>
                           <span className="text-primary-foreground/40 text-xs font-medium">{stat.label}</span>
                         </div>
                         <p className="text-primary-foreground/40 text-xs mt-0.5 truncate">{stat.desc}</p>
                       </div>
                     </div>
                   ))}
-                  {/* Fake progress */}
-                  <div className="pt-2">
-                    <div className="flex justify-between text-xs text-primary-foreground/30 mb-1.5">
-                      <span>Progresso do teste</span>
-                      <span>0%</span>
-                    </div>
-                    <div className="h-2 bg-primary-foreground/10 rounded-full overflow-hidden">
-                      <div className="h-full w-0 gold-gradient rounded-full" />
-                    </div>
-                  </div>
                 </div>
               </div>
             </motion.div>
@@ -234,71 +254,84 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── STATS STRIP (mobile) ─── */}
-      <section className="lg:hidden bg-card border-b">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            {[
-              { value: "10", label: "Perguntas" },
-              { value: "4 min", label: "Tempo médio" },
-              { value: "0–100", label: "Score" },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-xl sm:text-2xl font-bold text-primary">{s.value}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
+      {/* ─── DOR / CONTEXTO ─── */}
+      <section className="py-14 md:py-20 bg-background px-4 sm:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+           <h2 className="text-2xl md:text-3xl font-bold text-primary mb-6">NR-1 atualizada, riscos psicossociais obrigatórios, GRO/PGR… e a maior parte das empresas ainda está parada no documento.</h2>
+           <p className="text-muted-foreground text-lg mb-10">Muitos PGRs são vendidos como "prateleira", mas não tratam o custo invisível: FAP, afastamentos e ações trabalhistas.</p>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-2xl border bg-card text-center">
+                 <div className="text-3xl mb-3">📉</div>
+                 <h4 className="font-bold text-primary mb-2">Custo Invisível</h4>
+                 <p className="text-xs text-muted-foreground">O que não aparece no balanço mas pesa no lucro operacional.</p>
               </div>
-            ))}
+              <div className="p-6 rounded-2xl border bg-card text-center">
+                 <div className="text-3xl mb-3">⚖️</div>
+                 <h4 className="font-bold text-primary mb-2">Segurança Jurídica</h4>
+                 <p className="text-xs text-muted-foreground">Evidências que protegem a empresa de verdade.</p>
+              </div>
+              <div className="p-6 rounded-2xl border bg-card text-center">
+                 <div className="text-3xl mb-3">🚀</div>
+                 <h4 className="font-bold text-primary mb-2">Governança</h4>
+                 <p className="text-xs text-muted-foreground">Transformar obrigação em resultado financeiro.</p>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* ─── FERRAMENTAS GRATUITAS ─── */}
+      <section className="py-14 md:py-20 bg-muted/30 px-4 sm:px-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-card rounded-3xl p-8 border hover:shadow-xl transition-all group">
+              <ClipboardCheck className="h-10 w-10 text-secondary mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-2xl font-bold text-primary mb-3">Quiz NR-1 na Prática</h3>
+              <p className="text-muted-foreground mb-6">Descubra em 10 perguntas se a sua gestão está no papel ou se já virou governança.</p>
+              <Button onClick={() => navigate("/quiz")} className="gold-gradient border-0 text-primary w-full sm:w-auto px-8">Fazer Quiz</Button>
+            </div>
+            <div className="bg-card rounded-3xl p-8 border hover:shadow-xl transition-all group">
+              <Calculator className="h-10 w-10 text-secondary mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-2xl font-bold text-primary mb-3">Calculadora de Risco</h3>
+              <p className="text-muted-foreground mb-6">Simule o impacto financeiro da não adequação e veja sua faixa de risco real.</p>
+              <Button onClick={() => navigate("/calculadora")} className="gold-gradient border-0 text-primary w-full sm:w-auto px-8">Usar Calculadora</Button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── SOBRE O TESTE ─── */}
+      {/* ─── SOBRE O TESTE (SERVIÇOS) ─── */}
       <section id="sobre-teste" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
               <div>
-                <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Entenda</span>
+                <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Soluções</span>
                 <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-5 leading-tight">
-                  Por que fazer esse teste?
+                  Como a Maria Resende atua
                 </h2>
                 <div className="text-foreground/70 text-sm md:text-[0.95rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
-                  <p>
-                    A NR-1 mudou o jogo da responsabilidade empresarial.
-                  </p>
-                  <p>
-                    Não se trata mais apenas de atualizar o PGR e arquivar documentos. Trata-se de integrar os riscos psicossociais à forma como o trabalho é organizado, liderado e acompanhado no dia a dia.
-                  </p>
-                  <p className="font-medium text-foreground/85">
-                    E isso impacta diretamente o negócio:
-                  </p>
-                  <ul className="space-y-2 pl-1">
-                    <li className="flex gap-2 items-start">
-                      <span className="text-secondary mt-0.5">•</span>
-                      <span><strong className="text-foreground/85">Custos invisíveis</strong> como retrabalho, presenteísmo, rotatividade e perda de produtividade</span>
-                    </li>
-                    <li className="flex gap-2 items-start">
-                      <span className="text-secondary mt-0.5">•</span>
-                      <span><strong className="text-foreground/85">Impacto financeiro</strong> que muitas vezes não aparece no curto prazo — e não é só sobre multa</span>
-                    </li>
-                    <li className="flex gap-2 items-start">
-                      <span className="text-secondary mt-0.5">•</span>
-                      <span><strong className="text-foreground/85">Responsabilidade compartilhada</strong> entre empresa, liderança, equipe e toda a operação</span>
-                    </li>
+                  <p>Implementação estratégica da NR-1 com foco em blindagem jurídica e performance.</p>
+                  <ul className="space-y-3 pl-1">
+                    {[
+                      "Diagnóstico de Riscos Psicossociais",
+                      "Implementação do PGR/GRO Focado em Pessoas",
+                      "Programas de Saúde Mental e Performance",
+                      "Treinamentos de Liderança e Governança",
+                      "Acompanhamento de Indicadores (FAP, Absenteísmo, Turnover)"
+                    ].map((item, i) => (
+                      <li key={i} className="flex gap-2 items-start">
+                        <CheckCircle className="text-secondary h-4 w-4 mt-1 flex-shrink-0" />
+                        <span className="text-foreground/85">{item}</span>
+                      </li>
+                    ))}
                   </ul>
-                  <p>
-                    Ao mesmo tempo, empresas que estruturam isso de forma consistente começam a acessar algo que poucos estão percebendo: <strong className="text-secondary">vantagem competitiva real</strong> — e cuidando da reputação.
-                  </p>
-                  <p>
-                    Esse diagnóstico foi criado para te ajudar a enxergar, de forma rápida e prática, em qual nível a sua empresa está hoje e o que pode estar passando despercebido.
-                  </p>
                 </div>
               </div>
               <div className="space-y-3 md:space-y-4 md:pt-14">
                 {[
-                  { icon: MessageCircle, title: "Sem juridiquês", text: "10 perguntas objetivas, em linguagem que todo gestor entende." },
+                  { icon: MessageCircle, title: "Sem juridiquês", text: "Diagnóstico objetivo em linguagem que todo gestor entende." },
                   { icon: BarChart3, title: "Score instantâneo", text: "Resultado de 0 a 100 com diagnóstico personalizado por faixa." },
-                  { icon: Users, title: "Comunidade", text: 'Convite para o grupo "NR1 na Prática" com conteúdos e casos reais.' },
+                  { icon: Users, title: "Consultoria 360", text: "Visão integrada entre jurídico, saúde e operação." },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -319,54 +352,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── PARA QUEM É ─── */}
-      <section id="para-quem" className="py-12 md:py-24 px-4 sm:px-8 bg-card">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
-            <motion.div variants={fadeUp} className="text-center mb-10">
-              <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Público</span>
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
-                Para quem é esse teste
-              </h2>
-            </motion.div>
-            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
-              {[
-                { emoji: "👤", text: "Lidera pessoas ou áreas de Segurança, Saúde, RH ou Jurídico." },
-                { emoji: "📋", text: "Precisa adequar a empresa à NR-1 de forma prática e estruturada." },
-                { emoji: "🧠", text: "Sabe que saúde mental é tema de governança – e não só de campanha de Setembro Amarelo." },
-              ].map((item, i) => (
-                <div key={i} className="bg-background rounded-2xl p-5 md:p-6 border border-border/60 text-center hover:shadow-md transition-shadow">
-                  <span className="text-3xl mb-3 block">{item.emoji}</span>
-                  <p className="text-foreground/75 text-sm leading-relaxed">{item.text}</p>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── QUIZ CTA BANNER ─── */}
-      <section className="hero-gradient py-10 md:py-16 px-4 sm:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-        <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h3 className="text-lg sm:text-2xl md:text-3xl font-bold text-primary-foreground mb-3 md:mb-4">
-              Pronto para descobrir onde sua empresa está?
-            </h3>
-            <p className="text-primary-foreground/60 text-xs md:text-base mb-5 md:mb-6 max-w-lg mx-auto">
-              O diagnóstico leva menos de 5 minutos e o resultado é imediato.
-            </p>
-            <Button
-              onClick={() => scrollTo("quiz")}
-              className="gold-gradient border-0 text-primary px-8 py-5 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all gap-2"
-            >
-              Fazer o diagnóstico agora
-              <ArrowDown className="h-4 w-4" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ─── QUIZ ─── */}
       <section id="quiz" className="py-14 md:py-28 px-4 sm:px-8 bg-muted/30">
         <div className="max-w-3xl mx-auto">
@@ -374,13 +359,13 @@ const Index = () => {
             <motion.div variants={fadeUp} className="text-center mb-10">
               <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-1.5 mb-4">
                 <ClipboardCheck className="h-3.5 w-3.5 text-secondary" />
-                <span className="text-secondary text-xs font-bold tracking-wide uppercase">Quiz interativo</span>
+                <span className="text-secondary text-xs font-bold tracking-wide uppercase">Diagnóstico NR-1</span>
               </div>
               <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary leading-tight">
-                Seu diagnóstico de NR-1
+                Responda o diagnóstico
               </h2>
               <p className="text-muted-foreground text-sm md:text-base mt-2">
-                Responda com honestidade – o resultado é só para você.
+                Descubra se a sua gestão de riscos psicossociais está só no papel ou já virou governança de verdade.
               </p>
             </motion.div>
             <motion.div variants={fadeUp}>
@@ -395,114 +380,14 @@ const Index = () => {
       {/* ─── CALCULADORA DE RISCO ─── */}
       <section id="calculadora" className="relative overflow-hidden bg-muted/20 py-14 md:py-28 px-4 sm:px-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-secondary/10 to-transparent" />
-        <div className="pointer-events-none absolute right-[-4rem] top-24 h-40 w-40 rounded-full bg-secondary/10 blur-3xl sm:h-56 sm:w-56" />
-        <div className="pointer-events-none absolute left-[-4rem] bottom-10 h-40 w-40 rounded-full bg-primary/5 blur-3xl sm:h-56 sm:w-56" />
-
         <div className="relative max-w-5xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            variants={stagger}
-            className="space-y-6 md:space-y-8"
-          >
-            <motion.div variants={fadeUp} className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1.1fr_0.9fr] md:gap-6">
-              <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-xl shadow-primary/5 sm:p-8 md:p-10">
-                <div className="inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-secondary/10 px-4 py-1.5">
-                  <Calculator className="h-3.5 w-3.5 text-secondary" />
-                  <span className="text-secondary text-xs font-bold tracking-wide uppercase">Simulador gratuito</span>
-                </div>
-
-                <h2 className="mt-5 text-2xl font-bold leading-tight text-primary md:text-4xl">
-                  Calculadora de Risco NR-1
-                </h2>
-
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                  Nada de número genérico: a calculadora traduz a realidade da sua empresa em três saídas claras — score de risco, faixa provável de multa e impacto financeiro anual estimado.
-                </p>
-
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {calculatorPillars.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-border/60 bg-card px-3 py-1.5 text-[0.72rem] font-semibold text-foreground/75"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Button
-                    onClick={() => scrollTo("simulacao-calculadora")}
-                    className="gold-gradient w-full border-0 px-6 py-5 text-sm font-bold text-primary shadow-lg transition-all hover:scale-[1.01] hover:shadow-xl sm:w-auto"
-                  >
-                    Fazer minha simulação
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                  <p className="text-xs leading-relaxed text-muted-foreground sm:max-w-xs sm:text-sm">
-                    Você responde alguns pontos e recebe a leitura completa na hora.
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-3xl hero-gradient p-px shadow-xl shadow-primary/10">
-                <div className="h-full rounded-[1.45rem] bg-primary px-5 py-6 sm:px-6 sm:py-7">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-foreground/10">
-                      <Calculator className="h-5 w-5 text-secondary" />
-                    </div>
-                    <div>
-                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-primary-foreground/45">
-                        O que você recebe
-                      </p>
-                      <h3 className="text-lg font-bold text-primary-foreground">Uma leitura prática do seu risco</h3>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-3">
-                    {calculatorOutputs.map((item) => (
-                      <div key={item.title} className="rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-foreground/10">
-                            <item.icon className="h-4 w-4 text-secondary" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground/45">
-                              {item.eyebrow}
-                            </p>
-                            <p className="mt-1 text-sm font-bold text-primary-foreground">{item.title}</p>
-                            <p className="mt-1 text-xs leading-relaxed text-primary-foreground/65">{item.description}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger} className="space-y-6 md:space-y-8">
+            <motion.div variants={fadeUp} className="text-center mb-8">
+               <h2 className="text-2xl md:text-4xl font-bold text-primary">Calculadora de Risco NR-1</h2>
+               <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">Simule em poucos minutos o impacto financeiro da não adequação à NR-1, com base na realidade da sua operação.</p>
             </motion.div>
-
-            <motion.div
-              variants={fadeUp}
-              id="simulacao-calculadora"
-              className="rounded-[2rem] border border-border/60 bg-background/80 p-2 shadow-xl shadow-primary/5 backdrop-blur-sm sm:p-3"
-            >
+            <motion.div variants={fadeUp} className="rounded-[2rem] border border-border/60 bg-background/80 p-2 shadow-xl shadow-primary/5 backdrop-blur-sm sm:p-3">
               <div className="rounded-[1.7rem] border border-border/50 bg-card p-4 sm:p-8 md:p-10">
-                <div className="mb-6 flex flex-col gap-3 border-b border-border/60 pb-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-primary">Faça sua simulação</p>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      Preencha em etapas curtas e veja score, multa e impacto financeiro no mesmo fluxo.
-                    </p>
-                  </div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-secondary/10 px-4 py-2">
-                    <Calculator className="h-4 w-4 text-secondary" />
-                    <span className="text-[0.7rem] font-bold uppercase tracking-wide text-secondary">
-                      Guiado • rápido • responsivo
-                    </span>
-                  </div>
-                </div>
-
                 <RiskCalculator />
               </div>
             </motion.div>
@@ -510,39 +395,32 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ─── SOBRE A ESPECIALISTA ─── */}
       <section id="especialista" className="py-14 md:py-28 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Quem conduz</span>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 leading-tight">
-                Sobre a especialista
+                Maria Resende
               </h2>
             </motion.div>
             <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-14 items-center">
               <div className="md:col-span-2 flex justify-center">
                 <div className="relative">
                   <div className="absolute -inset-3 gold-gradient rounded-3xl opacity-15 blur-xl" />
-                  <img
-                    src={mariaResende}
-                    alt="Maria Resende – fundadora do Instituto Girassol"
-                    className="relative w-48 sm:w-64 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl"
-                  />
+                  <img src={mariaResende} alt="Maria Resende" className="relative w-48 sm:w-64 md:w-full max-w-xs rounded-3xl object-cover shadow-2xl" />
                 </div>
               </div>
               <div className="md:col-span-3">
-                <h3 className="text-xl md:text-2xl font-bold text-primary mb-1">Maria Resende</h3>
-                <p className="text-secondary font-semibold text-sm mb-6">Fundadora · Instituto Girassol de Desenvolvimento Humano</p>
+                <p className="text-secondary font-semibold text-sm mb-6 uppercase tracking-wider">Fundadora · Instituto Girassol de Desenvolvimento Humano</p>
                 <div className="text-foreground/70 text-sm md:text-[0.93rem] leading-[1.75] md:leading-[1.85] space-y-3 md:space-y-4">
-                  <p>
-                    Administradora, especialista em gestão de projetos e processos, pós-graduada em Psicologia Organizacional e fundadora do Instituto Girassol de Desenvolvimento Humano.
-                  </p>
-                  <p>
-                    Há mais de 20 anos atua com autogestão, liderança, organização do trabalho e produtividade saudável, integrando gestão, comportamento e estrutura organizacional com visão prática.
-                  </p>
-                  <p>
-                    Autora do livro <em className="text-secondary font-semibold not-italic">Coragem para Ser Livre</em>, Maria é referência em transformar a exigência legal da NR-1 em governança, produtividade e sustentabilidade organizacional.
-                  </p>
+                  <p>Administradora, especialista em gestão de projetos e processos, pós-graduada em Psicologia Organizacional e fundadora do Instituto Girassol.</p>
+                  <p>Há mais de 20 anos atua integrando gestão, comportamento e estrutura organizacional com visão prática de produtividade saudável.</p>
+                  <p>Maria é referência em transformar a exigência legal da NR-1 em governança, resultado e sustentabilidade para o negócio.</p>
+                </div>
+                <div className="mt-8">
+                  <Button onClick={() => navigate("/contato")} className="gold-gradient border-0 text-primary px-8 font-bold">Agendar diagnóstico estratégico</Button>
                 </div>
               </div>
             </motion.div>
@@ -550,18 +428,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── CONSULTORIA CTA ─── */}
-      <section className="py-14 md:py-28 px-4 sm:px-8 bg-card">
+      {/* ─── CONTATO ─── */}
+      <section id="contato" className="py-14 md:py-28 px-4 sm:px-8 bg-card">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
-              <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Próximo passo</span>
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">
-                Fale com a especialista
-              </h2>
-              <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
-                Preencha o formulário e a equipe do Instituto Girassol entrará em contato para entender sua realidade.
-              </p>
+              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-3 leading-tight">Agende um diagnóstico estratégico de NR-1</h2>
+              <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">Preencha o formulário e nossa equipe entrará em contato para falar sobre o seu cenário.</p>
             </motion.div>
             <motion.div variants={fadeUp} className="bg-background rounded-2xl sm:rounded-3xl border border-border/60 p-4 sm:p-8 md:p-10 shadow-sm">
               <ContactForm />
@@ -576,12 +449,12 @@ const Index = () => {
           <div className="flex flex-col items-center md:items-start gap-4">
             <img src={logoDark} alt="Instituto Girassol" className="h-10" />
             <p className="text-primary-foreground/40 text-xs text-center md:text-left max-w-sm leading-relaxed">
-              Instituto Girassol de Desenvolvimento Humano – Implementação prática da NR-1 com foco em governança, produtividade e saúde.
+              Instituto Girassol – Implementação estratégica da NR-1 com foco em governança e resultado.
             </p>
           </div>
           <div className="flex gap-6 text-primary-foreground/30 text-xs">
-            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Política de Privacidade</a>
-            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Termos de Uso</a>
+            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-primary-foreground/60 transition-colors">Termos</a>
           </div>
         </div>
       </footer>

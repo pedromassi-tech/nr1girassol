@@ -41,7 +41,7 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "propostas" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "propostas" | "blog" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
   const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
@@ -281,6 +281,7 @@ const AdminDashboard = () => {
             { key: "metricas" as const, label: "Métricas" },
             { key: "calculadora" as const, label: `Calculadora (${calcResults.length})` },
             { key: "propostas" as const, label: `Propostas (${proposals.length})` },
+            { key: "blog" as const, label: "Blog" },
             { key: "admins" as const, label: `Admins (${admins.length})` },
           ].map((t) => (
             <button
@@ -789,6 +790,25 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── BLOG TAB ─── */}
+        {tab === "blog" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-bold text-primary">Gerenciar Blog</h2>
+              <Button size="sm" className="gap-2 gold-gradient border-0 text-primary font-bold" onClick={() => window.open("/admin-blog", "_blank")}>
+                <Plus className="h-4 w-4" /> Novo Post
+              </Button>
+            </div>
+            <div className="bg-card rounded-xl border p-8 text-center">
+              <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+              <p className="text-muted-foreground text-sm">O gerenciamento avançado de posts está disponível na rota /admin-blog.</p>
+              <Button variant="outline" size="sm" className="mt-4" onClick={() => window.open("/admin-blog", "_blank")}>
+                Abrir Editor do Blog
+              </Button>
+            </div>
           </div>
         )}
 

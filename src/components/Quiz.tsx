@@ -23,6 +23,9 @@ import {
   Sparkles,
   TrendingUp,
   DollarSign,
+  Eye,
+  BarChart3,
+  Users
 } from "lucide-react";
 import { addQuizCompletion } from "@/lib/adminStore";
 
@@ -56,7 +59,6 @@ const Quiz = () => {
       if (currentQuestion + 1 < totalQuestions) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
-        // move to reputation phase
         setPhase("reputation");
         setCurrentQuestion(0);
       }
@@ -101,7 +103,6 @@ const Quiz = () => {
     return <CheckCircle className="h-10 w-10 text-secondary" />;
   };
 
-  // ===== Capture step =====
   if (showCapture) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -149,7 +150,7 @@ const Quiz = () => {
               />
             </div>
           </div>
-          <Button type="submit" className="w-full hero-gradient border-0 text-primary-foreground py-5 text-sm font-semibold shadow-md gap-2">
+          <Button type="submit" className="w-full hero-gradient border-0 text-primary py-5 text-sm font-semibold shadow-md gap-2">
             Ver meu resultado
             <ArrowRight className="h-4 w-4" />
           </Button>
@@ -158,16 +159,15 @@ const Quiz = () => {
     );
   }
 
-  // ===== Result step =====
   if (showResult) {
-    const riskColor =
+    const riskColorClass =
       totalScore <= 30
         ? "from-destructive/15 to-destructive/5 border-destructive/30 text-destructive"
         : totalScore <= 60
         ? "from-amber-500/15 to-amber-500/5 border-amber-500/30 text-amber-600"
         : "from-secondary/15 to-secondary/5 border-secondary/30 text-secondary";
 
-    const repColor =
+    const repColorClass =
       reputation.score <= 40
         ? "from-destructive/15 to-destructive/5 border-destructive/30 text-destructive"
         : reputation.score <= 70
@@ -178,19 +178,17 @@ const Quiz = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="text-center mb-6">
           <div className="flex justify-center mb-2">{getResultIcon()}</div>
-          <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Seu diagnóstico NR-1</p>
+          <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Diagnóstico Instituto Girassol</p>
           <h3 className="text-xl sm:text-2xl font-extrabold text-primary mt-1">
-            Três indicadores para sua empresa
+            Seus indicadores NR-1
           </h3>
         </div>
 
-        {/* 3 indicators */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          {/* Risk */}
-          <div className={`rounded-2xl border bg-gradient-to-b ${riskColor} p-4 sm:p-5 text-center`}>
+          <div className={`rounded-2xl border bg-gradient-to-b ${riskColorClass} p-4 sm:p-5 text-center`}>
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <AlertTriangle className="h-4 w-4" />
-              <span className="text-[0.65rem] sm:text-xs font-bold tracking-wider uppercase">Risco Organizacional</span>
+              <span className="text-[0.65rem] sm:text-xs font-bold tracking-wider uppercase">Risco NR-1</span>
             </div>
             <div className="text-3xl sm:text-4xl font-extrabold text-primary">
               {totalScore}
@@ -199,8 +197,7 @@ const Quiz = () => {
             <p className="mt-1.5 text-xs sm:text-sm font-bold">{result.level}</p>
           </div>
 
-          {/* Reputation */}
-          <div className={`rounded-2xl border bg-gradient-to-b ${repColor} p-4 sm:p-5 text-center`}>
+          <div className={`rounded-2xl border bg-gradient-to-b ${repColorClass} p-4 sm:p-5 text-center`}>
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <Sparkles className="h-4 w-4" />
               <span className="text-[0.65rem] sm:text-xs font-bold tracking-wider uppercase">Reputação</span>
@@ -212,54 +209,52 @@ const Quiz = () => {
             <p className="mt-1.5 text-xs sm:text-sm font-bold">{reputation.level}</p>
           </div>
 
-          {/* Financial impact */}
           <div className="rounded-2xl border border-orange-500/30 bg-gradient-to-b from-orange-500/15 to-orange-500/5 p-4 sm:p-5 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-2 text-orange-600">
               <DollarSign className="h-4 w-4" />
               <span className="text-[0.65rem] sm:text-xs font-bold tracking-wider uppercase">Impacto Financeiro</span>
             </div>
             <div className="text-lg sm:text-xl font-extrabold text-orange-600 leading-tight">
-              {formatBRL(impact.min)}
-              <span className="text-muted-foreground font-semibold"> – </span>
-              {formatBRL(impact.max)}
+              {formatBRL(impact.min)} – {formatBRL(impact.max)}
             </div>
             <p className="mt-1.5 text-[0.7rem] sm:text-xs text-muted-foreground">estimado por ano</p>
-            <p className="mt-1 text-xs sm:text-sm font-bold text-orange-600">{impact.label}</p>
           </div>
         </div>
 
-        {/* Explanations */}
         <div className="mt-6 space-y-3">
           <div className="rounded-xl border border-border bg-background/50 p-4">
-            <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1 flex items-center gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5" /> Risco Organizacional
-            </p>
-            <p className="text-xs sm:text-sm text-foreground/75 leading-relaxed whitespace-pre-line">{result.text}</p>
-          </div>
-          <div className="rounded-xl border border-border bg-background/50 p-4">
-            <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" /> Reputação Organizacional
-            </p>
-            <p className="text-xs sm:text-sm text-foreground/75 leading-relaxed">{reputation.text}</p>
-          </div>
-          <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
-            <p className="text-xs font-bold text-orange-600 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-              <TrendingUp className="h-3.5 w-3.5" /> Impacto Financeiro Estimado
-            </p>
-            <p className="text-xs sm:text-sm text-foreground/75 leading-relaxed">
-              Faixa anual estimada de exposição combinando risco e reputação — considera perda de produtividade,
-              rotatividade, risco trabalhista e potencial multa NR-1.
-            </p>
+             <div className="flex items-center gap-2 mb-2">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                <h4 className="text-sm font-bold text-primary uppercase">Detalhamento Financeiro</h4>
+             </div>
+             <div className="space-y-2">
+                <div className="flex justify-between text-xs sm:text-sm py-1 border-b">
+                   <span className="text-muted-foreground">Perda de produtividade</span>
+                   <span className="font-bold">{formatBRL(impact.perdaProdMin)} – {formatBRL(impact.perdaProdMax)}</span>
+                </div>
+                <div className="flex justify-between text-xs sm:text-sm py-1 border-b">
+                   <span className="text-muted-foreground">Custo com rotatividade</span>
+                   <span className="font-bold">{formatBRL(impact.custoRotatividade)}</span>
+                </div>
+                {impact.riscoTrabMax > 0 && (
+                  <div className="flex justify-between text-xs sm:text-sm py-1 border-b">
+                    <span className="text-muted-foreground">Risco trabalhista</span>
+                    <span className="font-bold">{formatBRL(impact.riscoTrabMin)} – {formatBRL(impact.riscoTrabMax)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-xs sm:text-sm py-1 font-bold text-orange-600">
+                   <span>Total anual estimado</span>
+                   <span>{formatBRL(impact.min)} – {formatBRL(impact.max)}</span>
+                </div>
+             </div>
           </div>
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
-          <a href="https://chat.whatsapp.com/Dj8pvjQAaNJE06oqDzfeya?mode=gi_t" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-            <Button className="w-full gold-gradient border-0 text-primary font-semibold px-6 py-5 shadow-md">
-              Entrar no grupo NR1 na Prática
-            </Button>
-          </a>
-          <Button variant="outline" onClick={handleRestart} className="w-full sm:w-auto gap-2 py-5">
+          <Button onClick={() => window.open("https://chat.whatsapp.com/Dj8pvjQAaNJE06oqDzfeya", "_blank")} className="w-full gold-gradient border-0 text-primary font-bold px-6 py-5 shadow-md">
+            Quero falar com a Maria sobre este resultado
+          </Button>
+          <Button variant="outline" onClick={handleRestart} className="w-full sm:w-auto gap-2 py-5 text-primary">
             <RotateCcw className="h-4 w-4" /> Refazer
           </Button>
         </div>
@@ -272,7 +267,6 @@ const Quiz = () => {
 
   return (
     <div>
-      {/* Progress */}
       <div className="mb-7">
         <div className="flex justify-between text-xs font-medium text-muted-foreground mb-2">
           <span>
@@ -324,7 +318,7 @@ const Quiz = () => {
             <Button
               onClick={handleNext}
               disabled={selectedOption === null}
-              className="hero-gradient border-0 text-primary-foreground px-7 py-5 text-sm font-semibold gap-2 shadow-md disabled:opacity-40"
+              className="gold-gradient border-0 text-primary px-7 py-5 text-sm font-semibold gap-2 shadow-md disabled:opacity-40"
             >
               {phase === "reputation" && currentQuestion + 1 === totalQuestions ? "Ver resultado" : "Próxima"}
               <ArrowRight className="h-4 w-4" />

@@ -175,19 +175,44 @@ export interface FinancialImpact {
   min: number;
   max: number;
   label: string;
+  perdaProdMin: number;
+  perdaProdMax: number;
+  custoRotatividade: number;
+  riscoTrabMin: number;
+  riscoTrabMax: number;
+  multaMin: number;
+  multaMax: number;
 }
 
 export function getFinancialImpact(riskScore: number, reputationScore: number): FinancialImpact {
-  // Quanto pior risco e reputação, maior o impacto estimado anual
-  const riskGap = 100 - riskScore;
-  const repGap = 100 - reputationScore;
-  const severity = (riskGap * 0.6 + repGap * 0.4) / 100; // 0–1
-  const min = Math.round(80_000 + severity * 420_000);
-  const max = Math.round(250_000 + severity * 1_750_000);
+  // Quanto pior risco (score menor) e reputação (score menor), maior o impacto estimado anual
+  const riskSeverity = (100 - riskScore) / 100;
+  const repSeverity = (100 - reputationScore) / 100;
+  const severity = (riskSeverity * 0.6 + repSeverity * 0.4); // 0–1
+
+  // Base values for estimation (avg company size assumed for quiz)
+  const baseFat = 15000000; // 15M
+  const numColab = 100;
+
+  const perdaProdMin = Math.round(baseFat * (0.01 + severity * 0.04));
+  const perdaProdMax = Math.round(baseFat * (0.03 + severity * 0.06));
+
+  const custoRotatividade = Math.round(numColab * (0.1 + severity * 0.15) * 15000);
+
+  const multaMin = Math.round(20000 + severity * 180000);
+  const multaMax = Math.round(80000 + severity * 420000);
+
+  const riscoTrabMin = severity > 0.5 ? Math.round(50000 + severity * 200000) : 0;
+  const riscoTrabMax = severity > 0.5 ? Math.round(150000 + severity * 600000) : 0;
+
+  const min = perdaProdMin + custoRotatividade + multaMin + riscoTrabMin;
+  const max = perdaProdMax + custoRotatividade + multaMax + riscoTrabMax;
+
   let label = "Impacto contido";
   if (severity > 0.6) label = "Impacto crítico";
   else if (severity > 0.35) label = "Impacto relevante";
-  return { min, max, label };
+
+  return { min, max, label, perdaProdMin, perdaProdMax, custoRotatividade, riscoTrabMin, riscoTrabMax, multaMin, multaMax };
 }
 
 export function formatBRL(value: number): string {
@@ -205,7 +230,7 @@ export interface ScoreResult {
 export function getScoreResult(score: number): ScoreResult {
   if (score <= 30) {
     return {
-      level: "Alerta Vermelho",
+      level: "Zona de Risco",
       color: "destructive",
       text: `Seu score em NR-1 na prática ficou em ${score} de 100.\nIsso mostra que hoje a sua empresa está bastante exposta – não só a multas, mas a um custo invisível de desorganização, conflitos, afastamentos e riscos jurídicos.\nA boa notícia é que, a partir daqui, qualquer passo já traz ganho: entender melhor a norma, mapear riscos psicossociais e começar um plano mínimo de ação.`,
     };
@@ -218,7 +243,7 @@ export function getScoreResult(score: number): ScoreResult {
     };
   }
   return {
-    level: "NR-1 na Rota da Governança",
+    level: "Em Blindagem",
     color: "success",
     text: `Seu score em NR-1 na prática ficou em ${score} de 100.\nIsso indica que a sua empresa já enxerga riscos psicossociais como tema de governança, e não só como obrigação legal.\nAinda assim, sempre há espaço para refinar diagnóstico, fortalecer evidências e blindar a organização em termos de saúde, produtividade e proteção jurídica.`,
   };
