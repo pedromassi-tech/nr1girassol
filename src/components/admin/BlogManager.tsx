@@ -120,8 +120,16 @@ const BlogManager = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2 md:col-span-1">
+                <Label>Data de Publicação</Label>
+                <Input 
+                  type="datetime-local"
+                  value={editingPost.published_at ? new Date(editingPost.published_at).toISOString().slice(0, 16) : ""} 
+                  onChange={e => setEditingPost({...editingPost, published_at: new Date(e.target.value).toISOString()})}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-1">
                 <Label>Categoria</Label>
                 <Input 
                   value={editingPost.category || ""} 
@@ -129,7 +137,7 @@ const BlogManager = () => {
                   placeholder="Ex: Saúde Mental, Liderança"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-1">
                 <Label>URL da Imagem de Capa</Label>
                 <Input 
                   value={editingPost.cover_image || ""} 
