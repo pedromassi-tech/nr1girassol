@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, ArrowLeft, Share2, Clock, CheckCircle, ArrowRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logoLight from "@/assets/logo-girassol-light.png";
+import Navbar from "@/components/Navbar";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
