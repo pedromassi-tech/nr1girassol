@@ -9,7 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard.tsx";
 import PublicProposal from "./pages/PublicProposal.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
-import AdminBlog from "./pages/AdminBlog.tsx";
+
 
 const queryClient = new QueryClient();
 
