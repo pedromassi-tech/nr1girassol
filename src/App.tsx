@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import PublicProposal from "./pages/PublicProposal.tsx";
 import Blog from "./pages/Blog.tsx";
+import BlogPost from "./pages/BlogPost.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import CalculatorPage from "./pages/CalculatorPage.tsx";
 
