@@ -90,29 +90,7 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* ─── HEADER ─── */}
-      <header className="bg-background border-b h-16 md:h-20 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-5 h-full flex items-center justify-between">
-          <img 
-            src={logoLight} 
-            alt="Logo" 
-            className="h-9 cursor-pointer" 
-            onClick={() => navigate("/")} 
-          />
-          <div className="hidden md:flex items-center gap-6">
-             <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="text-muted-foreground hover:text-primary gap-2">
-                <ArrowLeft className="h-4 w-4" /> Todos os posts
-             </Button>
-          </div>
-          <Button 
-            onClick={() => navigate("/quiz")}
-            size="sm"
-            className="gold-gradient border-0 text-primary font-black shadow-md"
-          >
-            Fazer o teste
-          </Button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* ─── POST HERO ─── */}
       <div className="relative pt-12 pb-12 md:pt-20 md:pb-16 bg-white overflow-hidden">
