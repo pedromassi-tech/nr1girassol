@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Quiz from "@/components/Quiz";
 import RiskCalculator from "@/components/RiskCalculator";
 import ContactForm from "@/components/ContactForm";
+import Navbar from "@/components/Navbar";
 import logoLight from "@/assets/logo-girassol-light.png";
 import logoDark from "@/assets/logo-girassol-dark.png";
 import mariaResende from "@/assets/maria-resende.png";
