@@ -55,30 +55,7 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* ─── HEADER ─── */}
-      <header className="hero-gradient border-b border-primary-foreground/10 h-16 md:h-20 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-5 h-full flex items-center justify-between">
-          <img 
-            src={logoLight} 
-            alt="Logo" 
-            className="h-9 cursor-pointer" 
-            onClick={() => navigate("/")} 
-          />
-          <nav className="hidden md:flex items-center gap-8">
-            <button onClick={() => navigate("/")} className="text-sm font-medium text-primary-foreground/70 hover:text-primary-foreground transition-colors">Início</button>
-            <button onClick={() => navigate("/quiz")} className="text-sm font-medium text-primary-foreground/70 hover:text-primary-foreground transition-colors">Quiz NR-1</button>
-            <button onClick={() => navigate("/calculadora")} className="text-sm font-medium text-primary-foreground/70 hover:text-primary-foreground transition-colors">Calculadora</button>
-          </nav>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => navigate("/")} 
-            className="gap-2 border-secondary/50 text-secondary bg-secondary/5 hover:bg-secondary/10"
-          >
-            <ArrowLeft className="h-4 w-4" /> Voltar ao site
-          </Button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* ─── HERO BLOG ─── */}
       <section className="hero-gradient pt-16 pb-24 px-5 relative overflow-hidden">
