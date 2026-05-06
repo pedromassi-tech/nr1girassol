@@ -400,7 +400,7 @@ const Index = () => {
       </section>
 
       {/* ─── CALCULADORA DE RISCO ─── */}
-      <section id="calculadora" className="relative overflow-hidden bg-muted/20 py-14 md:py-28 px-4 sm:px-8">
+      <section id="mentoria" className="relative overflow-hidden bg-muted/20 py-14 md:py-28 px-4 sm:px-8">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-secondary/10 to-transparent" />
         <div className="relative max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger} className="space-y-6 md:space-y-8">
@@ -408,9 +408,31 @@ const Index = () => {
                <h2 id="mentoria" className="text-2xl md:text-4xl font-bold text-primary">Mentoria Executiva | Gestão 360</h2>
                <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">Acompanhamento estratégico para líderes e empresários que precisam organizar rotina, fortalecer a liderança e sustentar resultados.</p>
             </motion.div>
-            <motion.div variants={fadeUp} className="rounded-[2rem] border border-border/60 bg-background/80 p-2 shadow-xl shadow-primary/5 backdrop-blur-sm sm:p-3">
-              <div className="rounded-[1.7rem] border border-border/50 bg-card p-4 sm:p-8 md:p-10">
-                <RiskCalculator />
+            <motion.div variants={fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-card rounded-3xl p-8 border shadow-sm">
+                <h3 className="text-xl font-bold text-primary mb-4">Temas trabalhados:</h3>
+                <ul className="space-y-3">
+                  {[
+                    "Clareza de prioridades e tomada de decisão",
+                    "Organização da rotina estratégica do líder",
+                    "Gestão da pressão e demandas constantes",
+                    "Fortalecimento de competências comportamentais",
+                    "Alinhamento entre vida profissional e resultados"
+                  ].map((topic, i) => (
+                    <li key={i} className="flex gap-2 items-center text-sm text-muted-foreground">
+                      <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
+                      {topic}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-primary/5 rounded-3xl p-8 border border-primary/10 flex flex-col justify-center">
+                <p className="text-sm text-primary/80 leading-relaxed mb-6">
+                  A Mentoria Gestão 360 não atua no campo motivacional, mas na construção consciente de decisões, rotinas e comportamentos que sustentam liderança e performance.
+                </p>
+                <Button onClick={() => navigate("/contato")} className="gold-gradient border-0 text-primary w-full font-bold py-6">
+                  Saber mais sobre a mentoria
+                </Button>
               </div>
             </motion.div>
           </motion.div>
