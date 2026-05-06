@@ -11,6 +11,7 @@ import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import CalculatorPage from "./pages/CalculatorPage.tsx";
+import MentorshipPage from "./pages/MentorshipPage.tsx";
 
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/servicos" element={<Index />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/calculadora" element={<CalculatorPage />} />
+          <Route path="/mentoria" element={<MentorshipPage />} />
           <Route path="/contato" element={<Index />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
