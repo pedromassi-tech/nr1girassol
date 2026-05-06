@@ -56,9 +56,6 @@ const Navbar = () => {
             alt="Instituto Girassol"
             className="h-9 md:h-11 object-contain"
           />
-          <span className={`text-lg font-bold tracking-tight hidden sm:block ${isDarkBg ? 'text-primary-foreground' : 'text-primary'}`}>
-            Maria Resende
-          </span>
         </div>
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((l) => (
