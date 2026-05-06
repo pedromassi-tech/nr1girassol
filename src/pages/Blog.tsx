@@ -5,6 +5,7 @@ import { Search, Calendar, ChevronRight, ArrowLeft, Clock, TrendingUp, BookOpen 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import logoLight from "@/assets/logo-girassol-light.png";
+import logoDark from "@/assets/logo-girassol-dark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Post {
