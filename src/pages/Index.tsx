@@ -103,12 +103,19 @@ const Index = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 md:h-20 flex items-center justify-between">
-          <img
-            src={scrolled ? logoLight : logoDark}
-            alt="Instituto Girassol"
-            className="h-9 md:h-11 object-contain cursor-pointer"
+          <div 
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          />
+          >
+            <img
+              src={scrolled ? logoLight : logoDark}
+              alt="Instituto Girassol"
+              className="h-9 md:h-11 object-contain"
+            />
+            <span className={`text-lg font-bold tracking-tight hidden sm:block ${scrolled ? 'text-primary' : 'text-primary-foreground'}`}>
+              Maria Resende
+            </span>
+          </div>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((l) => (
               <button
