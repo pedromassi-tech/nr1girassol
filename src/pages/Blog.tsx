@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import { Search, Calendar, ChevronRight, ArrowLeft, Clock, TrendingUp, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import logoLight from "@/assets/logo-girassol-light.png";
-import logoDark from "@/assets/logo-girassol-dark.png";
+import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Post {
