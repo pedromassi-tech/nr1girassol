@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Calendar, ChevronRight, ArrowLeft, Clock, TrendingUp, BookOpen } from "lucide-react";
+import { Search, Calendar, ChevronRight, Clock, TrendingUp, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
+import logoDark from "@/assets/logo-girassol-dark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Post {
