@@ -68,8 +68,8 @@ const Index = () => {
     const path = location.pathname;
     if (path === "/quiz") {
       scrollTo("quiz");
-    } else if (path === "/calculadora") {
-      scrollTo("calculadora");
+    } else if (path === "/mentoria") {
+      scrollTo("mentoria");
     } else if (path === "/sobre") {
       scrollTo("especialista");
     } else if (path === "/contato") {
@@ -88,8 +88,8 @@ const Index = () => {
   };
 
   const navLinks = [
-    { label: "Serviços", id: "sobre-teste", path: "/servicos" },
-    { label: "Calculadora", id: "calculadora", path: "/calculadora" },
+    { label: "Soluções", id: "sobre-teste", path: "/servicos" },
+    { label: "Mentoria", id: "mentoria", path: "/mentoria" },
     { label: "Especialista", id: "especialista", path: "/sobre" },
     { label: "Blog", id: "blog", path: "/blog" },
   ];
@@ -405,8 +405,8 @@ const Index = () => {
         <div className="relative max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger} className="space-y-6 md:space-y-8">
             <motion.div variants={fadeUp} className="text-center mb-8">
-               <h2 className="text-2xl md:text-4xl font-bold text-primary">Calculadora de Risco NR-1</h2>
-               <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">Simule em poucos minutos o impacto financeiro da não adequação à NR-1, com base na realidade da sua operação.</p>
+               <h2 id="mentoria" className="text-2xl md:text-4xl font-bold text-primary">Mentoria Executiva | Gestão 360</h2>
+               <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">Acompanhamento estratégico para líderes e empresários que precisam organizar rotina, fortalecer a liderança e sustentar resultados.</p>
             </motion.div>
             <motion.div variants={fadeUp} className="rounded-[2rem] border border-border/60 bg-background/80 p-2 shadow-xl shadow-primary/5 backdrop-blur-sm sm:p-3">
               <div className="rounded-[1.7rem] border border-border/50 bg-card p-4 sm:p-8 md:p-10">
