@@ -1,0 +1,36 @@
+name: Build and Deploy to HostGator
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Vite project
+      run: npm run build
+
+    - name: Upload to HostGator via SFTP
+      uses: wangyucode/sftp-upload-action@v2.0.2
+      with:
+        host: br928.hostgator.com.br
+        port: 22
+        username: mari8563
+        password: ${{ secrets.HOSTGATOR_PASSWORD }}
+        localDir: './dist'
+        remoteDir: '/home4/mari8563/public_html'
+        sftpArgs: '-o ConnectTimeout=5'
