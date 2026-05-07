@@ -388,23 +388,25 @@ const PublicProposal = () => {
                 <TrendingUp className="h-4 w-4" /> Investimento
               </p>
               <h2 className="text-2xl sm:text-4xl font-extrabold mb-6">
-                Valor do projeto
+                Plano de Investimento
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-5 sm:p-6 border border-white/20">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/70 mb-1">Total</p>
-                  <p className="text-3xl sm:text-5xl font-extrabold text-secondary">
-                    {formatBRL(proposal.investimentoTotal)}
+                <div className="bg-white/20 backdrop-blur rounded-2xl p-5 sm:p-8 border-2 border-secondary/50 shadow-xl">
+                  <p className="text-xs font-bold uppercase tracking-wider text-secondary mb-1">Investimento Mensal</p>
+                  <p className="text-4xl sm:text-6xl font-extrabold text-white">
+                    {formatBRL(valorParcela)}
+                    <span className="text-lg font-semibold text-primary-foreground/60"> /mês</span>
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-primary-foreground/70 mt-1 font-medium">
+                    Pagamento em {proposal.investimentoParcelas}x sem juros
                   </p>
                 </div>
-                <div className="bg-white/10 backdrop-blur rounded-2xl p-5 sm:p-6 border border-white/20">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/70 mb-1">
-                    Em {proposal.investimentoParcelas}x
-                  </p>
-                  <p className="text-3xl sm:text-5xl font-extrabold">
-                    {formatBRL(valorParcela)}
-                    <span className="text-base font-semibold text-primary-foreground/70"> /mês</span>
+                
+                <div className="bg-white/5 backdrop-blur rounded-2xl p-5 sm:p-6 border border-white/10 flex flex-col justify-center">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/50 mb-1">Total do Projeto</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary-foreground/80">
+                    {formatBRL(proposal.investimentoTotal)}
                   </p>
                 </div>
               </div>
