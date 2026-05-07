@@ -710,25 +710,35 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
               </details>
 
               {/* Parcelas — input livre + atalhos */}
-              <div>
-                <Label className="text-[10px] font-semibold uppercase tracking-wide text-foreground/70 mb-1.5 block">
-                  Parcelamento (nº de parcelas)
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={60}
-                    value={draft.investimentoParcelas}
-                    onChange={e => {
-                      const n = parseInt(e.target.value, 10);
-                      update("investimentoParcelas", Number.isFinite(n) && n > 0 ? n : 1);
-                    }}
-                    className="w-24 text-center font-semibold"
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    × de {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </span>
+              <div className="bg-secondary/5 rounded-xl p-4 border border-secondary/20">
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-wide text-secondary flex items-center gap-1.5">
+                    <DollarSign className="h-3 w-3" /> Estratégia: Valor Mensal em Destaque
+                  </Label>
+                  <span className="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold">RECOMENDADO</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] text-muted-foreground uppercase">Nº de parcelas</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={60}
+                      value={draft.investimentoParcelas}
+                      onChange={e => {
+                        const n = parseInt(e.target.value, 10);
+                        update("investimentoParcelas", Number.isFinite(n) && n > 0 ? n : 1);
+                      }}
+                      className="w-20 text-center font-bold text-lg h-12 border-secondary/30"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-[10px] text-muted-foreground uppercase">Valor por parcela</Label>
+                    <div className="text-xl font-extrabold text-primary">
+                      {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      <span className="text-xs font-normal text-muted-foreground ml-1">/mês</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="grid grid-cols-6 gap-1.5 mt-2">
                   {[1, 3, 4, 6, 10, 12].map(n => (
