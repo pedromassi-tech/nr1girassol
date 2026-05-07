@@ -33,4 +33,3 @@ jobs:
         password: ${{ secrets.HOSTGATOR_PASSWORD }}
         localDir: './dist'
         remoteDir: '/home4/mari8563/public_html'
-        sftpArgs: '-o ConnectTimeout=5'
