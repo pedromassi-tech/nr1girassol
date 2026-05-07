@@ -388,7 +388,7 @@ const PublicProposal = () => {
                 <TrendingUp className="h-4 w-4" /> Investimento
               </p>
               <h2 className="text-2xl sm:text-4xl font-extrabold mb-6">
-                Valor do projeto
+                Plano de Investimento
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
