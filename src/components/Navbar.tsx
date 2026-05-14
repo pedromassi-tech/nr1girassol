@@ -30,6 +30,7 @@ const Navbar = () => {
     { label: "Mentoria", path: "/mentoria" },
     { label: "Especialista", path: "/sobre" },
     { label: "Blog", path: "/blog" },
+    { label: "COPSOQ", path: "/copsoq" },
   ];
 
   const handleLogoClick = () => {

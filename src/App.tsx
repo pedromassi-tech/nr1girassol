@@ -12,6 +12,7 @@ import BlogPost from "./pages/BlogPost.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import CalculatorPage from "./pages/CalculatorPage.tsx";
 import MentorshipPage from "./pages/MentorshipPage.tsx";
+import CopsoqQuizPage from "./pages/CopsoqQuizPage.tsx";
 
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/calculadora" element={<CalculatorPage />} />
           <Route path="/mentoria" element={<MentorshipPage />} />
+          <Route path="/copsoq" element={<CopsoqQuizPage />} />
           <Route path="/contato" element={<Index />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
