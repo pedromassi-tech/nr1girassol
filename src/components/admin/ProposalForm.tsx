@@ -491,37 +491,44 @@ const ProposalForm = ({ open, onOpenChange, lead, proposal, prefill, onSaved }: 
 
           {/* INVESTIMENTO */}
           <Section icon={DollarSign} title="Investimento">
-            {/* Hero do total */}
+            {/* Hero do total — ESTRATÉGIA: Valor menor em primeiro plano */}
             <div className="rounded-xl border-2 border-secondary/40 bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent p-5">
               <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/60">
-                    Investimento total final
+                <div className="flex-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">
+                    Valor da parcela (foco do cliente)
                   </div>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-primary mt-1 tabular-nums">
-                    {valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Sugestão: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} •{" "}
-                    {horasFinais}h × R$ {valorHora} × {fatorAdequacao} × {fatorEstrategico} •{" "}
-                    {draft.investimentoParcelas}× de{" "}
-                    <span className="font-semibold text-primary">
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-3xl sm:text-5xl font-extrabold text-primary tabular-nums">
                       {valorParcelaFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                    </span>
+                    </div>
+                    <div className="text-sm font-semibold text-muted-foreground">
+                      /mês
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-secondary/20 flex gap-4">
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Investimento Total</div>
+                      <div className="text-lg font-bold text-primary/70">
+                        {valorFinal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Parcelamento</div>
+                      <div className="text-lg font-bold text-primary/70">{draft.investimentoParcelas}x fixas</div>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-3 italic">
+                    Sugestão técnica: {totalCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} ({horasFinais}h × R$ {valorHora})
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  {valorFinal !== totalCalculado && (
-                    <span className="text-[10px] text-muted-foreground">
-                      Valor manual aplicado
-                    </span>
-                  )}
+                <div className="flex flex-col items-end gap-2">
                   <Button
                     type="button"
                     size="sm"
                     onClick={aplicarCalculo}
                     disabled={valorFinal === totalCalculado}
-                    className="hero-gradient border-0 text-primary-foreground gap-1.5"
+                    className="hero-gradient border-0 text-primary-foreground gap-1.5 shadow-sm"
                   >
                     <Wand2 className="h-3.5 w-3.5" />
                     {valorFinal === totalCalculado ? "Sugestão aplicada" : "Usar sugestão"}

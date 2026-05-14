@@ -374,6 +374,17 @@ const PublicProposal = () => {
           </Section>
         )}
 
+        {/* VALIDAÇÃO FINAL (OBJETIVOS DE NOVO) */}
+        <section className="bg-primary/5 rounded-3xl p-8 border border-primary/10 text-center">
+          <p className="text-xs font-bold text-primary/60 uppercase tracking-widest mb-4">Confirmação de Escopo</p>
+          <h3 className="text-2xl font-bold text-primary mb-4 italic">
+            "Se a gente chegar nesse cenário, está ótimo pra mim."
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Essa frase de um de nossos clientes resume o foco desta proposta: entregar exatamente o que foi validado como prioritário para a <strong>{proposal.clienteEmpresa}</strong>.
+          </p>
+        </section>
+
         {/* INVESTIMENTO */}
         {proposal.investimentoTotal > 0 && (
           <motion.section
