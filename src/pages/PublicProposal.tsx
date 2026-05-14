@@ -375,44 +375,42 @@ const PublicProposal = () => {
           </Section>
         )}
 
-        {/* FASES */}
-        {proposal.fases.length > 0 && (
-          <Section
-            eyebrow="Metodologia"
-            title="Como vamos executar"
-            subtitle={`Projeto com prazo estimado de ${proposal.prazoMeses} ${proposal.prazoMeses === 1 ? "mês" : "meses"}.`}
-          >
-            <div className="space-y-3 sm:space-y-4">
-              {proposal.fases.filter(f => f.titulo).map((fase, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="relative pl-12 sm:pl-16 pb-4 border-l-2 border-secondary/30 ml-4"
-                >
-                  <div className="absolute -left-5 top-0 h-10 w-10 rounded-full hero-gradient text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
-                    {i + 1}
-                  </div>
-                  <div className="bg-card border rounded-xl p-4 sm:p-5">
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg font-bold text-primary">{fase.titulo}</h3>
-                      {fase.duracao && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
-                          <Clock className="h-3 w-3" /> {fase.duracao}
-                        </span>
-                      )}
-                    </div>
-                    {fase.descricao && (
-                      <p className="text-sm text-foreground/75 leading-relaxed">{fase.descricao}</p>
+        {/* SOLUÇÃO (FASES) */}
+        <Section
+          eyebrow="Solução"
+          title="Caminho para o resultado"
+          subtitle={`Como vamos transformar seu cenário atual em conformidade e performance em ${proposal.prazoMeses} meses.`}
+        >
+          <div className="space-y-3 sm:space-y-4">
+            {proposal.fases.filter(f => f.titulo).map((fase, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="relative pl-12 sm:pl-16 pb-4 border-l-2 border-secondary/30 ml-4"
+              >
+                <div className="absolute -left-5 top-0 h-10 w-10 rounded-full hero-gradient text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
+                  {i + 1}
+                </div>
+                <div className="bg-card border rounded-xl p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-primary">{fase.titulo}</h3>
+                    {fase.duracao && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
+                        <Clock className="h-3 w-3" /> {fase.duracao}
+                      </span>
                     )}
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-        )}
+                  {fase.descricao && (
+                    <p className="text-sm text-foreground/75 leading-relaxed">{fase.descricao}</p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
 
         {/* ENTREGÁVEIS */}
         {proposal.entregaveis.length > 0 && (
@@ -445,6 +443,7 @@ const PublicProposal = () => {
             Essa frase de um de nossos clientes resume o foco desta proposta: entregar exatamente o que foi validado como prioritário para a <strong>{proposal.clienteEmpresa}</strong>.
           </p>
         </section>
+
 
         {/* INVESTIMENTO */}
         {proposal.investimentoTotal > 0 && (
