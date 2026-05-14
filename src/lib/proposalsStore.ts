@@ -256,33 +256,27 @@ export const DEFAULT_DIFERENCIAIS = [
 
 export const DEFAULT_FASES: ProposalFase[] = [
   {
-    titulo: "Fase 1 — Diagnóstico de Campo",
-    descricao: "Coleta in loco/remota de dados, observação de rotinas reais e mapeamento por estabelecimento e função.",
+    titulo: "Fase 1 — Diagnóstico de Campo (Escuta e Dados)",
+    descricao: "Mapeamento qualitativo e quantitativo por estabelecimento e função. Identificação de sinais de sobrecarga, afastamentos e clima.",
     duracao: "3 a 4 semanas",
   },
   {
-    titulo: "Fase 2 — Análise Técnica e Escuta",
-    descricao: "Escuta qualitativa e quantitativa, identificação de grupos expostos e consolidação crítica dos achados.",
-    duracao: "3 a 5 semanas",
-  },
-  {
-    titulo: "Fase 3 — Estruturação Documental",
-    descricao: "Elaboração do PGR/GRO com inclusão dos riscos psicossociais, plano de ação e governança integrada.",
+    titulo: "Fase 2 — Estruturação e Governança",
+    descricao: "Elaboração do PGR/GRO conforme nova NR-1, integrando riscos psicossociais e definindo o mapa de processos de risco.",
     duracao: "4 a 6 semanas",
   },
   {
-    titulo: "Fase 4 — Aculturamento e Liderança",
-    descricao: "Mentoria estratégica, desenvolvimento de líderes e implementação de canais de escuta seguros.",
-    duracao: "Contínua",
+    titulo: "Fase 3 — Consolidação e Liderança",
+    descricao: "Mentoria estratégica para líderes, implementação de canais de escuta e aculturamento para sustentação da conformidade.",
+    duracao: "Contínua / 3 meses",
   },
 ];
 
 export const DEFAULT_ENTREGAVEIS = [
   "Diagnóstico completo de riscos psicossociais por função",
-  "PGR atualizado conforme NR-1 (versão 2024)",
-  "Inventário de Riscos Psicossociais",
-  "Plano de Ação priorizado e cronograma de execução",
-  "Relatório executivo para liderança e conselho",
-  "Material de comunicação e aculturamento interno",
+  "PGR atualizado conforme NR-1 (com riscos psicossociais)",
+  "Inventário de Riscos e Plano de Ação priorizado",
+  "Relatório executivo com impacto financeiro e reputacional",
+  "Material de orientação para lideranças e aculturamento",
   "Certificado de conformidade técnica",
 ];

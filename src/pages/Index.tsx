@@ -224,52 +224,35 @@ const Index = () => {
               <div>
                 <span className="text-secondary font-semibold text-xs tracking-widest uppercase">Soluções</span>
                 <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-primary mt-2 mb-5 leading-tight">
-                  Como atuo nas organizações
+                  Serviço NR-1: Governança e Riscos Psicossociais
                 </h2>
                 <div className="text-foreground/70 text-sm md:text-[0.95rem] leading-[1.75] md:leading-[1.85] space-y-4">
-                  <p>Soluções estruturadas em desenvolvimento humano, gestão do tempo e performance organizacional.</p>
-                  <p>Atuo como parceira estratégica de empresas que buscam melhorar resultados sem ampliar sobrecarga, organizando rotina, processos e relações de trabalho.</p>
-                  <ul className="space-y-3 pl-1 mt-6">
-                    {[
-                      { title: "Palestras Corporativas de Alto Impacto", desc: "Gestão do tempo, saúde mental e performance com base técnica." },
-                      { title: "Treinamentos em Gestão do Tempo e Soft Skills", desc: "Práticos e personalizados para organização da rotina e priorização." },
-                      { title: "Consultoria Estratégica em Processos", desc: "Revisão de fluxos e acordos para reduzir retrabalho e sobrecarga." },
-                      { title: "Diagnóstico Estratégico de Performance", desc: "Leitura sistêmica dos times, riscos psicossociais e gargalos." },
-                      { title: "Mentoria Executiva para Lideranças", desc: "Fortalecimento da liderança e tomada de decisão consciente." }
-                    ].map((item, i) => (
-                      <li key={i} className="flex gap-3 items-start">
-                        <CheckCircle className="text-secondary h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="text-primary font-bold block text-sm">{item.title}</span>
-                          <span className="text-foreground/70 text-xs">{item.desc}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="space-y-4 md:pt-14">
-                <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10">
-                  <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
-                    <Award className="h-5 w-5 text-secondary" />
-                    Método Gestão 360º
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">Metodologia própria que integra gestão do tempo, comportamento, processos e desenvolvimento humano.</p>
-                  <div className="grid grid-cols-1 gap-3">
-                    {[
-                      "Organização da rotina e do tempo",
-                      "Clareza de papéis e decisões",
-                      "Desenvolvimento de Soft Skills",
-                      "Alinhamento entre pessoas e processos"
-                    ].map((step, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs font-medium text-primary/80">
-                        <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-                        {step}
+                  <p>Minha atuação em NR-1 foca no que realmente importa: a <strong>saúde mental</strong> e a <strong>segurança jurídica</strong> da sua empresa através do Método Gestão 360.</p>
+                  <div className="space-y-6 mt-8">
+                    <div className="flex gap-4">
+                      <div className="h-8 w-8 rounded-full bg-secondary/20 text-secondary flex items-center justify-center flex-shrink-0 font-bold text-sm">1</div>
+                      <div>
+                        <h4 className="font-bold text-primary text-base">Diagnóstico de Campo (Escuta e Dados)</h4>
+                        <p className="text-xs mt-1">Mapeamento qualitativo e quantitativo para identificar sobrecarga e riscos invisíveis.</p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="h-8 w-8 rounded-full bg-secondary/20 text-secondary flex items-center justify-center flex-shrink-0 font-bold text-sm">2</div>
+                      <div>
+                        <h4 className="font-bold text-primary text-base">Estruturação e Governança</h4>
+                        <p className="text-xs mt-1">Elaboração do PGR/GRO integrado à nova NR-1, com mapa de processos de risco claro.</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="h-8 w-8 rounded-full bg-secondary/20 text-secondary flex items-center justify-center flex-shrink-0 font-bold text-sm">3</div>
+                      <div>
+                        <h4 className="font-bold text-primary text-base">Consolidação e Liderança</h4>
+                        <p className="text-xs mt-1">Mentoria para líderes e implementação de canais de escuta para sustentação dos resultados.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-secondary/10 rounded-3xl p-6 border border-secondary/20">
                   <h3 className="text-lg font-bold text-primary mb-2 flex items-center gap-2">
                     <Users className="h-5 w-5 text-secondary" />

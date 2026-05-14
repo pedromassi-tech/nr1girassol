@@ -248,22 +248,83 @@ const PublicProposal = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-16 space-y-12 sm:space-y-20">
-        {/* RESUMO DO ESCOPO */}
-        {proposal.escopoResumo && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="border-l-4 border-secondary bg-secondary/5 rounded-r-2xl p-6 sm:p-8"
-          >
-            <h2 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Target className="h-4 w-4" /> Sobre esta proposta
-            </h2>
-            <p className="text-base sm:text-lg text-foreground/85 leading-relaxed whitespace-pre-line">
-              {proposal.escopoResumo}
+        {/* QUEM É MARIA / INSTITUTO GIRASSOL */}
+        <Section
+          eyebrow="Autoridade"
+          title="Quem é Maria Resende / Instituto Girassol"
+          subtitle="Trajetória dedicada ao desenvolvimento humano e governança de risco."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-muted/20 rounded-3xl p-6 sm:p-10 border border-border">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                <Award className="h-3.5 w-3.5" /> Especialista em Gestão 360
+              </div>
+              <p className="text-foreground/80 leading-relaxed italic">
+                "Minha missão é transformar a conformidade da NR-1 em produtividade sustentável, protegendo a saúde mental dos times e a segurança jurídica das empresas."
+              </p>
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <div className="h-5 w-5 rounded-full bg-secondary/20 text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="h-3 w-3" />
+                  </div>
+                  <p className="text-sm text-foreground/75"><span className="font-bold text-primary">Método Gestão 360:</span> Abordagem sistêmica que integra pessoas, processos e conformidade.</p>
+                </div>
+                <div className="flex gap-3">
+                  <div className="h-5 w-5 rounded-full bg-secondary/20 text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="h-3 w-3" />
+                  </div>
+                  <p className="text-sm text-foreground/75"><span className="font-bold text-primary">Foco em NR-1:</span> Especialista em riscos psicossociais e governança estratégica de SST.</p>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop" 
+                alt="Maria Resende" 
+                className="rounded-2xl shadow-xl w-full object-cover aspect-[4/5]" 
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* OBJETIVOS DO CLIENTE */}
+        <Section
+          eyebrow="Validação"
+          title="Objetivos do projeto"
+          subtitle="O que buscamos alcançar com esta parceria, com base nas suas prioridades."
+        >
+          <div className="bg-secondary/5 border-l-4 border-secondary p-6 sm:p-8 rounded-r-2xl">
+            <h3 className="text-lg font-bold text-primary mb-4">O que a {proposal.clienteEmpresa} busca:</h3>
+            <p className="text-lg text-foreground/80 italic leading-relaxed">
+              "{proposal.escopoResumo || "Reduzir riscos, organizar rotina e cumprir a NR-1 com foco em saúde mental e produtividade."}"
             </p>
-          </motion.section>
-        )}
+          </div>
+        </Section>
+
+        {/* CENÁRIO ATUAL */}
+        <Section
+          eyebrow="Diagnóstico"
+          title="Onde estamos hoje"
+          subtitle="Panorama atual baseado nos dados do quiz e da calculadora."
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-card border rounded-2xl p-6">
+              <h4 className="font-bold text-primary mb-1">Score de Risco</h4>
+              <p className="text-xs text-muted-foreground">Impacto financeiro e multas.</p>
+              <div className="mt-4 text-2xl font-bold text-orange-600">Médio/Alto</div>
+            </div>
+            <div className="bg-card border rounded-2xl p-6">
+              <h4 className="font-bold text-primary mb-1">Conformidade NR-1</h4>
+              <p className="text-xs text-muted-foreground">Status atual fiscalização.</p>
+              <div className="mt-4 text-2xl font-bold text-red-600">Crítico</div>
+            </div>
+            <div className="bg-card border rounded-2xl p-6">
+              <h4 className="font-bold text-primary mb-1">Sintomas</h4>
+              <p className="text-xs text-muted-foreground">Sobrecarga detectada.</p>
+              <div className="mt-4 text-sm font-semibold">Risco de Turnover</div>
+            </div>
+          </div>
+        </Section>
 
         {/* CONTEXTO DO CLIENTE */}
         <Section
@@ -314,44 +375,42 @@ const PublicProposal = () => {
           </Section>
         )}
 
-        {/* FASES */}
-        {proposal.fases.length > 0 && (
-          <Section
-            eyebrow="Metodologia"
-            title="Como vamos executar"
-            subtitle={`Projeto com prazo estimado de ${proposal.prazoMeses} ${proposal.prazoMeses === 1 ? "mês" : "meses"}.`}
-          >
-            <div className="space-y-3 sm:space-y-4">
-              {proposal.fases.filter(f => f.titulo).map((fase, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="relative pl-12 sm:pl-16 pb-4 border-l-2 border-secondary/30 ml-4"
-                >
-                  <div className="absolute -left-5 top-0 h-10 w-10 rounded-full hero-gradient text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
-                    {i + 1}
-                  </div>
-                  <div className="bg-card border rounded-xl p-4 sm:p-5">
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg font-bold text-primary">{fase.titulo}</h3>
-                      {fase.duracao && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
-                          <Clock className="h-3 w-3" /> {fase.duracao}
-                        </span>
-                      )}
-                    </div>
-                    {fase.descricao && (
-                      <p className="text-sm text-foreground/75 leading-relaxed">{fase.descricao}</p>
+        {/* SOLUÇÃO (FASES) */}
+        <Section
+          eyebrow="Solução"
+          title="Caminho para o resultado"
+          subtitle={`Como vamos transformar seu cenário atual em conformidade e performance em ${proposal.prazoMeses} meses.`}
+        >
+          <div className="space-y-3 sm:space-y-4">
+            {proposal.fases.filter(f => f.titulo).map((fase, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="relative pl-12 sm:pl-16 pb-4 border-l-2 border-secondary/30 ml-4"
+              >
+                <div className="absolute -left-5 top-0 h-10 w-10 rounded-full hero-gradient text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
+                  {i + 1}
+                </div>
+                <div className="bg-card border rounded-xl p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-primary">{fase.titulo}</h3>
+                    {fase.duracao && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
+                        <Clock className="h-3 w-3" /> {fase.duracao}
+                      </span>
                     )}
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-        )}
+                  {fase.descricao && (
+                    <p className="text-sm text-foreground/75 leading-relaxed">{fase.descricao}</p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
 
         {/* ENTREGÁVEIS */}
         {proposal.entregaveis.length > 0 && (
@@ -373,6 +432,18 @@ const PublicProposal = () => {
             </div>
           </Section>
         )}
+
+        {/* VALIDAÇÃO FINAL (OBJETIVOS DE NOVO) */}
+        <section className="bg-primary/5 rounded-3xl p-8 border border-primary/10 text-center">
+          <p className="text-xs font-bold text-primary/60 uppercase tracking-widest mb-4">Confirmação de Escopo</p>
+          <h3 className="text-2xl font-bold text-primary mb-4 italic">
+            "Se a gente chegar nesse cenário, está ótimo pra mim."
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Essa frase de um de nossos clientes resume o foco desta proposta: entregar exatamente o que foi validado como prioritário para a <strong>{proposal.clienteEmpresa}</strong>.
+          </p>
+        </section>
+
 
         {/* INVESTIMENTO */}
         {proposal.investimentoTotal > 0 && (
