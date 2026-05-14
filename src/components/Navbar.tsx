@@ -13,6 +13,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const isBlogPage = location.pathname.startsWith("/blog");
+  const isCopsoqPage = location.pathname === "/copsoq";
   const isDarkBg = !scrolled && !isBlogPage;
 
   useEffect(() => {
@@ -72,13 +73,15 @@ const Navbar = () => {
               {l.label}
             </button>
           ))}
-          <Button
-            onClick={() => navigate("/quiz")}
-            size="sm"
-            className="gold-gradient border-0 text-primary font-semibold shadow-md hover:shadow-lg transition-shadow"
-          >
-            Fazer o teste
-          </Button>
+          {!isCopsoqPage && (
+            <Button
+              onClick={() => navigate("/quiz")}
+              size="sm"
+              className="gold-gradient border-0 text-primary font-semibold shadow-md hover:shadow-lg transition-shadow"
+            >
+              Fazer o teste
+            </Button>
+          )}
         </nav>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -107,12 +110,14 @@ const Navbar = () => {
                   {l.label}
                 </button>
               ))}
-              <Button 
-                onClick={() => navigate("/quiz")} 
-                className="gold-gradient border-0 text-primary font-semibold mt-2 w-full"
-              >
-                Fazer o teste
-              </Button>
+              {!isCopsoqPage && (
+                <Button 
+                  onClick={() => navigate("/quiz")} 
+                  className="gold-gradient border-0 text-primary font-semibold mt-2 w-full"
+                >
+                  Fazer o teste
+                </Button>
+              )}
             </nav>
           </motion.div>
         )}
