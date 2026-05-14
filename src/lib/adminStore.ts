@@ -3,6 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
+export interface CopsoqToken {
+  id: string;
+  token: string;
+  empresa: string;
+  usado: boolean;
+  usadoEm?: string;
+  createdAt: string;
+}
+
 export type LeadStatus = "novo" | "em_contato" | "negociando" | "fechado" | "perdido";
 
 export interface Lead {
@@ -317,4 +326,47 @@ export function getSession(): { email: string; nome: string } | null {
 
 export function logout() {
   removeItem(SESSION_KEY);
+}
+
+// ─── COPSOQ TOKENS ───
+const TOKENS_KEY = "girassol_copsoq_tokens";
+
+export function getCopsoqTokens(): CopsoqToken[] {
+  return getItem<CopsoqToken[]>(TOKENS_KEY, []);
+}
+
+export function generateCopsoqToken(empresa: string): CopsoqToken {
+  const tokens = getCopsoqTokens();
+  const newToken: CopsoqToken = {
+    id: crypto.randomUUID(),
+    token: Math.random().toString(36).substring(2, 8).toUpperCase(),
+    empresa,
+    usado: false,
+    createdAt: new Date().toISOString(),
+  };
+  tokens.push(newToken);
+  setItem(TOKENS_KEY, tokens);
+  return newToken;
+}
+
+export function validateCopsoqToken(tokenStr: string): CopsoqToken | null {
+  const tokens = getCopsoqTokens();
+  const found = tokens.find(t => t.token === tokenStr.toUpperCase());
+  if (!found) return null;
+  return found;
+}
+
+export function useCopsoqToken(tokenId: string) {
+  const tokens = getCopsoqTokens();
+  const idx = tokens.findIndex(t => t.id === tokenId);
+  if (idx !== -1) {
+    tokens[idx].usado = true;
+    tokens[idx].usadoEm = new Date().toISOString();
+    setItem(TOKENS_KEY, tokens);
+  }
+}
+
+export function deleteCopsoqToken(tokenId: string) {
+  const tokens = getCopsoqTokens();
+  setItem(TOKENS_KEY, tokens.filter(t => t.id !== tokenId));
 }
