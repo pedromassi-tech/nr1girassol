@@ -6,8 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   getSession, logout, getLeads, getPageViews, getQuizCompletions,
   getAdmins, addAdmin, removeAdmin, updateLead, deleteLead, loginAdmin,
-  getCalculatorCompletions,
-  type Lead, type AdminUser, type QuizCompletion, type CalculatorCompletion, type LeadStatus,
+  getCalculatorCompletions, getCopsoqTokens, generateCopsoqToken, deleteCopsoqToken,
+  type Lead, type AdminUser, type QuizCompletion, type CalculatorCompletion, type LeadStatus, type CopsoqToken,
 } from "@/lib/adminStore";
 import {
   Users, Eye, ClipboardCheck, LogOut, UserPlus, Trash2,
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
   const [session, setSession] = useState(getSession());
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "propostas" | "blog" | "admins">("crm");
+  const [tab, setTab] = useState<"crm" | "metricas" | "calculadora" | "copsoq" | "propostas" | "blog" | "admins">("crm");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [quizzes, setQuizzes] = useState<QuizCompletion[]>([]);
   const [calcResults, setCalcResults] = useState<CalculatorCompletion[]>([]);
@@ -62,6 +62,8 @@ const AdminDashboard = () => {
   });
   const [creatorChoice, setCreatorChoice] = useState<{ open: boolean; lead: Lead | null }>({ open: false, lead: null });
   const [proposalsSearch, setProposalsSearch] = useState("");
+  const [copsoqTokens, setCopsoqTokens] = useState<CopsoqToken[]>([]);
+  const [newTokenEmpresa, setNewTokenEmpresa] = useState("");
 
   const refreshData = async () => {
     try {
@@ -78,6 +80,7 @@ const AdminDashboard = () => {
       setCalcResults(calcData);
       setProposals(proposalsData);
       setAdmins(getAdmins());
+      setCopsoqTokens(getCopsoqTokens());
     } catch {
       setLeads([]);
       setQuizzes([]);
@@ -186,6 +189,21 @@ const AdminDashboard = () => {
     setLoginError("E-mail ou senha incorretos.");
   };
 
+  const handleGenerateCopsoqToken = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTokenEmpresa) return;
+    generateCopsoqToken(newTokenEmpresa);
+    setNewTokenEmpresa("");
+    refreshData();
+    toast({ title: "Token gerado com sucesso!" });
+  };
+
+  const handleDeleteToken = (id: string) => {
+    if (!confirm("Excluir este token?")) return;
+    deleteCopsoqToken(id);
+    refreshData();
+  };
+
   if (!session) {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
@@ -281,6 +299,7 @@ const AdminDashboard = () => {
             { key: "crm" as const, label: `CRM (${leads.length})` },
             { key: "metricas" as const, label: "Métricas" },
             { key: "calculadora" as const, label: `Calculadora (${calcResults.length})` },
+            { key: "copsoq" as const, label: `COPSOQ (${copsoqTokens.length})` },
             { key: "propostas" as const, label: `Propostas (${proposals.length})` },
             { key: "blog" as const, label: "Blog" },
             { key: "admins" as const, label: `Admins (${admins.length})` },
@@ -791,6 +810,85 @@ const AdminDashboard = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── COPSOQ TAB ─── */}
+        {tab === "copsoq" && (
+          <div className="space-y-6">
+            <div className="bg-card rounded-xl border p-6">
+              <h3 className="text-lg font-bold text-primary mb-4">Gerar Novo Token COPSOQ</h3>
+              <form onSubmit={handleGenerateCopsoqToken} className="flex gap-2">
+                <Input 
+                  placeholder="Nome da Empresa (ex: ACME Corp)" 
+                  value={newTokenEmpresa}
+                  onChange={(e) => setNewTokenEmpresa(e.target.value)}
+                  className="flex-1"
+                />
+                <Button type="submit" className="hero-gradient border-0 text-primary-foreground gap-2">
+                  <Plus className="h-4 w-4" /> Gerar Token
+                </Button>
+              </form>
+              <p className="text-[10px] text-muted-foreground mt-2 uppercase font-medium tracking-wider">
+                Cada token permite um acesso único ao diagnóstico psicossocial simplificado.
+              </p>
+            </div>
+
+            <div className="bg-card rounded-xl border overflow-hidden">
+              <div className="p-4 border-b bg-muted/20">
+                <h3 className="text-sm font-bold text-primary">Tokens Gerados</h3>
+              </div>
+              <div className="divide-y">
+                {copsoqTokens.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground text-sm">
+                    Nenhum token gerado ainda.
+                  </div>
+                ) : (
+                  copsoqTokens.map((t) => (
+                    <div key={t.id} className="p-4 flex items-center justify-between hover:bg-muted/5 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-bold text-primary truncate">{t.empresa}</span>
+                          {t.usado ? (
+                            <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold border border-green-200">USADO</span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold border border-blue-200">DISPONÍVEL</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                          <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground font-bold text-sm tracking-wider">{t.token}</span>
+                          <span>Criado em: {new Date(t.createdAt).toLocaleDateString("pt-BR")}</span>
+                          {t.usadoEm && <span>Usado em: {new Date(t.usadoEm).toLocaleDateString("pt-BR")}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(t.token);
+                            toast({ title: "Token copiado!" });
+                          }}
+                          className="h-8 w-8"
+                          title="Copiar Token"
+                        >
+                          <Copy className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleDeleteToken(t.id)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          title="Excluir Token"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         )}
 
