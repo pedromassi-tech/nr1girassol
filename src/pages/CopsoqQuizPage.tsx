@@ -13,6 +13,8 @@ import { toast } from "@/hooks/use-toast";
 const CopsoqQuizPage = () => {
   const [token, setToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState({ empresa: "", cargo: "" });
   const [validatedToken, setValidatedToken] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -26,7 +28,9 @@ const CopsoqQuizPage = () => {
         toast({ title: "Token já utilizado", description: "Este token já foi usado para realizar o quiz.", variant: "destructive" });
       } else {
         setValidatedToken(result);
+        setCompanyInfo(prev => ({ ...prev, empresa: result.empresa }));
         setIsAuthenticated(true);
+        setShowCompanyForm(true);
         toast({ title: "Acesso liberado", description: `Bem-vindo à análise da ${result.empresa}` });
       }
     } else {
@@ -53,15 +57,24 @@ const CopsoqQuizPage = () => {
     
     // Salvar como lead no CRM
     await addLead({
-      nome: `Colaborador (${validatedToken.empresa})`,
+      nome: `Colaborador (${companyInfo.empresa})`,
       email: "copsoq-anonimo@girassol.com",
       whatsapp: "",
-      empresa: validatedToken.empresa,
-      cargo: "Colaborador",
+      empresa: companyInfo.empresa,
+      cargo: companyInfo.cargo || "Colaborador",
       desafio: `Quiz COPSOQ — Score: ${score}/100 — ${level}`,
     });
     
     setShowResult(true);
+  };
+
+  const handleCompanySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyInfo.empresa || !companyInfo.cargo) {
+      toast({ title: "Campos obrigatórios", description: "Por favor, preencha o nome da empresa e seu cargo.", variant: "destructive" });
+      return;
+    }
+    setShowCompanyForm(false);
   };
 
   const progress = (currentStep / copsoqQuestions.length) * 100;
@@ -93,6 +106,42 @@ const CopsoqQuizPage = () => {
                 />
                 <Button type="submit" className="w-full hero-gradient text-primary font-bold py-6">
                   Acessar Quiz
+                </Button>
+              </form>
+            </motion.div>
+          ) : showCompanyForm ? (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card p-8 rounded-3xl border shadow-xl max-w-md mx-auto">
+              <div className="text-center mb-8">
+                <div className="h-16 w-16 rounded-2xl gold-gradient flex items-center justify-center mx-auto mb-4 shadow-md text-primary">
+                  <Building2 className="h-8 w-8" />
+                </div>
+                <h1 className="text-2xl font-bold text-primary">Identificação</h1>
+                <p className="text-muted-foreground mt-2">Para prosseguir, confirme os dados da empresa e seu cargo.</p>
+              </div>
+              
+              <form onSubmit={handleCompanySubmit} className="space-y-4 text-left">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-primary uppercase tracking-widest ml-1">Empresa</label>
+                  <Input 
+                    placeholder="Nome da empresa" 
+                    value={companyInfo.empresa} 
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, empresa: e.target.value })}
+                    className="py-6"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-primary uppercase tracking-widest ml-1">Seu Cargo</label>
+                  <Input 
+                    placeholder="Ex: Gerente, Operador, Analista..." 
+                    value={companyInfo.cargo} 
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, cargo: e.target.value })}
+                    className="py-6"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full hero-gradient text-primary font-bold py-6 mt-4">
+                  Iniciar Análise <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
             </motion.div>
